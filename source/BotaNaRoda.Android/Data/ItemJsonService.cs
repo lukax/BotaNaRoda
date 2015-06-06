@@ -32,7 +32,7 @@ namespace BotaNaRoda.Android.Data
             RefreshCache();
         }
 
-        public IEnumerable<Item> GetAllItems()
+		public IReadOnlyList<Item> GetAllItems()
         {
             return _items;
         }

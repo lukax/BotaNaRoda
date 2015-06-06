@@ -15,7 +15,7 @@ namespace BotaNaRoda.Android.Data
 {
     public interface IItemDataService
     {
-        IEnumerable<Item> GetAllItems();
+		IReadOnlyList<Item> GetAllItems();
         void RefreshCache();
         Item GetItem(string id);
         void SaveItem(Item item);
