@@ -52,6 +52,12 @@ namespace BotaNaRoda.Android
 			}
 		}
 
+		protected override void OnResume ()
+		{
+			base.OnResume ();
+			_adapter.NotifyDataSetChanged ();
+		}
+
 		void _itemsListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
 		{
 			Intent itemDetailIntent = new Intent (this, typeof(ItemDetailActivity));

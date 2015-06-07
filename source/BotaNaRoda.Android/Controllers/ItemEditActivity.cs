@@ -75,7 +75,19 @@ namespace BotaNaRoda.Android
 
 		void DeleteItem ()
 		{
+			AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
+			alertConfirm.SetCancelable (false);
+			alertConfirm.SetPositiveButton ("OK", ConfirmDelete);
+			alertConfirm.SetNegativeButton ("Cancel", delegate {});
+			alertConfirm.SetMessage ("Tem certeza que quer remover o Item?");
+			alertConfirm.Show ();
+		}
+
+		void ConfirmDelete(object sender, EventArgs e)
+		{
 			ItemData.Service.DeleteItem (_item);
+			Toast toast = Toast.MakeText (this, "Item removido", ToastLength.Short);
+			toast.Show ();
 			Finish ();
 		}
 
