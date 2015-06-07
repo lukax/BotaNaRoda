@@ -45,10 +45,28 @@ namespace BotaNaRoda.Android
 		{
 			
 			// aapt resource value: 0x7f020000
-			public const int Icon = 2130837504;
+			public const int ic_delete = 2130837504;
 			
 			// aapt resource value: 0x7f020001
-			public const int monoandroidsplash = 2130837505;
+			public const int ic_gps = 2130837505;
+			
+			// aapt resource value: 0x7f020002
+			public const int ic_map = 2130837506;
+			
+			// aapt resource value: 0x7f020003
+			public const int ic_mode_edit = 2130837507;
+			
+			// aapt resource value: 0x7f020004
+			public const int ic_refresh = 2130837508;
+			
+			// aapt resource value: 0x7f020005
+			public const int ic_save = 2130837509;
+			
+			// aapt resource value: 0x7f020006
+			public const int Icon = 2130837510;
+			
+			// aapt resource value: 0x7f020007
+			public const int monoandroidsplash = 2130837511;
 			
 			static Drawable()
 			{
@@ -63,26 +81,29 @@ namespace BotaNaRoda.Android
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f07000a
-			public const int actionDelete = 2131165194;
+			// aapt resource value: 0x7f07000e
+			public const int actionDelete = 2131165198;
 			
-			// aapt resource value: 0x7f07000b
-			public const int actionNew = 2131165195;
+			// aapt resource value: 0x7f07000f
+			public const int actionNew = 2131165199;
 			
-			// aapt resource value: 0x7f07000c
-			public const int actionRefresh = 2131165196;
+			// aapt resource value: 0x7f070010
+			public const int actionRefresh = 2131165200;
 			
-			// aapt resource value: 0x7f070009
-			public const int actionSave = 2131165193;
+			// aapt resource value: 0x7f07000d
+			public const int actionSave = 2131165197;
+			
+			// aapt resource value: 0x7f070004
+			public const int itemAddressText = 2131165188;
 			
 			// aapt resource value: 0x7f070003
-			public const int itemCreateDescription = 2131165187;
+			public const int itemDescriptionText = 2131165187;
 			
-			// aapt resource value: 0x7f070007
-			public const int itemsAuthor = 2131165191;
+			// aapt resource value: 0x7f07000a
+			public const int itemsAuthor = 2131165194;
 			
-			// aapt resource value: 0x7f070008
-			public const int itemsDescription = 2131165192;
+			// aapt resource value: 0x7f07000b
+			public const int itemsDescription = 2131165195;
 			
 			// aapt resource value: 0x7f070001
 			public const int itemsDetailAuthor = 2131165185;
@@ -93,14 +114,23 @@ namespace BotaNaRoda.Android
 			// aapt resource value: 0x7f070000
 			public const int itemsDetailImage = 2131165184;
 			
-			// aapt resource value: 0x7f070006
-			public const int itemsImageView = 2131165190;
+			// aapt resource value: 0x7f07000c
+			public const int itemsDistance = 2131165196;
 			
-			// aapt resource value: 0x7f070004
-			public const int itemsListView = 2131165188;
+			// aapt resource value: 0x7f070009
+			public const int itemsImageView = 2131165193;
+			
+			// aapt resource value: 0x7f070007
+			public const int itemsListView = 2131165191;
 			
 			// aapt resource value: 0x7f070005
-			public const int relativeLayout1 = 2131165189;
+			public const int locationImageButton = 2131165189;
+			
+			// aapt resource value: 0x7f070006
+			public const int mapImageButton = 2131165190;
+			
+			// aapt resource value: 0x7f070008
+			public const int relativeLayout1 = 2131165192;
 			
 			static Id()
 			{

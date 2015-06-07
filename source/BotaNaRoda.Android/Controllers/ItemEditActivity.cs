@@ -11,27 +11,49 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Android.Entity;
+using Android.Locations;
+using Android.Content.PM;
 
 namespace BotaNaRoda.Android
 {
-	[Activity (Label = "ItemEditActivity")]			
-	public class ItemEditActivity : Activity
+	[Activity (Label = "ItemEditActivity",
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
+	public class ItemEditActivity : Activity, ILocationListener
 	{
 		EditText _itemDescriptionView;
 		Item _item;
+		LocationManager _locMgr;
+		ImageButton _locationImageButton;
+		EditText _itemAddressView;
+		Location currentLocation; 
+		ProgressDialog _progressDialog;
 
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.ItemEdit);
 		
-			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemCreateDescription);
+			_locMgr = GetSystemService(Context.LocationService) as LocationManager;
+
+			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescriptionText);
+			_itemAddressView = FindViewById<EditText> (Resource.Id.itemAddressText);
+			_locationImageButton = FindViewById<ImageButton> (Resource.Id.locationImageButton);
+			_locationImageButton.Click += _locationImageButton_Click;
 
 			_item = new Item ();
 			if (Intent.HasExtra ("itemId")) {
 				_item = ItemData.Service.GetAllItems () [Intent.GetIntExtra ("itemId", 0)];
 				UpdateUI ();
 			}
+		}
+
+		void _locationImageButton_Click (object sender, EventArgs e)
+		{
+			Criteria criteria = new Criteria ();
+			criteria.Accuracy = Accuracy.Fine;
+			criteria.PowerRequirement = Power.High;
+			_locMgr.RequestSingleUpdate (criteria, this, null);
+			_progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
 		}
 
 		public override bool OnCreateOptionsMenu (IMenu menu)
@@ -68,7 +90,15 @@ namespace BotaNaRoda.Android
 
 		void SaveItem ()
 		{
+			if (currentLocation == null) {
+				Toast toast = Toast.MakeText (this, "Não é possivel salvar item sem a localização!", ToastLength.Short);
+				toast.Show ();
+				return;
+			}
+
 			_item.Description = _itemDescriptionView.Text;
+			_item.Latitude = currentLocation.Latitude;
+			_item.Longitude = currentLocation.Longitude;
 			ItemData.Service.SaveItem (_item);
 			Finish ();
 		}
@@ -94,6 +124,41 @@ namespace BotaNaRoda.Android
 		void UpdateUI ()
 		{
 			_itemDescriptionView.Text = _item.Description;
+		}
+
+		void UpdateAddressFields(Address address){
+			if(String.IsNullOrEmpty(_itemAddressView.Text)) {
+				for (int i = 0; i < address.MaxAddressLineIndex; i++) {
+					if (!String.IsNullOrEmpty(_itemAddressView.Text))
+						_itemAddressView.Text += System.Environment.NewLine;
+					_itemAddressView.Text += address.GetAddressLine (i);
+				}
+			}
+		}
+
+		public void OnLocationChanged (Location location)
+		{
+			currentLocation = location;
+
+			Geocoder geocdr = new Geocoder (this);
+			var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
+			if (addresses.Any ()) {
+				UpdateAddressFields (addresses.First ());
+			}
+
+			_progressDialog.Cancel ();
+		}
+
+		public void OnProviderDisabled (string provider)
+		{
+		}
+
+		public void OnProviderEnabled (string provider)
+		{
+		}
+
+		public void OnStatusChanged (string provider, Availability status, Bundle extras)
+		{
 		}
 	}
 }

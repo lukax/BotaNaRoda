@@ -21,4 +21,11 @@
         p1:layout_below="@id/itemsAuthor"
         p1:layout_toRightOf="@id/itemsImageView"
         p1:id="@+id/itemsDescription" />
+    <TextView
+        p1:text="200m"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_below="@id/itemsDescription"
+        p1:id="@+id/itemsDistance"
+        p1:layout_toRightOf="@id/itemsAuthor" />
 </RelativeLayout>

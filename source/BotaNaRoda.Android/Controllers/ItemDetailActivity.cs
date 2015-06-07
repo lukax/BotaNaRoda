@@ -11,10 +11,12 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Android.Entity;
+using Android.Content.PM;
 
 namespace BotaNaRoda.Android
 {
-	[Activity (Label = "ItemDetailActivity")]			
+	[Activity (Label = "ItemDetailActivity",
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
 	public class ItemDetailActivity : Activity
 	{
 		ImageView _itemImageView;

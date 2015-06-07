@@ -70,6 +70,12 @@
     <AndroidResource Include="Resources\layout\ItemDetail.axml" />
     <AndroidResource Include="Resources\layout\ItemEdit.axml" />
     <AndroidResource Include="Resources\menu\ItemEditMenu.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_delete.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_gps.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_map.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_mode_edit.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_refresh.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_save.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
@@ -97,5 +103,6 @@
   <ItemGroup>
     <Folder Include="Resources\menu\" />
     <Folder Include="Controllers\" />
+    <Folder Include="Resources\drawable-hdpi\" />
   </ItemGroup>
 </Project>

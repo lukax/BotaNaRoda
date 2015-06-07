@@ -4,12 +4,14 @@ using BotaNaRoda.Android.Entity;
 using Android.App;
 using Android.Views;
 using System.Linq;
+using Android.Locations;
 
 namespace BotaNaRoda.Android
 {
 	public class ItemsListAdapter : BaseAdapter<Item>
 	{
 		Activity context;
+		public Location CurrentLocation { get; set; }
 
 		public ItemsListAdapter (Activity context)
 		{
@@ -30,6 +32,20 @@ namespace BotaNaRoda.Android
 			var item = this [position];
 			view.FindViewById<TextView> (Resource.Id.itemsAuthor).Text = "Me";
 			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Description;
+
+			if ((CurrentLocation != null) && (item.Latitude.HasValue) && (item.Longitude.HasValue)) {
+				Location itemLocation = new Location ("");
+				itemLocation.Latitude = item.Latitude.Value;
+				itemLocation.Longitude = item.Longitude.Value;
+				float distance = CurrentLocation.DistanceTo (itemLocation);
+				view.FindViewById<TextView>
+				(Resource.Id.itemsDistance).Text = String.Format("{0:0,0.00}m", distance);
+			}
+			else {
+				view.FindViewById<TextView>
+				(Resource.Id.itemsDistance).Text = "??";
+			}
+
 			return view;
 		}
 

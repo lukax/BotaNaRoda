@@ -9,6 +9,28 @@
         android:inputType="textMultiLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/itemCreateDescription"
+        android:id="@+id/itemDescriptionText"
         android:hint="Description" />
+    <EditText
+        android:inputType="textPostalAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemAddressText"
+        android:hint="Address" />
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:src="@drawable/ic_gps"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/locationImageButton" />
+        <ImageButton
+            android:src="@drawable/ic_map"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/mapImageButton" />
+    </LinearLayout>
 </LinearLayout>
