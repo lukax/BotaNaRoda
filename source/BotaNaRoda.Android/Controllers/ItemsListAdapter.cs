@@ -26,8 +26,10 @@ namespace BotaNaRoda.Android
 		public override View GetView (int position, View convertView, ViewGroup parent)
 		{
 			var view = convertView ?? context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, null);
-			view.FindViewById<TextView> (Resource.Id.itemsAuthor).Text = "asdf";
-			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = "asdf";
+
+			var item = this [position];
+			view.FindViewById<TextView> (Resource.Id.itemsAuthor).Text = "Me";
+			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Description;
 			return view;
 		}
 

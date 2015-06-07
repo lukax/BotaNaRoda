@@ -63,26 +63,44 @@ namespace BotaNaRoda.Android
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f070005
-			public const int actionNew = 2131165189;
+			// aapt resource value: 0x7f07000a
+			public const int actionDelete = 2131165194;
 			
-			// aapt resource value: 0x7f070006
-			public const int actionRefresh = 2131165190;
+			// aapt resource value: 0x7f07000b
+			public const int actionNew = 2131165195;
+			
+			// aapt resource value: 0x7f07000c
+			public const int actionRefresh = 2131165196;
+			
+			// aapt resource value: 0x7f070009
+			public const int actionSave = 2131165193;
 			
 			// aapt resource value: 0x7f070003
-			public const int itemsAuthor = 2131165187;
+			public const int itemCreateDescription = 2131165187;
 			
-			// aapt resource value: 0x7f070004
-			public const int itemsDescription = 2131165188;
+			// aapt resource value: 0x7f070007
+			public const int itemsAuthor = 2131165191;
 			
-			// aapt resource value: 0x7f070002
-			public const int itemsImageView = 2131165186;
-			
-			// aapt resource value: 0x7f070000
-			public const int itemsListView = 2131165184;
+			// aapt resource value: 0x7f070008
+			public const int itemsDescription = 2131165192;
 			
 			// aapt resource value: 0x7f070001
-			public const int relativeLayout1 = 2131165185;
+			public const int itemsDetailAuthor = 2131165185;
+			
+			// aapt resource value: 0x7f070002
+			public const int itemsDetailDescription = 2131165186;
+			
+			// aapt resource value: 0x7f070000
+			public const int itemsDetailImage = 2131165184;
+			
+			// aapt resource value: 0x7f070006
+			public const int itemsImageView = 2131165190;
+			
+			// aapt resource value: 0x7f070004
+			public const int itemsListView = 2131165188;
+			
+			// aapt resource value: 0x7f070005
+			public const int relativeLayout1 = 2131165189;
 			
 			static Id()
 			{
@@ -98,10 +116,16 @@ namespace BotaNaRoda.Android
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int Items = 2130903040;
+			public const int ItemDetail = 2130903040;
 			
 			// aapt resource value: 0x7f030001
-			public const int ItemsListItem = 2130903041;
+			public const int ItemEdit = 2130903041;
+			
+			// aapt resource value: 0x7f030002
+			public const int Items = 2130903042;
+			
+			// aapt resource value: 0x7f030003
+			public const int ItemsListItem = 2130903043;
 			
 			static Layout()
 			{
@@ -117,7 +141,10 @@ namespace BotaNaRoda.Android
 		{
 			
 			// aapt resource value: 0x7f060000
-			public const int ItemsMenu = 2131099648;
+			public const int ItemEditMenu = 2131099648;
+			
+			// aapt resource value: 0x7f060001
+			public const int ItemsMenu = 2131099649;
 			
 			static Menu()
 			{

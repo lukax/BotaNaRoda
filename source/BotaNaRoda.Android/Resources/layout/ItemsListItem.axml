@@ -5,8 +5,8 @@
     p1:id="@+id/relativeLayout1">
     <ImageView
         p1:src="@android:drawable/ic_menu_gallery"
-        p1:layout_width="200dp"
-        p1:layout_height="200dp"
+        p1:layout_width="100dp"
+        p1:layout_height="100dp"
         p1:id="@+id/itemsImageView" />
     <TextView
         p1:text="Lucas Espindola"
