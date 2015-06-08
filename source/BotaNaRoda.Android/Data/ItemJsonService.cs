@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace BotaNaRoda.Android.Data
 {
-    public class ItemJsonService : IItemDataService
+	public class ItemJsonService : IItemDataService
     {
         private readonly string _storagePath;
         private readonly List<Item> _items = new List<Item>();
@@ -52,7 +52,7 @@ namespace BotaNaRoda.Android.Data
 
         public Item GetItem(string id)
         {
-            return _items.FirstOrDefault(x => x.Id.Equals(id));
+			return _items.FirstOrDefault(x => x.Id == id);
         }
 
         public void SaveItem(Item item)
@@ -73,13 +73,24 @@ namespace BotaNaRoda.Android.Data
 
         public void DeleteItem(Item item)
         {
-            File.Delete(GetFilename(item.Id));
-            _items.Remove(item);
+			if(File.Exists(GetFilename(item.Id))){
+				File.Delete(GetFilename(item.Id));
+			}
+			if (File.Exists (GetImageFileName (item.Id))) {
+				File.Delete (GetImageFileName (item.Id));
+			}
+
+			_items.Remove(item);
         }
 
         private string GetFilename(string id)
         {
             return Path.Combine(_storagePath, string.Format("item{0}.json", id));
         }
+
+		public string GetImageFileName (string id)
+		{
+			return Path.Combine (_storagePath, string.Format("itemImage{0}.jpg", id));
+		}
     }
 }

@@ -20,5 +20,6 @@ namespace BotaNaRoda.Android.Data
         Item GetItem(string id);
         void SaveItem(Item item);
         void DeleteItem(Item item);
+		string GetImageFileName(string id);
     }
 }

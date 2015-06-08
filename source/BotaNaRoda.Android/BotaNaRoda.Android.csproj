@@ -76,6 +76,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_mode_edit.png" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_refresh.png" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_save.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\ic_photo_camera.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />

@@ -14,6 +14,8 @@ using BotaNaRoda.Android.Entity;
 using Android.Locations;
 using Android.Content.PM;
 using Android.Net;
+using Android.Provider;
+using Android.Graphics;
 
 namespace BotaNaRoda.Android
 {
@@ -21,6 +23,7 @@ namespace BotaNaRoda.Android
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
 	public class ItemEditActivity : Activity, ILocationListener
 	{
+		const int CAPTURE_PHOTO = 0;
 		EditText _itemDescriptionView;
 		Item _item;
 		LocationManager _locMgr;
@@ -29,6 +32,8 @@ namespace BotaNaRoda.Android
 		Location currentLocation; 
 		ProgressDialog _progressDialog;
 		ImageButton _mapImageButton;
+		ImageView _itemImageView;
+		ImageButton _cameraImageButton;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -43,6 +48,9 @@ namespace BotaNaRoda.Android
 			_locationImageButton.Click += _locationImageButton_Click;
 			_mapImageButton = FindViewById<ImageButton> (Resource.Id.mapImageButton);
 			_mapImageButton.Click += _mapImageButton_Click;
+			_cameraImageButton = FindViewById<ImageButton> (Resource.Id.cameraImageButton);
+			_cameraImageButton.Click += _cameraImageButton_Click;
+			_itemImageView = FindViewById<ImageView> (Resource.Id.itemImageView);
 
 			_item = new Item ();
 			if (Intent.HasExtra ("itemId")) {
@@ -50,42 +58,7 @@ namespace BotaNaRoda.Android
 				UpdateUI ();
 			}
 		}
-
-		void _mapImageButton_Click (object sender, EventArgs e)
-		{
-			global::Android.Net.Uri geoUri;
-			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
-				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
-			} else {
-				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
-			}
-			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
-
-			PackageManager packageManager = PackageManager;
-			IList<ResolveInfo> activities =
-				packageManager.QueryIntentActivities(mapIntent, 0);
-			if (activities.Count == 0) {
-				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
-				alertConfirm.SetCancelable (false);
-				alertConfirm.SetPositiveButton ("OK", delegate {
-				});
-				alertConfirm.SetMessage ("No map app available.");
-				alertConfirm.Show ();
-			} else {
-				StartActivity (mapIntent);
-			}
-		}
-
-		void _locationImageButton_Click (object sender, EventArgs e)
-		{
-			Criteria criteria = new Criteria ();
-			criteria.Accuracy = Accuracy.Fine;
-			criteria.PowerRequirement = Power.High;
-			_locMgr.RequestSingleUpdate (criteria, this, null);
-			_progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
-		}
-
-		public override bool OnCreateOptionsMenu (IMenu menu)
+			public override bool OnCreateOptionsMenu (IMenu menu)
 		{
 			MenuInflater.Inflate (Resource.Menu.ItemEditMenu, menu);
 			return base.OnCreateOptionsMenu (menu);
@@ -116,6 +89,52 @@ namespace BotaNaRoda.Android
 					return base.OnOptionsItemSelected(item);
 			}
 		}
+
+		protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
+		{
+			if (requestCode == CAPTURE_PHOTO) {
+				if (resultCode == Result.Ok) {
+					// display saved image
+					Bitmap poiImage = ItemData.GetImageFile (_item.Id);
+					_itemImageView.SetImageBitmap (poiImage);
+					if (poiImage != null)
+						poiImage.Dispose ();
+				}
+				else {
+					// let the user know the photo was cancelled
+					Toast toast = Toast.MakeText (this, "No picture captured.",
+						ToastLength.Short);
+					toast.Show();
+				} }
+			else
+				base.OnActivityResult (requestCode, resultCode, data);
+		}
+
+		public void OnLocationChanged (Location location)
+		{
+			currentLocation = location;
+
+			Geocoder geocdr = new Geocoder (this);
+			var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
+			if (addresses.Any ()) {
+				UpdateAddressFields (addresses.First ());
+			}
+
+			_progressDialog.Cancel ();
+		}
+
+		public void OnProviderDisabled (string provider)
+		{
+		}
+
+		public void OnProviderEnabled (string provider)
+		{
+		}
+
+		public void OnStatusChanged (string provider, Availability status, Bundle extras)
+		{
+		}
+
 
 		void SaveItem ()
 		{
@@ -164,31 +183,66 @@ namespace BotaNaRoda.Android
 				}
 			}
 		}
-
-		public void OnLocationChanged (Location location)
+			
+		void _cameraImageButton_Click (object sender, EventArgs e)
 		{
-			currentLocation = location;
+			Java.IO.File imageFile = new Java.IO.File(
+				ItemData.Service.GetImageFileName(_item.Id));
+			global::Android.Net.Uri imageUri = global::Android.Net.Uri.FromFile (imageFile);
 
-			Geocoder geocdr = new Geocoder (this);
-			var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
-			if (addresses.Any ()) {
-				UpdateAddressFields (addresses.First ());
+			Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
+			cameraIntent.PutExtra (MediaStore.ExtraOutput, imageUri);
+			cameraIntent.PutExtra (MediaStore.ExtraSizeLimit, 1.5 * 1024);
+
+			PackageManager packageManager = PackageManager;
+			IList<ResolveInfo> activities =
+				packageManager.QueryIntentActivities(cameraIntent, 0);
+			if (activities.Count == 0) {
+				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
+				alertConfirm.SetCancelable (false);
+				alertConfirm.SetPositiveButton ("OK", delegate {});
+				alertConfirm.SetMessage ("No camera app available.");
+				alertConfirm.Show ();
 			}
-
-			_progressDialog.Cancel ();
+			else {
+				StartActivityForResult (cameraIntent, CAPTURE_PHOTO);
+			}
 		}
 
-		public void OnProviderDisabled (string provider)
+		void _mapImageButton_Click (object sender, EventArgs e)
 		{
+			global::Android.Net.Uri geoUri;
+			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
+				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
+			} else {
+				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
+			}
+			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
+
+			PackageManager packageManager = PackageManager;
+			IList<ResolveInfo> activities =
+				packageManager.QueryIntentActivities(mapIntent, 0);
+			if (activities.Count == 0) {
+				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
+				alertConfirm.SetCancelable (false);
+				alertConfirm.SetPositiveButton ("OK", delegate {});
+				alertConfirm.SetMessage ("No map app available.");
+				alertConfirm.Show ();
+			} else {
+				StartActivity (mapIntent);
+			}
 		}
 
-		public void OnProviderEnabled (string provider)
+		void _locationImageButton_Click (object sender, EventArgs e)
 		{
+			Criteria criteria = new Criteria ();
+			criteria.Accuracy = Accuracy.Fine;
+			criteria.PowerRequirement = Power.High;
+			_locMgr.RequestSingleUpdate (criteria, this, null);
+			_progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
 		}
 
-		public void OnStatusChanged (string provider, Availability status, Bundle extras)
-		{
-		}
+
 	}
 }
 

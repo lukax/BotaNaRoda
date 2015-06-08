@@ -14,7 +14,7 @@ namespace BotaNaRoda.Android.Entity
 {
     public class Item
     {
-        public string Id { get; set; }
+		public string Id { get; set; }
         public string Description { get; set; }
         public DateTime PostDate { get; set; }
 
