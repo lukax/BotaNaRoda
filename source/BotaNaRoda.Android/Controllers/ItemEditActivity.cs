@@ -95,19 +95,17 @@ namespace BotaNaRoda.Android
 			if (requestCode == CAPTURE_PHOTO) {
 				if (resultCode == Result.Ok) {
 					// display saved image
-					Bitmap poiImage = ItemData.GetImageFile (_item.Id);
-					_itemImageView.SetImageBitmap (poiImage);
-					if (poiImage != null)
-						poiImage.Dispose ();
-				}
-				else {
+					using (Bitmap itemImage = ItemData.GetImageFile (_item.Id)) {
+						_itemImageView.SetImageBitmap (itemImage);
+					}
+				} else {
 					// let the user know the photo was cancelled
-					Toast toast = Toast.MakeText (this, "No picture captured.",
-						ToastLength.Short);
-					toast.Show();
-				} }
-			else
+					Toast toast = Toast.MakeText (this, "No picture captured.", ToastLength.Short);
+					toast.Show ();
+				} 
+			} else {
 				base.OnActivityResult (requestCode, resultCode, data);
+			}
 		}
 
 		public void OnLocationChanged (Location location)

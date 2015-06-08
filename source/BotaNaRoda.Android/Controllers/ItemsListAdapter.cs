@@ -5,6 +5,7 @@ using Android.App;
 using Android.Views;
 using System.Linq;
 using Android.Locations;
+using Android.Graphics;
 
 namespace BotaNaRoda.Android
 {
@@ -33,6 +34,7 @@ namespace BotaNaRoda.Android
 			view.FindViewById<TextView> (Resource.Id.itemsAuthor).Text = "Me";
 			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Description;
 
+			//calculate distance
 			if ((CurrentLocation != null) && (item.Latitude.HasValue) && (item.Longitude.HasValue)) {
 				Location itemLocation = new Location ("");
 				itemLocation.Latitude = item.Latitude.Value;
@@ -44,6 +46,11 @@ namespace BotaNaRoda.Android
 			else {
 				view.FindViewById<TextView>
 				(Resource.Id.itemsDistance).Text = "??";
+			}
+
+			//load image
+			using (Bitmap itemImage = ItemData.GetImageFile (item.Id)) {
+				view.FindViewById<ImageView> (Resource.Id.itemsImageView).SetImageBitmap (itemImage);
 			}
 
 			return view;
