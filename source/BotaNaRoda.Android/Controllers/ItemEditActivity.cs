@@ -13,6 +13,7 @@ using Android.Widget;
 using BotaNaRoda.Android.Entity;
 using Android.Locations;
 using Android.Content.PM;
+using Android.Net;
 
 namespace BotaNaRoda.Android
 {
@@ -27,6 +28,7 @@ namespace BotaNaRoda.Android
 		EditText _itemAddressView;
 		Location currentLocation; 
 		ProgressDialog _progressDialog;
+		ImageButton _mapImageButton;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -39,11 +41,38 @@ namespace BotaNaRoda.Android
 			_itemAddressView = FindViewById<EditText> (Resource.Id.itemAddressText);
 			_locationImageButton = FindViewById<ImageButton> (Resource.Id.locationImageButton);
 			_locationImageButton.Click += _locationImageButton_Click;
+			_mapImageButton = FindViewById<ImageButton> (Resource.Id.mapImageButton);
+			_mapImageButton.Click += _mapImageButton_Click;
 
 			_item = new Item ();
 			if (Intent.HasExtra ("itemId")) {
 				_item = ItemData.Service.GetAllItems () [Intent.GetIntExtra ("itemId", 0)];
 				UpdateUI ();
+			}
+		}
+
+		void _mapImageButton_Click (object sender, EventArgs e)
+		{
+			global::Android.Net.Uri geoUri;
+			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
+				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
+			} else {
+				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
+			}
+			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
+
+			PackageManager packageManager = PackageManager;
+			IList<ResolveInfo> activities =
+				packageManager.QueryIntentActivities(mapIntent, 0);
+			if (activities.Count == 0) {
+				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
+				alertConfirm.SetCancelable (false);
+				alertConfirm.SetPositiveButton ("OK", delegate {
+				});
+				alertConfirm.SetMessage ("No map app available.");
+				alertConfirm.Show ();
+			} else {
+				StartActivity (mapIntent);
 			}
 		}
 
