@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-     <item android:id="@+id/actionSave"
-       android:icon="@drawable/ic_save"
-       android:title="Save"
-     android:showAsAction="ifRoom" />
-     <item android:id="@+id/actionDelete"
-       android:icon="@drawable/ic_delete"
-       android:title="Delete"
-     android:showAsAction="ifRoom" />
+  <item android:id="@+id/actionSave"
+    android:icon="@drawable/ic_save"
+    android:title="Adicionar"
+  android:showAsAction="ifRoom" />
+  <item android:id="@+id/actionDelete"
+    android:icon="@drawable/ic_delete"
+    android:title="Remover"
+    android:showAsAction="never" />
+  <item android:id="@+id/actionLocation"
+  android:icon="@drawable/ic_gps"
+  android:title="Buscar Localização"
+  android:showAsAction="never" />
+  <item android:id="@+id/actionMap"
+  android:icon="@drawable/ic_gps"
+  android:title="Mapa"
+  android:showAsAction="never" />
 </menu>

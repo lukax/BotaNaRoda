@@ -44,6 +44,7 @@ namespace BotaNaRoda.Android
 				}
 				UpdateUI ();
 			}
+
 		}
 
 		void UpdateUI()

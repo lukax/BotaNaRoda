@@ -33,7 +33,6 @@ namespace BotaNaRoda.Android
 		ProgressDialog _progressDialog;
 		ImageButton _mapImageButton;
 		ImageView _itemImageView;
-		ImageButton _cameraImageButton;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -45,12 +44,8 @@ namespace BotaNaRoda.Android
 			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescriptionText);
 			_itemAddressView = FindViewById<EditText> (Resource.Id.itemAddressText);
 			_locationImageButton = FindViewById<ImageButton> (Resource.Id.locationImageButton);
-			_locationImageButton.Click += _locationImageButton_Click;
-			_mapImageButton = FindViewById<ImageButton> (Resource.Id.mapImageButton);
-			_mapImageButton.Click += _mapImageButton_Click;
-			_cameraImageButton = FindViewById<ImageButton> (Resource.Id.cameraImageButton);
-			_cameraImageButton.Click += _cameraImageButton_Click;
 			_itemImageView = FindViewById<ImageView> (Resource.Id.itemImageView);
+            _itemImageView.Click += _imageButton_Click;
 
 			_item = new Item ();
 			if (Intent.HasExtra ("itemId")) {
@@ -58,7 +53,14 @@ namespace BotaNaRoda.Android
 				UpdateUI ();
 			}
 		}
-			public override bool OnCreateOptionsMenu (IMenu menu)
+
+	    protected override void OnResume()
+	    {
+	        base.OnResume();
+            GetLocation();
+	    }
+
+	    public override bool OnCreateOptionsMenu (IMenu menu)
 		{
 			MenuInflater.Inflate (Resource.Menu.ItemEditMenu, menu);
 			return base.OnCreateOptionsMenu (menu);
@@ -69,8 +71,8 @@ namespace BotaNaRoda.Android
 			base.OnPrepareOptionsMenu (menu);
 			// disable delete for a new POI
 			if (_item.Id == null) {
-				IMenuItem item = menu.FindItem (Resource.Id.actionDelete);
-				item.SetEnabled (false);
+				IMenuItem delete = menu.FindItem (Resource.Id.actionDelete);
+				delete.SetEnabled (false);
 			}
 			return true;
 		}
@@ -85,6 +87,12 @@ namespace BotaNaRoda.Android
 				case Resource.Id.actionDelete:
 					DeleteItem ();
 					return true;
+                case Resource.Id.actionMap:
+			        OpenMap();
+			        return true;
+                case Resource.Id.actionLocation:
+                    GetLocation();
+			        return true;
 				default :
 					return base.OnOptionsItemSelected(item);
 			}
@@ -182,7 +190,7 @@ namespace BotaNaRoda.Android
 			}
 		}
 			
-		void _cameraImageButton_Click (object sender, EventArgs e)
+		void _imageButton_Click (object sender, EventArgs e)
 		{
 			Java.IO.File imageFile = new Java.IO.File(
 				ItemData.Service.GetImageFileName(_item.Id));
@@ -207,7 +215,7 @@ namespace BotaNaRoda.Android
 			}
 		}
 
-		void _mapImageButton_Click (object sender, EventArgs e)
+		void OpenMap ()
 		{
 			global::Android.Net.Uri geoUri;
 			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
@@ -231,7 +239,7 @@ namespace BotaNaRoda.Android
 			}
 		}
 
-		void _locationImageButton_Click (object sender, EventArgs e)
+		void GetLocation ()
 		{
 			Criteria criteria = new Criteria ();
 			criteria.Accuracy = Accuracy.Fine;
