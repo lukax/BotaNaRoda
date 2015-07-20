@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
+using Android.Support.V4.Widget;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
@@ -16,6 +17,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ListView _itemsListView;
 		ItemsListAdapter _adapter;
 		LocationManager _locMgr;
+        private SwipeRefreshLayout _refresher;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -27,6 +29,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 			//ItemData.Service.SaveItem (new Item {Description="item3"});
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
+            _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+            _refresher.Refresh += async delegate
+            {
+                Refresh();
+            };
 			_itemsListView = FindViewById<ListView> (Resource.Id.itemsListView);
 			_adapter = new ItemsListAdapter (this);
 			_itemsListView.Adapter = _adapter;
@@ -46,10 +53,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 				case Resource.Id.actionNew:
 					StartActivity(typeof(ItemCreateActivity));
 					return true;
-				case Resource.Id.actionRefresh:
-					ItemData.Service.RefreshCache ();
-					_adapter.NotifyDataSetChanged ();
-					return true;
 				default:
 					return base.OnOptionsItemSelected (item);
 			}
@@ -58,7 +61,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		protected override void OnResume ()
 		{
 			base.OnResume ();
-			_adapter.NotifyDataSetChanged ();
+            Refresh();
 
 			Criteria criteria = new Criteria ();
 			criteria.Accuracy = Accuracy.Coarse;
@@ -97,6 +100,14 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public void OnStatusChanged (string provider, Availability status, Bundle extras)
 		{
 		}
+
+        private void Refresh()
+        {
+            _refresher.Refreshing = true;
+            ItemData.Service.RefreshCache();
+            _adapter.NotifyDataSetChanged();
+            _refresher.Refreshing = false;
+        }
 	}
 }
 
