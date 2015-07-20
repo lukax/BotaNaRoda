@@ -13,6 +13,7 @@ namespace BotaNaRoda.Ndroid.Entity
 
         public Item()
         {
+            Id = Guid.NewGuid().ToString();
         }
     }
 }

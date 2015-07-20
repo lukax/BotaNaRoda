@@ -9,11 +9,6 @@
         p1:layout_width="match_parent"
         p1:layout_height="match_parent"
         p1:padding="15dp">
-        <ImageView
-            p1:src="@android:drawable/ic_menu_gallery"
-            p1:layout_width="250dp"
-            p1:layout_height="250dp"
-            p1:id="@+id/itemsDetailImage" />
         <TextView
             p1:text="Text"
             p1:layout_width="match_parent"
@@ -24,10 +19,15 @@
             p1:layout_width="match_parent"
             p1:layout_height="wrap_content"
             p1:id="@+id/itemsDetailDescription" />
+        <ImageView
+            p1:src="@android:drawable/ic_menu_gallery"
+            p1:layout_width="match_parent"
+            p1:layout_height="250dp"
+            p1:id="@+id/itemsDetailImage" />
         <fragment
             p1:id="@+id/map"
             p1:layout_width="match_parent"
-            p1:layout_height="match_parent"
+            p1:layout_height="200dp"
             class="com.google.android.gms.maps.MapFragment" />
     </LinearLayout>
 </ScrollView>

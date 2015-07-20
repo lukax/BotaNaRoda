@@ -130,7 +130,7 @@
     <Compile Include="Controllers\ItemsListAdapter.cs" />
     <Compile Include="Data\ItemData.cs" />
     <Compile Include="Controllers\ItemDetailActivity.cs" />
-    <Compile Include="Controllers\ItemEditActivity.cs" />
+    <Compile Include="Controllers\ItemCreateActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -141,8 +141,8 @@
     <AndroidResource Include="Resources\layout\Items.axml" />
     <AndroidResource Include="Resources\layout\ItemsListItem.axml" />
     <AndroidResource Include="Resources\layout\ItemDetail.axml" />
-    <AndroidResource Include="Resources\layout\ItemEdit.axml" />
-    <AndroidResource Include="Resources\menu\ItemEditMenu.xml" />
+    <AndroidResource Include="Resources\layout\ItemCreate.axml" />
+    <AndroidResource Include="Resources\menu\ItemCreateMenu.xml" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_delete.png" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_gps.png" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_map.png" />

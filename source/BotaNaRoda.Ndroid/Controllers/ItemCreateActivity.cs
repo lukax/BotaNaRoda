@@ -12,12 +12,15 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Entity;
+using Java.IO;
+using Environment = System.Environment;
+using Uri = Android.Net.Uri;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "ItemEditActivity",
+	[Activity (Label = "ItemCreateActivity",
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
-	public class ItemEditActivity : Activity, ILocationListener
+	public class ItemCreateActivity : Activity, ILocationListener
 	{
 		const int CAPTURE_PHOTO = 0;
 		EditText _itemDescriptionView;
@@ -31,9 +34,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			SetContentView (Resource.Layout.ItemEdit);
+			SetContentView (Resource.Layout.ItemCreate);
 		
-			_locMgr = GetSystemService(Context.LocationService) as LocationManager;
+			_locMgr = GetSystemService(LocationService) as LocationManager;
 
 			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescriptionText);
 			_itemAddressView = FindViewById<EditText> (Resource.Id.itemAddressText);
@@ -55,7 +58,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 	    public override bool OnCreateOptionsMenu (IMenu menu)
 		{
-			MenuInflater.Inflate (Resource.Menu.ItemEditMenu, menu);
+			MenuInflater.Inflate (Resource.Menu.ItemCreateMenu, menu);
 			return base.OnCreateOptionsMenu (menu);
 		}
 
@@ -63,10 +66,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			base.OnPrepareOptionsMenu (menu);
 			// disable delete for a new POI
-			if (_item.Id == null) {
-				IMenuItem delete = menu.FindItem (Resource.Id.actionDelete);
-				delete.SetEnabled (false);
-			}
+            //if (_item.Id == null) {
+            //    IMenuItem delete = menu.FindItem (Resource.Id.actionDelete);
+            //    delete.SetEnabled (false);
+            //}
 			return true;
 		}
 
@@ -77,9 +80,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 				case Resource.Id.actionSave:
 					SaveItem ();
 					return true;
-				case Resource.Id.actionDelete:
-					DeleteItem ();
-					return true;
+                //case Resource.Id.actionDelete:
+                //    DeleteItem ();
+                //    return true;
                 case Resource.Id.actionMap:
 			        OpenMap();
 			        return true;
@@ -177,7 +180,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			if(String.IsNullOrEmpty(_itemAddressView.Text)) {
 				for (int i = 0; i < address.MaxAddressLineIndex; i++) {
 					if (!String.IsNullOrEmpty(_itemAddressView.Text))
-						_itemAddressView.Text += System.Environment.NewLine;
+						_itemAddressView.Text += Environment.NewLine;
 					_itemAddressView.Text += address.GetAddressLine (i);
 				}
 			}
@@ -185,9 +188,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 			
 		void _imageButton_Click (object sender, EventArgs e)
 		{
-			Java.IO.File imageFile = new Java.IO.File(
+			File imageFile = new File(
 				ItemData.Service.GetImageFileName(_item.Id));
-			global::Android.Net.Uri imageUri = global::Android.Net.Uri.FromFile (imageFile);
+			var imageUri = Uri.FromFile (imageFile);
 
 			Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
 			cameraIntent.PutExtra (MediaStore.ExtraOutput, imageUri);
@@ -210,11 +213,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		void OpenMap ()
 		{
-			global::Android.Net.Uri geoUri;
+			Uri geoUri;
 			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
-				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
+				geoUri = Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
 			} else {
-				geoUri = global::Android.Net.Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
+				geoUri = Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
 			}
 			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
 

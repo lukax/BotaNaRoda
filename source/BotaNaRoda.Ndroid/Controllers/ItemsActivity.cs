@@ -25,7 +25,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			//ItemData.Service.SaveItem (new Item {Description="item1"});
 			//ItemData.Service.SaveItem (new Item {Description="item2"});
 			//ItemData.Service.SaveItem (new Item {Description="item3"});
-			_locMgr = GetSystemService(Context.LocationService) as LocationManager;
+			_locMgr = GetSystemService(LocationService) as LocationManager;
 
 			_itemsListView = FindViewById<ListView> (Resource.Id.itemsListView);
 			_adapter = new ItemsListAdapter (this);
@@ -44,7 +44,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			switch (item.ItemId) 
 			{
 				case Resource.Id.actionNew:
-					StartActivity(typeof(ItemEditActivity));
+					StartActivity(typeof(ItemCreateActivity));
 					return true;
 				case Resource.Id.actionRefresh:
 					ItemData.Service.RefreshCache ();
