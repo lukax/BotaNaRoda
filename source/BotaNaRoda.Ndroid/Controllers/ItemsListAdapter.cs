@@ -40,12 +40,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 				itemLocation.Latitude = item.Latitude.Value;
 				itemLocation.Longitude = item.Longitude.Value;
 				float distance = CurrentLocation.DistanceTo (itemLocation);
-				view.FindViewById<TextView>
-				(Resource.Id.itemsDistance).Text = String.Format("{0:0,0.00}m", distance);
+				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = String.Format("{0:0,0.00}m", distance);
 			}
 			else {
-				view.FindViewById<TextView>
-				(Resource.Id.itemsDistance).Text = "??";
+				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = "??";
 			}
 
 			//load image

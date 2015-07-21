@@ -4,6 +4,7 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Widget;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Entity;
@@ -17,10 +18,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ImageView _itemImageView;
 		TextView _itemAuthorView;
 		TextView _itemDescriptionView;
-		Item _item;
+		Item _item = new Item();
 	    private GoogleMap mMap;
+        private SwipeRefreshLayout _refresher;
 
-	    protected override void OnCreate (Bundle bundle)
+        protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
 			SetContentView(Resource.Layout.ItemDetail);
@@ -30,18 +32,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_itemImageView = FindViewById<ImageView> (Resource.Id.itemsDetailImage);
 			_itemAuthorView = FindViewById<TextView> (Resource.Id.itemsDetailAuthor);
 			_itemDescriptionView = FindViewById<TextView> (Resource.Id.itemsDetailDescription);
-
-			_item = new Item ();
-            if (Intent.HasExtra("itemId"))
+            _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+            _refresher.Refresh += delegate
             {
-				_item = ItemData.Service.GetAllItems () [Intent.GetIntExtra ("itemId", -1)];
-				using (Bitmap itemImage = ItemData.GetImageFile (_item.Id)) {
-					_itemImageView.SetImageBitmap (itemImage);
-				}
-				UpdateUi ();
-			}
+                Refresh();
+            };
 
-            SetUpMapIfNeeded();
+            Refresh();
 		}
 
 	    protected override void OnResume()
@@ -50,11 +47,24 @@ namespace BotaNaRoda.Ndroid.Controllers
             SetUpMapIfNeeded();
 	    }
 
+        void Refresh()
+        {
+            _refresher.Refreshing = true;
+            _item = ItemData.Service.GetAllItems()[Intent.GetIntExtra("itemId", -1)];
+            using (Bitmap itemImage = ItemData.GetImageFile(_item.Id))
+            {
+                _itemImageView.SetImageBitmap(itemImage);
+            }
+            UpdateUi();
+            _refresher.Refreshing = false;
+        }
+
 	    void UpdateUi()
 		{
 			_itemAuthorView.Text = "Me";
 			_itemDescriptionView.Text = _item.Description;
-		}
+            SetUpMapIfNeeded();
+        }
 
         /**
         * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly

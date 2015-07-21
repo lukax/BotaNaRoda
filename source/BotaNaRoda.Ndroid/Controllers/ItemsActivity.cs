@@ -30,7 +30,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
             _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            _refresher.Refresh += async delegate
+            _refresher.Refresh += delegate
             {
                 Refresh();
             };
