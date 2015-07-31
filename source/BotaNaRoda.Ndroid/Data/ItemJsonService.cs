@@ -75,12 +75,12 @@ namespace BotaNaRoda.Ndroid.Data
 
         private string GetFilename(string id)
         {
-            return Path.Combine(_storagePath, string.Format("item{0}.json", id));
+            return Path.Combine(_storagePath, string.Format("item_{0}.json", id));
         }
 
 		public string GetImageFileName (string id)
 		{
-			return Path.Combine (_storagePath, string.Format("itemImage{0}.jpg", id));
+			return Path.Combine (_storagePath, string.Format("itemImg_{0}.jpg", id));
 		}
     }
 }

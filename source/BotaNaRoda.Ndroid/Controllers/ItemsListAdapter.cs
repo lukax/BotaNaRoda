@@ -31,7 +31,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			var view = convertView ?? context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, null);
 
 			var item = this [position];
-			view.FindViewById<TextView> (Resource.Id.itemsAuthor).Text = "Me";
 			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Description;
 
 			//calculate distance
@@ -46,11 +45,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = "??";
 			}
 
+			var imgView = view.FindViewById<ImageView> (Resource.Id.itemsImageView);
 			//load image
-			using (Bitmap itemImage = ItemData.GetImageFile (item.Id)) {
-				view.FindViewById<ImageView> (Resource.Id.itemsImageView).SetImageBitmap (itemImage);
+			using (Bitmap itemImage = ItemData.GetImageFile (item.Id, imgView.Width, imgView.Height)) {
+				imgView.SetImageBitmap (itemImage);
 			}
-
+			// Dispose of the Java side bitmap.
+			//GC.Collect();
 			return view;
 		}
 

@@ -7,6 +7,7 @@ using Android.Support.V4.Widget;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
+using System;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -14,7 +15,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]
 	public class ItemsActivity : Activity, ILocationListener
     {
-		ListView _itemsListView;
+		GridView _itemsListView;
 		ItemsListAdapter _adapter;
 		LocationManager _locMgr;
         private SwipeRefreshLayout _refresher;
@@ -34,7 +35,9 @@ namespace BotaNaRoda.Ndroid.Controllers
             {
                 Refresh();
             };
-			_itemsListView = FindViewById<ListView> (Resource.Id.itemsListView);
+
+			FindViewById<Button> (Resource.Id.newItem).Click += NewItem;
+			_itemsListView = FindViewById<GridView> (Resource.Id.itemsGridView);
 			_adapter = new ItemsListAdapter (this);
 			_itemsListView.Adapter = _adapter;
 			_itemsListView.ItemClick += _itemsListView_ItemClick;
@@ -50,9 +53,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			switch (item.ItemId) 
 			{
-				case Resource.Id.actionNew:
-					StartActivity(typeof(ItemCreateActivity));
-					return true;
 				default:
 					return base.OnOptionsItemSelected (item);
 			}
@@ -99,6 +99,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnStatusChanged (string provider, Availability status, Bundle extras)
 		{
+		}
+
+		private void NewItem(object sender, EventArgs args){
+			StartActivity(typeof(ItemCreateActivity));
 		}
 
         private void Refresh()

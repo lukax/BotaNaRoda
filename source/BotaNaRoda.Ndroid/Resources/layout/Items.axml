@@ -4,8 +4,24 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <ListView
-        android:id="@+id/itemsListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <GridView
+            android:id="@+id/itemsGridView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:columnWidth="130dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center" />
+        <Button
+            android:text="Bota na Roda"
+            android:layout_height="50dp"
+            android:layout_width="fill_parent"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/newItem" />
+    </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>

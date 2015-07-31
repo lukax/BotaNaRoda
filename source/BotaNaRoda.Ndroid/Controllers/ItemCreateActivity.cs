@@ -26,7 +26,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		EditText _itemDescriptionView;
 		Item _item;
 		LocationManager _locMgr;
-		EditText _itemAddressView;
+		EditText _itemTitleView;
 		Location currentLocation; 
 		ProgressDialog _progressDialog;
 		ImageView _itemImageView;
@@ -38,8 +38,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 		
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
-			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescriptionText);
-			_itemAddressView = FindViewById<EditText> (Resource.Id.itemAddressText);
+			_itemTitleView = FindViewById<EditText> (Resource.Id.itemTitle);
+			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescription);
 			_itemImageView = FindViewById<ImageView> (Resource.Id.itemImageView);
             _itemImageView.Click += _imageButton_Click;
 
@@ -99,7 +99,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			if (requestCode == CAPTURE_PHOTO) {
 				if (resultCode == Result.Ok) {
 					// display saved image
-					using (Bitmap itemImage = ItemData.GetImageFile (_item.Id)) {
+					using (Bitmap itemImage = ItemData.GetImageFile (_item.Id, _itemImageView.Width, _itemImageView.Height)) {
 						_itemImageView.SetImageBitmap (itemImage);
 					}
 				} else {
@@ -115,13 +115,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public void OnLocationChanged (Location location)
 		{
 			currentLocation = location;
-
-			Geocoder geocdr = new Geocoder (this);
-			var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
-			if (addresses.Any ()) {
-				UpdateAddressFields (addresses.First ());
-			}
-
+			//Geocoder geocdr = new Geocoder (this);
+			//var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
+			//if (addresses.Any ()) {
+			//	UpdateAddressFields (addresses.First ());
+			//}
 			_progressDialog.Cancel ();
 		}
 
@@ -152,40 +150,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 			ItemData.Service.SaveItem (_item);
 			Finish ();
 		}
-
-		void DeleteItem ()
-		{
-			AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
-			alertConfirm.SetCancelable (false);
-			alertConfirm.SetPositiveButton ("OK", ConfirmDelete);
-			alertConfirm.SetNegativeButton ("Cancel", delegate {});
-			alertConfirm.SetMessage ("Tem certeza que quer remover o Item?");
-			alertConfirm.Show ();
-		}
-
-		void ConfirmDelete(object sender, EventArgs e)
-		{
-			ItemData.Service.DeleteItem (_item);
-			Toast toast = Toast.MakeText (this, "Item removido", ToastLength.Short);
-			toast.Show ();
-			Finish ();
-		}
-
+        
 		void UpdateUI ()
 		{
 			_itemDescriptionView.Text = _item.Description;
 		}
 
-		void UpdateAddressFields(Address address){
-			if(String.IsNullOrEmpty(_itemAddressView.Text)) {
-				for (int i = 0; i < address.MaxAddressLineIndex; i++) {
-					if (!String.IsNullOrEmpty(_itemAddressView.Text))
-						_itemAddressView.Text += Environment.NewLine;
-					_itemAddressView.Text += address.GetAddressLine (i);
-				}
-			}
-		}
-			
 		void _imageButton_Click (object sender, EventArgs e)
 		{
 			File imageFile = new File(
@@ -194,7 +164,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 			Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
 			cameraIntent.PutExtra (MediaStore.ExtraOutput, imageUri);
-			cameraIntent.PutExtra (MediaStore.ExtraSizeLimit, 1.5 * 1024);
+			cameraIntent.PutExtra (MediaStore.ExtraSizeLimit, 1 * 1024);
 
 			PackageManager packageManager = PackageManager;
 			IList<ResolveInfo> activities =
@@ -214,10 +184,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 		void OpenMap ()
 		{
 			Uri geoUri;
-			if (String.IsNullOrEmpty (_itemAddressView.Text)) {
+			if (String.IsNullOrEmpty (_itemTitleView.Text)) {
 				geoUri = Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
 			} else {
-				geoUri = Uri.Parse (String.Format ("geo:0,0?q={0}", _itemAddressView.Text));
+				geoUri = Uri.Parse (String.Format ("geo:0,0?q={0}", _itemTitleView.Text));
 			}
 			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
 

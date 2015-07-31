@@ -5,27 +5,19 @@
     p1:id="@+id/relativeLayout1">
     <ImageView
         p1:src="@android:drawable/ic_menu_gallery"
-        p1:layout_width="100dp"
-        p1:layout_height="100dp"
+        p1:layout_width="200dp"
+        p1:layout_height="200dp"
         p1:id="@+id/itemsImageView" />
-    <TextView
-        p1:text="Lucas Espindola"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:layout_toRightOf="@id/itemsImageView"
-        p1:id="@+id/itemsAuthor" />
     <TextView
         p1:text="asdfasdfasdf"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_below="@id/itemsAuthor"
-        p1:layout_toRightOf="@id/itemsImageView"
+        p1:layout_below="@id/itemsImageView"
         p1:id="@+id/itemsDescription" />
     <TextView
         p1:text="200m"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:layout_below="@id/itemsDescription"
-        p1:id="@+id/itemsDistance"
-        p1:layout_toRightOf="@id/itemsAuthor" />
+        p1:id="@+id/itemsDistance" />
 </RelativeLayout>
