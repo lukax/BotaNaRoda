@@ -8,6 +8,8 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using System;
+using System.ComponentModel;
+using System.Threading;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -101,16 +103,28 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		}
 
-		private void NewItem(object sender, EventArgs args){
+		private void NewItem(object sender, EventArgs args)
+		{
 			StartActivity(typeof(ItemCreateActivity));
 		}
 
         private void Refresh()
         {
-            _refresher.Refreshing = true;
-            ItemData.Service.RefreshCache();
-            _adapter.NotifyDataSetChanged();
-            _refresher.Refreshing = false;
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (sender, args) =>
+            {
+                ItemData.Service.RefreshCache();
+                Thread.Sleep(3000);
+            };
+            worker.RunWorkerCompleted += (sender, args) => {
+                RunOnUiThread(() =>
+                {
+                    _refresher.Refreshing = false;
+                    _adapter.NotifyDataSetChanged();
+                });
+            };
+            worker.RunWorkerAsync();
+
         }
 	}
 }

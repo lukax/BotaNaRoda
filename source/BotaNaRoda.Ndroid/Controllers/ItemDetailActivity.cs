@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Threading;
 using Android.App;
 using Android.Content.PM;
 using Android.Gms.Maps;
@@ -22,7 +24,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         TextView _itemDescriptionView;
         Item _item = new Item();
         private GoogleMap mMap;
-        private SwipeRefreshLayout _refresher;
+        private Button _reserveButton;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -34,11 +36,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage);
             _itemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor);
             _itemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription);
-            _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            _refresher.Refresh += delegate
-            {
-                Refresh();
-            };
+			_reserveButton = FindViewById<Button>(Resource.Id.reserveButton);
+            _reserveButton.Click += ReserveItem;
 
             Refresh();
         }
@@ -67,6 +66,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
 
+		void ReserveItem (object sender, EventArgs e)
+		{
+		    _reserveButton.Text = "Reserved";
+		    _reserveButton.Enabled = false;
+		}
+
         void DeleteItem()
         {
             AlertDialog.Builder alertConfirm = new AlertDialog.Builder(this);
@@ -87,21 +92,26 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void Refresh()
         {
-            _refresher.Refreshing = true;
-            _item = ItemData.Service.GetAllItems()[Intent.GetIntExtra("itemId", -1)];
-			using (Bitmap itemImage = ItemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (sender, args) =>
             {
-                _itemImageView.SetImageBitmap(itemImage);
-            }
-            UpdateUi();
-            _refresher.Refreshing = false;
-        }
-
-        void UpdateUi()
-        {
-            _itemAuthorView.Text = "Me";
-            _itemDescriptionView.Text = _item.Description;
-            SetUpMapIfNeeded();
+                _item = ItemData.Service.GetAllItems()[Intent.GetIntExtra("itemId", -1)];
+                Thread.Sleep(3000);
+            };
+            worker.RunWorkerCompleted += (sender, args) =>
+            {
+                RunOnUiThread(() =>
+                {
+                    using (Bitmap itemImage = ItemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
+                    {
+                        _itemImageView.SetImageBitmap(itemImage);
+                        _itemAuthorView.Text = "Me";
+                        _itemDescriptionView.Text = _item.Description;
+                        SetUpMapIfNeeded();
+                    }
+                });
+            };
+            worker.RunWorkerAsync();
         }
 
         /**

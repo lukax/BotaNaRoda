@@ -1,27 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:minWidth="25px"
-    android:minHeight="25px">
-    <EditText
-        android:inputType="textPostalAddress"
+    android:layout_height="fill_parent">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@android:drawable/ic_menu_gallery"
+                android:layout_gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/itemImageView"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:id="@+id/itemTitle"
+                android:hint="Nome do produto"
+                android:layout_below="@id/itemImageView"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
+            <EditText
+                android:inputType="textMultiLine"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:id="@+id/itemDescription"
+                android:hint="Uma breve descrição do produto"
+                android:lines="5"
+                android:layout_below="@id/itemTitle"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:prompt="@string/item_categories_prompt"
+                android:id="@+id/itemCategory"
+                android:layout_below="@id/itemDescription"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
+        </RelativeLayout>
+    </ScrollView>
+    <Button
+        android:text="Botar na Roda"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemTitle"
-        android:hint="Nome" />
-    <EditText
-        android:inputType="textMultiLine"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemDescription"
-        android:hint="Descrição do produto"
-        android:lines="5" />
-    <ImageView
-        android:src="@android:drawable/ic_menu_gallery"
-        android:layout_gravity="center"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:id="@+id/itemImageView" />
-</LinearLayout>
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/saveButton" />
+</RelativeLayout>

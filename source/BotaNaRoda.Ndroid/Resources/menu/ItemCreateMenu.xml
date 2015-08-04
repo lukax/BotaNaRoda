@@ -1,9 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:id="@+id/actionSave"
-    android:icon="@drawable/ic_save"
-    android:title="Adicionar"
-    android:showAsAction="ifRoom" />
   <item android:id="@+id/actionLocation"
     android:icon="@drawable/ic_gps"
     android:title="Buscar Localização"

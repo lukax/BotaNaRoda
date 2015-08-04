@@ -13,12 +13,12 @@
             android:layout_height="fill_parent"
             android:columnWidth="130dp"
             android:numColumns="auto_fit"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
+            android:verticalSpacing="1dp"
+            android:horizontalSpacing="5dp"
             android:stretchMode="columnWidth"
             android:gravity="center" />
         <Button
-            android:text="Bota na Roda"
+            android:text="Botar na Roda"
             android:layout_height="50dp"
             android:layout_width="fill_parent"
             android:layout_alignParentBottom="true"

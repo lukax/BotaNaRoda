@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ApplicationName">BotaNaRoda</string>
+    <string name="item_categories_prompt">Escolha uma categoria</string>
+    <string-array name="item_categories">
+      <item>Eletrônicos</item>
+      <item>Cozinha</item>
+    </string-array>
 </resources>

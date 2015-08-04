@@ -30,8 +30,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 		Location currentLocation; 
 		ProgressDialog _progressDialog;
 		ImageView _itemImageView;
+	    Spinner _itemCategory;
+		Button _saveButton;
 
-		protected override void OnCreate (Bundle bundle)
+	    protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.ItemCreate);
@@ -42,6 +44,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_itemDescriptionView = FindViewById<EditText> (Resource.Id.itemDescription);
 			_itemImageView = FindViewById<ImageView> (Resource.Id.itemImageView);
             _itemImageView.Click += _imageButton_Click;
+		    _itemCategory = FindViewById<Spinner>(Resource.Id.itemCategory);
+	        var categoriesAdapter = ArrayAdapter.CreateFromResource(this, Resource.Array.item_categories, Android.Resource.Layout.SimpleSpinnerItem);
+            categoriesAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            _itemCategory.Adapter = categoriesAdapter;
+            _itemCategory.ItemSelected += ItemCategoryOnItemSelected;
+			_saveButton = FindViewById<Button> (Resource.Id.saveButton);
+			_saveButton.Click += _saveButton_Click;
 
 			_item = new Item ();
 			if (Intent.HasExtra ("itemId")) {
@@ -49,6 +58,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 				UpdateUI ();
 			}
 		}
+
+
+
+	    private void ItemCategoryOnItemSelected(object sender, AdapterView.ItemSelectedEventArgs itemSelectedEventArgs)
+	    {
+	    }
 
 	    protected override void OnResume()
 	    {
@@ -77,9 +92,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			switch (item.ItemId)
 			{
-				case Resource.Id.actionSave:
-					SaveItem ();
-					return true;
                 //case Resource.Id.actionDelete:
                 //    DeleteItem ();
                 //    return true;
@@ -135,8 +147,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		}
 
+		void UpdateUI ()
+		{
+			_itemDescriptionView.Text = _item.Description;
+		}
 
-		void SaveItem ()
+
+		void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (currentLocation == null) {
 				Toast toast = Toast.MakeText (this, "Não é possivel salvar item sem a localização!", ToastLength.Short);
@@ -149,11 +166,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_item.Longitude = currentLocation.Longitude;
 			ItemData.Service.SaveItem (_item);
 			Finish ();
-		}
-        
-		void UpdateUI ()
-		{
-			_itemDescriptionView.Text = _item.Description;
 		}
 
 		void _imageButton_Click (object sender, EventArgs e)

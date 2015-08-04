@@ -1,32 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:p1="http://schemas.android.com/apk/res/android"
-    p1:id="@+id/refresher"
-    p1:layout_width="fill_parent"
-    p1:layout_height="fill_parent">
-    <LinearLayout
-        p1:orientation="vertical"
-        p1:layout_width="match_parent"
-        p1:layout_height="match_parent"
-        p1:padding="15dp">
-        <TextView
-            p1:text="Text"
-            p1:layout_width="match_parent"
-            p1:layout_height="wrap_content"
-            p1:id="@+id/itemsDetailAuthor" />
-        <TextView
-            p1:text="Text"
-            p1:layout_width="match_parent"
-            p1:layout_height="wrap_content"
-            p1:id="@+id/itemsDetailDescription" />
-        <ImageView
-            p1:src="@android:drawable/ic_menu_gallery"
-            p1:layout_width="match_parent"
-            p1:layout_height="250dp"
-            p1:id="@+id/itemsDetailImage" />
-        <fragment
-            p1:id="@+id/map"
-            p1:layout_width="match_parent"
-            p1:layout_height="200dp"
-            class="com.google.android.gms.maps.MapFragment" />
-    </LinearLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@android:drawable/ic_menu_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:id="@+id/itemsDetailImage" />
+            <TextView
+                android:text="Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/itemsDetailAuthor"
+                android:layout_below="@id/itemsDetailImage"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" />
+            <TextView
+                android:text="Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/itemsDetailTitle"
+                android:layout_below="@id/itemsDetailAuthor"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" />
+            <TextView
+                android:text="Text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/itemsDetailDescription"
+                android:layout_below="@id/itemsDetailTitle"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" />
+            <TextView
+                android:text="Rio de Janeiro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/itemsDetailLocation"
+                android:layout_below="@id/itemsDetailDescription"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" />
+            <fragment
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                class="com.google.android.gms.maps.MapFragment"
+                android:layout_below="@id/itemsDetailLocation" />
+        </RelativeLayout>
+    </ScrollView>
+    <Button
+        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:text="Reservar"
+        android:id="@+id/reserveButton"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>
