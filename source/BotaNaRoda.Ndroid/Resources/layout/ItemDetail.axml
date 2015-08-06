@@ -14,7 +14,7 @@
                 android:layout_height="250dp"
                 android:id="@+id/itemsDetailImage" />
             <TextView
-                android:text="Text"
+                android:text="Autor..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailAuthor"
@@ -22,7 +22,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
             <TextView
-                android:text="Text"
+                android:text="Produto..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailTitle"
@@ -31,7 +31,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
             <TextView
-                android:text="Text"
+                android:text="Descrição..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDescription"
@@ -39,7 +39,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
             <TextView
-                android:text="Rio de Janeiro"
+                android:text="Localização..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailLocation"

@@ -24,7 +24,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	{
 		const int CAPTURE_PHOTO = 0;
 		EditText _itemDescriptionView;
-		Item _item;
+		Item _item = new Item();
 		LocationManager _locMgr;
 		EditText _itemTitleView;
 		Location currentLocation; 
@@ -32,6 +32,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ImageView _itemImageView;
 	    Spinner _itemCategory;
 		Button _saveButton;
+	    private bool _imageTaken;
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -48,22 +49,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        var categoriesAdapter = ArrayAdapter.CreateFromResource(this, Resource.Array.item_categories, Android.Resource.Layout.SimpleSpinnerItem);
             categoriesAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _itemCategory.Adapter = categoriesAdapter;
-            _itemCategory.ItemSelected += ItemCategoryOnItemSelected;
 			_saveButton = FindViewById<Button> (Resource.Id.saveButton);
 			_saveButton.Click += _saveButton_Click;
-
-			_item = new Item ();
-			if (Intent.HasExtra ("itemId")) {
-				_item = ItemData.Service.GetAllItems () [Intent.GetIntExtra ("itemId", 0)];
-				UpdateUI ();
-			}
 		}
-
-
-
-	    private void ItemCategoryOnItemSelected(object sender, AdapterView.ItemSelectedEventArgs itemSelectedEventArgs)
-	    {
-	    }
 
 	    protected override void OnResume()
 	    {
@@ -80,11 +68,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public override bool OnPrepareOptionsMenu (IMenu menu)
 		{
 			base.OnPrepareOptionsMenu (menu);
-			// disable delete for a new POI
-            //if (_item.Id == null) {
-            //    IMenuItem delete = menu.FindItem (Resource.Id.actionDelete);
-            //    delete.SetEnabled (false);
-            //}
 			return true;
 		}
 
@@ -92,9 +75,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			switch (item.ItemId)
 			{
-                //case Resource.Id.actionDelete:
-                //    DeleteItem ();
-                //    return true;
                 case Resource.Id.actionMap:
 			        OpenMap();
 			        return true;
@@ -111,12 +91,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 			if (requestCode == CAPTURE_PHOTO) {
 				if (resultCode == Result.Ok) {
 					// display saved image
+				    _imageTaken = true;
 					using (Bitmap itemImage = ItemData.GetImageFile (_item.Id, _itemImageView.Width, _itemImageView.Height)) {
 						_itemImageView.SetImageBitmap (itemImage);
 					}
 				} else {
 					// let the user know the photo was cancelled
-					Toast toast = Toast.MakeText (this, "No picture captured.", ToastLength.Short);
+					Toast toast = Toast.MakeText (this, "Nenhuma foto capturada", ToastLength.Short);
 					toast.Show ();
 				} 
 			} else {
@@ -127,11 +108,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public void OnLocationChanged (Location location)
 		{
 			currentLocation = location;
-			//Geocoder geocdr = new Geocoder (this);
-			//var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
-			//if (addresses.Any ()) {
-			//	UpdateAddressFields (addresses.First ());
-			//}
 			_progressDialog.Cancel ();
 		}
 
@@ -147,12 +123,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		}
 
-		void UpdateUI ()
-		{
-			_itemDescriptionView.Text = _item.Description;
-		}
-
-
 		void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (currentLocation == null) {
@@ -160,11 +130,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 				toast.Show ();
 				return;
 			}
+            if (!_imageTaken)
+            {
+                Toast toast = Toast.MakeText(this, "Não é possivel salvar item sem pelo menos uma foto!", ToastLength.Short);
+                toast.Show();
+                return;
+            }
 
+            _item.Title = _itemTitleView.Text;
 			_item.Description = _itemDescriptionView.Text;
+		    _item.Category = _itemCategory.SelectedItem.ToString();
 			_item.Latitude = currentLocation.Latitude;
 			_item.Longitude = currentLocation.Longitude;
 			ItemData.Service.SaveItem (_item);
+
 			Finish ();
 		}
 
@@ -185,7 +164,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
 				alertConfirm.SetCancelable (false);
 				alertConfirm.SetPositiveButton ("OK", delegate {});
-				alertConfirm.SetMessage ("No camera app available.");
+				alertConfirm.SetMessage ("No camera app available");
 				alertConfirm.Show ();
 			}
 			else {
@@ -196,10 +175,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 		void OpenMap ()
 		{
 			Uri geoUri;
-			if (String.IsNullOrEmpty (_itemTitleView.Text)) {
-				geoUri = Uri.Parse (String.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
+			if (string.IsNullOrEmpty (_itemTitleView.Text)) {
+				geoUri = Uri.Parse (string.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
 			} else {
-				geoUri = Uri.Parse (String.Format ("geo:0,0?q={0}", _itemTitleView.Text));
+				geoUri = Uri.Parse (string.Format ("geo:0,0?q={0}", _itemTitleView.Text));
 			}
 			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
 

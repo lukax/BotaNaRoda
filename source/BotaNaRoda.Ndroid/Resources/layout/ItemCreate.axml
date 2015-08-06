@@ -9,36 +9,36 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
             <ImageView
+                android:id="@+id/itemImageView"
                 android:src="@android:drawable/ic_menu_gallery"
                 android:layout_gravity="center"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:id="@+id/itemImageView"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp" />
             <EditText
+                android:id="@+id/itemTitle"
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:id="@+id/itemTitle"
                 android:hint="Nome do produto"
                 android:layout_below="@id/itemImageView"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp" />
             <EditText
+                android:id="@+id/itemDescription"
                 android:inputType="textMultiLine"
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:id="@+id/itemDescription"
-                android:hint="Uma breve descrição do produto"
                 android:lines="5"
+                android:hint="Uma breve descrição do produto"
                 android:layout_below="@id/itemTitle"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp" />
             <Spinner
+                android:id="@+id/itemCategory"
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
                 android:prompt="@string/item_categories_prompt"
-                android:id="@+id/itemCategory"
                 android:layout_below="@id/itemDescription"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp" />

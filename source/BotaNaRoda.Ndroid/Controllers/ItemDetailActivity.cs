@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using Android.App;
 using Android.Content.PM;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
+using Android.Locations;
 using Android.OS;
 using Android.Support.V4.Widget;
 using Android.Views;
@@ -19,12 +21,14 @@ namespace BotaNaRoda.Ndroid.Controllers
         ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]
     public class ItemDetailActivity : Activity
     {
-        ImageView _itemImageView;
-        TextView _itemAuthorView;
-        TextView _itemDescriptionView;
-        Item _item = new Item();
+        private ImageView _itemImageView;
+        private TextView _itemAuthorView;
+        private TextView _itemDescriptionView;
+        private Item _item = new Item();
         private GoogleMap mMap;
         private Button _reserveButton;
+        private TextView _itemTitleView;
+        private TextView _itemLocationView;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -35,7 +39,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _itemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage);
             _itemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor);
+            _itemTitleView = FindViewById<TextView>(Resource.Id.itemsDetailTitle);
             _itemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription);
+            _itemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation);
 			_reserveButton = FindViewById<Button>(Resource.Id.reserveButton);
             _reserveButton.Click += ReserveItem;
 
@@ -104,9 +110,10 @@ namespace BotaNaRoda.Ndroid.Controllers
                 {
                     using (Bitmap itemImage = ItemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
                     {
-                        _itemImageView.SetImageBitmap(itemImage);
-                        _itemAuthorView.Text = "Me";
+                        _itemAuthorView.Text = "Lucas";
+                        _itemTitleView.Text = _item.Title;
                         _itemDescriptionView.Text = _item.Description;
+                        _itemImageView.SetImageBitmap(itemImage);
                         SetUpMapIfNeeded();
                     }
                 });
@@ -162,6 +169,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             mMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
             mMap.MoveCamera(cameraUpdate);
+
+            Geocoder geocdr = new Geocoder (this);
+            var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
+            if (addresses.Any ()) {
+            	_itemLocationView.Text = addresses.First ().FeatureName;
+            }
         }
 
     }
