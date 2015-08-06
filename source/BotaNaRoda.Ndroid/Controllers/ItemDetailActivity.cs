@@ -119,7 +119,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                     using (Bitmap itemImage = ItemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
                     {
                         _itemAuthorView.Text = "Lucas";
-                        _itemTitleView.Text = _item.Title;
+                        _itemTitleView.Text = _item.Name;
                         _itemDescriptionView.Text = _item.Description;
                         _itemImageView.SetImageBitmap(itemImage);
                         SetUpMapIfNeeded();

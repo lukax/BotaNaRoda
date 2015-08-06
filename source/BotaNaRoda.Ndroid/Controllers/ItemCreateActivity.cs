@@ -137,7 +137,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 return;
             }
 
-            _item.Title = _itemTitleView.Text;
+            _item.Name = _itemTitleView.Text;
 			_item.Description = _itemDescriptionView.Text;
 		    _item.Category = _itemCategory.SelectedItem.ToString();
 			_item.Latitude = currentLocation.Latitude;

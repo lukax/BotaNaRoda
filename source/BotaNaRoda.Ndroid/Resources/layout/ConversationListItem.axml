@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:id="@+id/relativeLayout1"
+    p1:minWidth="25px"
+    p1:minHeight="25px">
+    <ImageView
+        p1:id="@+id/conversationProfileImage"
+        p1:src="@android:drawable/ic_menu_gallery"
+        p1:layout_width="80dp"
+        p1:layout_height="80dp" />
+    <TextView
+        p1:id="@+id/conversationUserName"
+        p1:text="Lucas E."
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_toRightOf="@id/conversationProfileImage" />
+    <TextView
+        p1:id="@+id/conversationItemName"
+        p1:text="Luva de Neve"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_below="@id/conversationUserName"
+        p1:layout_toRightOf="@id/conversationProfileImage" />
+    <TextView
+        p1:id="@+id/conversationLastMessageTime"
+        p1:text="11 horas atrás"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_below="@id/conversationItemName"
+        p1:layout_toRightOf="@id/conversationProfileImage" />
+    <ImageView
+        p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+        p1:layout_alignParentRight="true"
+        p1:layout_width="25dp"
+        p1:layout_height="80dp" />
+</RelativeLayout>

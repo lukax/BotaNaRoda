@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:minWidth="25px"
+    p1:minHeight="25px"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:id="@+id/relativeLayout1">
+    <ImageView
+        p1:id="@+id/chatItemImage"
+        p1:src="@android:drawable/ic_menu_gallery"
+        p1:layout_width="65dp"
+        p1:layout_height="65dp" />
+    <TextView
+        p1:id="@+id/chatItemName"
+        p1:text="Luva de Neve"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_toRightOf="@id/chatItemImage" />
+    <TextView
+        p1:id="@+id/chatItemDistance"
+        p1:text="500m"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_below="@id/chatItemName"
+        p1:layout_toRightOf="@id/chatItemImage" />
+    <ImageView
+        p1:id="@+id/chatUserImage"
+        p1:src="@android:drawable/ic_menu_gallery"
+        p1:layout_width="65dp"
+        p1:layout_height="65dp"
+        p1:layout_alignParentRight="true" />
+    <TextView
+        p1:id="@+id/chatUserName"
+        p1:text="Lucas E."
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_toLeftOf="@id/chatUserImage" />
+    <ListView
+        p1:id="@+id/chatMessageList"
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="wrap_content"
+        p1:layout_height="match_parent"
+        p1:layout_below="@id/imageView1"
+        p1:layout_marginBottom="50dp" />
+    <TextView
+        p1:id="@+id/chatMessageText"
+        p1:text="Digitar mensagem..."
+        p1:layout_width="match_parent"
+        p1:layout_height="50dp"
+        p1:layout_marginRight="50dp"
+        p1:layout_alignParentBottom="true" />
+    <ImageButton
+        p1:id="@+id/chatSendButton"
+        p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+        p1:layout_width="50dp"
+        p1:layout_height="50dp"
+        p1:layout_alignParentBottom="true"
+        p1:layout_alignParentRight="true" />
+</RelativeLayout>
