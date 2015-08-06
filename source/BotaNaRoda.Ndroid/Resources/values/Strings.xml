@@ -4,6 +4,11 @@
     <string name="item_categories_prompt">Escolha uma categoria</string>
     <string-array name="item_categories">
       <item>Eletrônicos</item>
-      <item>Cozinha</item>
+      <item>Roupas e Acessórios</item>
+      <item>Casa e Jardim</item>
+      <item>Video, Audio e Livros</item>
+      <item>Esporte, Lazer e Jogos</item>
+      <item>Infantil</item>
+      <item>Outros</item>
     </string-array>
 </resources>
