@@ -25,10 +25,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         private TextView _itemAuthorView;
         private TextView _itemDescriptionView;
         private Item _item = new Item();
-        private GoogleMap mMap;
+        private GoogleMap _mMap;
         private Button _reserveButton;
         private TextView _itemTitleView;
         private TextView _itemLocationView;
+        private Button _reportFraudButton;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -44,6 +45,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation);
 			_reserveButton = FindViewById<Button>(Resource.Id.reserveButton);
             _reserveButton.Click += ReserveItem;
+            _reportFraudButton = FindViewById<Button>(Resource.Id.reportFraudButton);
+            _reportFraudButton.Click += ReportFraudButtonOnClick;
 
             Refresh();
         }
@@ -77,6 +80,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    _reserveButton.Text = "Reserved";
 		    _reserveButton.Enabled = false;
 		}
+
+        private void ReportFraudButtonOnClick(object sender, EventArgs eventArgs)
+        {
+            _reportFraudButton.Visibility = ViewStates.Invisible;
+        }
 
         void DeleteItem()
         {
@@ -140,12 +148,12 @@ namespace BotaNaRoda.Ndroid.Controllers
         private void SetUpMapIfNeeded()
         {
             // Do a null check to confirm that we have not already instantiated the map.
-            if (mMap == null)
+            if (_mMap == null)
             {
                 // Try to obtain the map from the SupportMapFragment.
-                mMap = (FragmentManager.FindFragmentById<MapFragment>(Resource.Id.map)).Map;
+                _mMap = (FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment)).Map;
                 // Check if we were successful in obtaining the map.
-                if (mMap != null)
+                if (_mMap != null)
                 {
                     SetUpMap();
                 }
@@ -167,8 +175,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
-            mMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
-            mMap.MoveCamera(cameraUpdate);
+            _mMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
+            _mMap.MoveCamera(cameraUpdate);
 
             Geocoder geocdr = new Geocoder (this);
             var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
