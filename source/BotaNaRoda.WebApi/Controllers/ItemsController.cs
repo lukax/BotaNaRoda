@@ -2,13 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BotaNaRoda.WebApi.Data;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.OptionsModel;
+using MongoDB.Driver;
+
+// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BotaNaRoda.WebApi.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class ItemsController : Controller
     {
+        private readonly ItemsContext _itemsContext;
+
+        public ItemsController(ItemsContext itemsContext)
+        {
+            _itemsContext = itemsContext;
+        }
+
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
