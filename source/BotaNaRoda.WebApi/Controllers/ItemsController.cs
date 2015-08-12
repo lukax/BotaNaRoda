@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
+using BotaNaRoda.WebApi.Entity;
+using BotaNaRoda.WebApi.Models;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,36 +25,32 @@ namespace BotaNaRoda.WebApi.Controllers
             _itemsContext = itemsContext;
         }
 
-        // GET: api/values
+        // GET: api/items
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<List<Item>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return await _itemsContext.Items.Find(new BsonDocument()).ToListAsync();
         }
 
-        // GET api/values/5
+        // GET api/items/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<Item> Get(string id)
         {
-            return "value";
+            return await _itemsContext.Items.Find(x => x.Id == id).FirstAsync();
         }
 
-        // POST api/values
+        // POST api/items
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async void Post([FromBody]PostItemBindingModel model)
         {
+            await _itemsContext.Items.InsertOneAsync(new Item(model));
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
+        // DELETE api/items/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async void Delete(string id)
         {
+            await _itemsContext.Items.DeleteOneAsync(x => x.Id == id);
         }
     }
 }
