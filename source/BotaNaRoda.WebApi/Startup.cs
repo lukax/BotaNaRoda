@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
+using BotaNaRoda.WebApi.Identity;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
@@ -10,6 +12,9 @@ using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Runtime;
+using Thinktecture.IdentityServer.Core.Configuration;
+using Thinktecture.IdentityServer.Core.Logging;
+using Thinktecture.IdentityServer.Core.Services;
 
 namespace BotaNaRoda.WebApi
 {
@@ -42,25 +47,51 @@ namespace BotaNaRoda.WebApi
             // maps the AppSettings configuration key to an instance of the configuration class
             services.Configure<AppSettings>(Configuration.GetConfigurationSection("AppSettings"));
 
-            //di stuff
             services.AddSingleton<ItemsContext>();
 
             services.AddMvc();
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
+
+            services.AddDataProtection();
         }
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IApplicationEnvironment env)
         {
-            // Configure the HTTP request pipeline.
-            app.UseStaticFiles();
+            LogProvider.SetCurrentLogProvider(new DiagnosticsTraceLogProvider());
 
-            // Add MVC to the request pipeline.
+            //app.UseStaticFiles();
             app.UseMvc();
-            // Add the following route for porting Web API 2 controllers.
-            // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
+
+            app.Map("/core", core =>
+            {
+                var factory = InMemoryFactory.Create(
+                                clients: Clients.Get(),
+                                scopes: Scopes.Get());
+                factory.UserService = new Registration<IUserService>(resolver => new UserService());
+
+                var idsrvOptions = new IdentityServerOptions
+                {
+                    IssuerUri = "https://botanaroda.com.br",
+                    Factory = factory,
+                    RequireSsl = false,
+                    SigningCertificate = new X509Certificate2(env.ApplicationBasePath + "\\Identity\\idsrv3test.pfx", "idsrv3test"),
+
+                    CorsPolicy = CorsPolicy.AllowAll,
+
+                    EventsOptions = new EventsOptions
+                    {
+                        RaiseSuccessEvents = true,
+                        RaiseErrorEvents = true,
+                        RaiseFailureEvents = true,
+                        RaiseInformationEvents = true
+                    }
+                };
+
+                core.UseIdentityServer(idsrvOptions);
+            });
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BotaNaRoda.WebApi.Entity;
+using BotaNaRoda.WebApi.Domain;
 using Microsoft.Framework.OptionsModel;
 using MongoDB.Driver;
 

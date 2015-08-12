@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
-using BotaNaRoda.WebApi.Entity;
+using BotaNaRoda.WebApi.Domain;
 using BotaNaRoda.WebApi.Models;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;

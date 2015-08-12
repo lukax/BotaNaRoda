@@ -8,7 +8,12 @@
     "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5",
     "Microsoft.AspNet.StaticFiles": "1.0.0-beta5",
     "Microsoft.Framework.Configuration.Json": "1.0.0-beta5",
-    "MongoDB.Driver": "2.0.1"
+    "MongoDB.Driver": "2.0.1",
+    "Microsoft.Owin": "3.0.1",
+    "Microsoft.AspNet.Owin": "1.0.0-beta5",
+    "Microsoft.AspNet.DataProtection": "1.0.0-beta5",
+    "Microsoft.AspNet.Identity": "3.0.0-beta5",
+    "Thinktecture.IdentityServer3": "1.5.0"
   },
 
   "commands": {

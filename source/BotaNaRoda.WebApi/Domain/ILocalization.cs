@@ -1,4 +1,4 @@
-﻿namespace BotaNaRoda.WebApi.Entity
+﻿namespace BotaNaRoda.WebApi.Domain
 {
     public interface ILocalization
     {

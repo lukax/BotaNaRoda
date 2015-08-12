@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BotaNaRoda.WebApi.Entity;
+using BotaNaRoda.WebApi.Domain;
 
 namespace BotaNaRoda.WebApi.Models
 {

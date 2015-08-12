@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace BotaNaRoda.WebApi.Entity
+namespace BotaNaRoda.WebApi.Domain
 {
     public class User : ILocalization
     {
@@ -16,6 +13,8 @@ namespace BotaNaRoda.WebApi.Entity
         public DateTime UpdatedAt { get; set; }
 
         public string Username { get; set; }
+        public string PasswordHash { get; set; }
+
         public string Avatar { get; set; }
 
         public double Latitude { get; set; }
