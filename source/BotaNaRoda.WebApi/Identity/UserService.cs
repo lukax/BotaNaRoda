@@ -19,12 +19,12 @@ namespace BotaNaRoda.WebApi.Identity
             new User{
                 Id = "123",
                 Username = "alice",
-                PasswordHash = "alice",
+                PasswordHash = "AQAAAAEAACcQAAAAEJDhtBV5eN45xYhcm+hnnvr6u1uhqLrsDFZcMGnCSx3YDpRhyOhzRpDTCgeC1odrxg==",
             },
             new User{
                 Id = "890",
                 Username = "bob",
-                PasswordHash = "bob",
+                PasswordHash = "AQAAAAEAACcQAAAAEL+DbblrZq5vYstzBdDtGz8uAkT7ZQT2pMNseXh2AL19gxqxaFREx6pcIGsyc0vi7w==",
             },
         };
 
@@ -59,7 +59,6 @@ namespace BotaNaRoda.WebApi.Identity
             return Task.FromResult(new List<Claim>
             {
                 new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
-                new Claim(Constants.ClaimTypes.Address, user.Address)
             }.AsEnumerable());
         }
 
