@@ -121,6 +121,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                         _itemAuthorView.Text = "Lucas";
                         _itemTitleView.Text = _item.Name;
                         _itemDescriptionView.Text = _item.Description;
+                        _itemLocationView.Text = _item.Address;
                         _itemImageView.SetImageBitmap(itemImage);
                         SetUpMapIfNeeded();
                     }
@@ -177,12 +178,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _mMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
             _mMap.MoveCamera(cameraUpdate);
-
-            Geocoder geocdr = new Geocoder (this);
-            var addresses = geocdr.GetFromLocation (location.Latitude, location.Longitude, 1);
-            if (addresses.Any ()) {
-            	_itemLocationView.Text = addresses.First ().FeatureName;
-            }
         }
 
     }

@@ -22,17 +22,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
 	public class ItemCreateActivity : Activity, ILocationListener
 	{
-		const int CAPTURE_PHOTO = 0;
-		EditText _itemDescriptionView;
-		Item _item = new Item();
-		LocationManager _locMgr;
-		EditText _itemTitleView;
-		Location currentLocation; 
-		ProgressDialog _progressDialog;
-		ImageView _itemImageView;
-	    Spinner _itemCategory;
-		Button _saveButton;
+        private const int CapturePhoto = 0;
+        private EditText _itemDescriptionView;
+        private LocationManager _locMgr;
+        private EditText _itemTitleView;
+        private Location _currentLocation;
+        private ProgressDialog _progressDialog;
+        private ImageView _itemImageView;
+        private Spinner _itemCategory;
 	    private bool _imageTaken;
+	    private IList<Address> _addresses;
+	    private readonly string _newItemGuid = Guid.NewGuid().ToString();
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -49,8 +49,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        var categoriesAdapter = ArrayAdapter.CreateFromResource(this, Resource.Array.item_categories, Android.Resource.Layout.SimpleSpinnerItem);
             categoriesAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _itemCategory.Adapter = categoriesAdapter;
-			_saveButton = FindViewById<Button> (Resource.Id.saveButton);
-			_saveButton.Click += _saveButton_Click;
+			FindViewById<Button> (Resource.Id.saveButton).Click += _saveButton_Click;
 		}
 
 	    protected override void OnResume()
@@ -75,9 +74,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			switch (item.ItemId)
 			{
-                case Resource.Id.actionMap:
-			        OpenMap();
-			        return true;
+           //     case Resource.Id.actionMap:
+			        //OpenMap();
+			        //return true;
                 case Resource.Id.actionLocation:
                     GetLocation();
 			        return true;
@@ -88,11 +87,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
 		{
-			if (requestCode == CAPTURE_PHOTO) {
+			if (requestCode == CapturePhoto) {
 				if (resultCode == Result.Ok) {
 					// display saved image
 				    _imageTaken = true;
-					using (Bitmap itemImage = ItemData.GetImageFile (_item.Id, _itemImageView.Width, _itemImageView.Height)) {
+					using (Bitmap itemImage = ItemData.GetImageFile (_newItemGuid, _itemImageView.Width, _itemImageView.Height)) {
 						_itemImageView.SetImageBitmap (itemImage);
 					}
 				} else {
@@ -107,8 +106,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
-			currentLocation = location;
-			_progressDialog.Cancel ();
+			_currentLocation = location;
+            Geocoder geocdr = new Geocoder(this);
+            _addresses = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1);
+            _progressDialog.Cancel ();
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -125,7 +126,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		void _saveButton_Click (object sender, EventArgs e)
 		{
-			if (currentLocation == null) {
+			if (_currentLocation == null) {
 				Toast toast = Toast.MakeText (this, "Não é possivel salvar item sem a localização!", ToastLength.Short);
 				toast.Show ();
 				return;
@@ -137,20 +138,24 @@ namespace BotaNaRoda.Ndroid.Controllers
                 return;
             }
 
-            _item.Name = _itemTitleView.Text;
-			_item.Description = _itemDescriptionView.Text;
-		    _item.Category = _itemCategory.SelectedItem.ToString();
-			_item.Latitude = currentLocation.Latitude;
-			_item.Longitude = currentLocation.Longitude;
-			ItemData.Service.SaveItem (_item);
-
+		    var item = new Item
+		    {
+		        Name = _itemTitleView.Text,
+		        Id = _newItemGuid,
+		        Description = _itemDescriptionView.Text,
+		        Category = _itemCategory.SelectedItem.ToString(),
+		        Address = _addresses.First().FeatureName,
+		        Latitude = _currentLocation.Latitude,
+		        Longitude = _currentLocation.Longitude
+		    };
+		    ItemData.Service.SaveItem (item);
 			Finish ();
 		}
 
 		void _imageButton_Click (object sender, EventArgs e)
 		{
 			File imageFile = new File(
-				ItemData.Service.GetImageFileName(_item.Id));
+				ItemData.Service.GetImageFileName(_newItemGuid));
 			var imageUri = Uri.FromFile (imageFile);
 
 			Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
@@ -168,33 +173,33 @@ namespace BotaNaRoda.Ndroid.Controllers
 				alertConfirm.Show ();
 			}
 			else {
-				StartActivityForResult (cameraIntent, CAPTURE_PHOTO);
+				StartActivityForResult (cameraIntent, CapturePhoto);
 			}
 		}
 
-		void OpenMap ()
-		{
-			Uri geoUri;
-			if (string.IsNullOrEmpty (_itemTitleView.Text)) {
-				geoUri = Uri.Parse (string.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
-			} else {
-				geoUri = Uri.Parse (string.Format ("geo:0,0?q={0}", _itemTitleView.Text));
-			}
-			Intent mapIntent = new Intent (Intent.ActionView, geoUri);
+		//void OpenMap ()
+		//{
+		//	Uri geoUri;
+		//	if (string.IsNullOrEmpty (_itemTitleView.Text)) {
+		//		geoUri = Uri.Parse (string.Format ("geo:{0},{1}", _item.Latitude, _item.Longitude)); 
+		//	} else {
+		//		geoUri = Uri.Parse (string.Format ("geo:0,0?q={0}", _itemTitleView.Text));
+		//	}
+		//	Intent mapIntent = new Intent (Intent.ActionView, geoUri);
 
-			PackageManager packageManager = PackageManager;
-			IList<ResolveInfo> activities =
-				packageManager.QueryIntentActivities(mapIntent, 0);
-			if (activities.Count == 0) {
-				AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
-				alertConfirm.SetCancelable (false);
-				alertConfirm.SetPositiveButton ("OK", delegate {});
-				alertConfirm.SetMessage ("No map app available.");
-				alertConfirm.Show ();
-			} else {
-				StartActivity (mapIntent);
-			}
-		}
+		//	PackageManager packageManager = PackageManager;
+		//	IList<ResolveInfo> activities =
+		//		packageManager.QueryIntentActivities(mapIntent, 0);
+		//	if (activities.Count == 0) {
+		//		AlertDialog.Builder alertConfirm = new AlertDialog.Builder (this);
+		//		alertConfirm.SetCancelable (false);
+		//		alertConfirm.SetPositiveButton ("OK", delegate {});
+		//		alertConfirm.SetMessage ("No map app available.");
+		//		alertConfirm.Show ();
+		//	} else {
+		//		StartActivity (mapIntent);
+		//	}
+		//}
 
 		void GetLocation ()
 		{

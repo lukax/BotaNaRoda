@@ -52,7 +52,7 @@ namespace BotaNaRoda.Ndroid.Data
             {
                 item.Id = Guid.NewGuid().ToString();
             }
-            item.PostDate = DateTime.UtcNow;
+            item.CreatedAt = DateTime.UtcNow;
 
             var itemString = JsonConvert.SerializeObject(item);
             File.WriteAllText(GetFilename(item.Id), itemString);
