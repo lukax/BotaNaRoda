@@ -10,6 +10,9 @@ namespace BotaNaRoda.WebApi.Domain
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -35,9 +38,10 @@ namespace BotaNaRoda.WebApi.Domain
             CreatedAt = DateTime.UtcNow;
         }
 
-        public Item(PostItemBindingModel model) : this()
+        public Item(PostItemBindingModel model, string userId) : this()
         {
             Name = model.Name;
+            UserId = userId;
             Description = model.Description;
             CategoryType = model.CategoryType;
             ProductImages = model.ProductImages;

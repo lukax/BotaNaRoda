@@ -12,8 +12,18 @@ namespace BotaNaRoda.WebApi.Domain
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public User From { get; set; }
-        public User To { get; set; }
-        public Item Item { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string FromUserId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ToUserId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ItemId { get; set; }
+
+        public Conversation()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 }

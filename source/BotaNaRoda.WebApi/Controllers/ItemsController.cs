@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Domain;
 using BotaNaRoda.WebApi.Models;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Thinktecture.IdentityServer.Core.Extensions;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -34,23 +36,46 @@ namespace BotaNaRoda.WebApi.Controllers
 
         // GET api/items/5
         [HttpGet("{id}")]
-        public async Task<Item> Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
-            return await _itemsContext.Items.Find(x => x.Id == id).FirstAsync();
+            var item = await _itemsContext.Items.Find(x => x.Id == id).FirstAsync();
+            if (item == null)
+            {
+                return HttpNotFound();
+            }
+
+            var user = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+            return new ObjectResult(new ListItemViewModel(item, new UserViewModel(user)));
         }
 
         // POST api/items
         [HttpPost]
-        public async void Post([FromBody]PostItemBindingModel model)
+        [Authorize]
+        public async Task<IActionResult> Post([FromBody]PostItemBindingModel model)
         {
-            await _itemsContext.Items.InsertOneAsync(new Item(model));
+            if (!ModelState.IsValid)
+            {
+                return HttpBadRequest(ModelState);
+            }
+
+            var item = new Item(model, User.GetSubjectId());
+            await _itemsContext.Items.InsertOneAsync(item);
+            return Created(Request.Path + item.Id, null);
         }
 
         // DELETE api/items/5
         [HttpDelete("{id}")]
-        public async void Delete(string id)
+        [Authorize]
+        public async Task<IActionResult> Delete(string id)
         {
-            await _itemsContext.Items.DeleteOneAsync(x => x.Id == id);
+            var userId = User.GetSubjectId();
+            var result = await _itemsContext.Items.DeleteOneAsync(x => x.Id == id && x.UserId == userId);
+            //TODO acknowledge result
+            //if (result.DeletedCount > 0)
+            //{
+                return new HttpStatusCodeResult(204); // No content
+            //}
+            //return HttpNotFound();
         }
     }
 }

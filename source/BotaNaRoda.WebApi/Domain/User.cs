@@ -23,5 +23,10 @@ namespace BotaNaRoda.WebApi.Domain
         public string City { get; set; }
         public string CountryCode { get; set; }
         public string ZipCode { get; set; }
+
+        public User()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 }

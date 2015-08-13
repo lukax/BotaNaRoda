@@ -21,5 +21,7 @@ namespace BotaNaRoda.WebApi.Data
         public IMongoCollection<Item> Items => _db.GetCollection<Item>("items");
 
         public IMongoCollection<User> Users => _db.GetCollection<User>("users");
+
+        public IMongoCollection<Conversation> Conversations => _db.GetCollection<Conversation>("conversations");
     }
 }
