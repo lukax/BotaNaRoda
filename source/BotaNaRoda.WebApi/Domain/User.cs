@@ -1,4 +1,5 @@
 ﻿using System;
+using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -26,7 +27,20 @@ namespace BotaNaRoda.WebApi.Domain
 
         public User()
         {
+            Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
+        }
+
+        public User(RegisterUserBindingModel model)
+        {
+            Username = model.Username;
+            Avatar = model.Avatar;
+            Latitude = model.Latitude;
+            Longitude = model.Longitude;
+            Address = model.Address;
+            City = model.City;
+            CountryCode = model.CountryCode;
+            ZipCode = model.ZipCode;
         }
     }
 }

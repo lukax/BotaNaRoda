@@ -13,8 +13,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Thinktecture.IdentityServer.Core.Extensions;
 
-// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace BotaNaRoda.WebApi.Controllers
 {
     [Route("api/[controller]")]
@@ -51,7 +49,7 @@ namespace BotaNaRoda.WebApi.Controllers
         // POST api/items
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Post([FromBody]PostItemBindingModel model)
+        public async Task<IActionResult> Post([FromBody] PostItemBindingModel model)
         {
             if (!ModelState.IsValid)
             {
