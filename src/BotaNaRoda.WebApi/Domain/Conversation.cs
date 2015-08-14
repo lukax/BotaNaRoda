@@ -13,16 +13,17 @@ namespace BotaNaRoda.WebApi.Domain
         public DateTime UpdatedAt { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
+        public string ItemId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
         public string FromUserId { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string ToUserId { get; set; }
 
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string ItemId { get; set; }
-
         public Conversation()
         {
+            Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
         }
     }

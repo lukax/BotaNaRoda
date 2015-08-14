@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -38,8 +39,10 @@ namespace BotaNaRoda.WebApi.Domain
             CreatedAt = DateTime.UtcNow;
         }
 
-        public Item(PostItemBindingModel model, string userId) : this()
+        public Item(PostItemBindingModel model, string userId) 
         {
+            Id = ObjectId.GenerateNewId().ToString();
+            CreatedAt = DateTime.UtcNow;
             Name = model.Name;
             UserId = userId;
             Description = model.Description;

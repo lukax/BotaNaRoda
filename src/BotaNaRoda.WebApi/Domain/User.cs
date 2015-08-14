@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -26,7 +27,7 @@ namespace BotaNaRoda.WebApi.Domain
         public string ZipCode { get; set; }
 
         public int Credits { get; set; }
-        public int Score { get; set; }
+        public List<UserRating> Ratings { get; set; }
 
         public User()
         {
@@ -36,6 +37,8 @@ namespace BotaNaRoda.WebApi.Domain
 
         public User(RegisterUserBindingModel model)
         {
+            Id = ObjectId.GenerateNewId().ToString();
+            CreatedAt = DateTime.UtcNow;
             Username = model.Username;
             Avatar = model.Avatar;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);

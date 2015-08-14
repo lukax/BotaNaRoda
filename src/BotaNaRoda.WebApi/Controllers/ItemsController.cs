@@ -42,7 +42,8 @@ namespace BotaNaRoda.WebApi.Controllers
                             }
                         } 
                     }
-                }
+                },
+                { "status", 0 }
             }).Skip(offset).Limit(20).ToListAsync();
             return items.Select(x => new ItemListViewModel(x));
         }

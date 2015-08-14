@@ -4,6 +4,6 @@
     {
         Available,
         Unavailable,
-        Busy
+        Pending
     }
 }
