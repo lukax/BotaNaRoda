@@ -48,7 +48,7 @@ namespace BotaNaRoda.WebApi
             // maps the AppSettings configuration key to an instance of the configuration class
             services.Configure<AppSettings>(Configuration.GetConfigurationSection("AppSettings"));
 
-            services.AddSingleton<ItemsContext>();
+            services.AddTransient<ItemsContext>();
 
             services.AddMvc();
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.

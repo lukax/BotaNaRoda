@@ -30,13 +30,10 @@ namespace BotaNaRoda.WebApi.Identity
 
         public async Task<AuthenticateResult> AuthenticateLocalAsync(string username, string password, SignInMessage message)
         {
+            var user = await _itemsContext.Users.Find(x => x.Username == username).FirstOrDefaultAsync();
+
             PasswordHasher<User> hasher = new PasswordHasher<User>();
-
-            User user = await _itemsContext.Users.Find(x => x.Username == username &&
-                                          (hasher.VerifyHashedPassword(x, x.PasswordHash, password) !=
-                                           PasswordVerificationResult.Failed)).FirstOrDefaultAsync();
-
-            if (user == null)
+            if (user == null || hasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
             {
                 return await Task.FromResult<AuthenticateResult>(null);
             }
