@@ -10,6 +10,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
 using Thinktecture.IdentityServer.Core.Extensions;
 
@@ -27,9 +28,23 @@ namespace BotaNaRoda.WebApi.Controllers
 
         // GET: api/items
         [HttpGet]
-        public async Task<List<Item>> Get()
+        public async Task<List<Item>> Get(double latitude, double longitude, double radius, int offset)
         {
-            return await _itemsContext.Items.Find(new BsonDocument()).ToListAsync();
+            return await _itemsContext.Items.Find(new BsonDocument
+            {
+                { "coordinates",
+                    new BsonDocument("$geoWithin",  
+                        new BsonDocument("$centerSphere", 
+                            new BsonArray
+                            {
+                                new BsonArray { longitude, latitude },
+                                radius
+                            }
+                        )
+                    )
+                }
+
+            }).Skip(offset).Limit(20).ToListAsync();
         }
 
         // GET api/items/5

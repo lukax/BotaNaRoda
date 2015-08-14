@@ -1,4 +1,6 @@
-﻿namespace BotaNaRoda.WebApi.Domain
+﻿using MongoDB.Driver.GeoJsonObjectModel;
+
+namespace BotaNaRoda.WebApi.Domain
 {
     public interface ILocalization
     {
@@ -7,7 +9,6 @@
         string CountryCode { get; set; }
         string ZipCode { get; set; }
 
-        double Latitude { get; set; }
-        double Longitude { get; set; }
+        GeoJson2DGeographicCoordinates Coordinates { get; set; }
     }
 }

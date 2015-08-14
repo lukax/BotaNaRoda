@@ -2,6 +2,7 @@
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace BotaNaRoda.WebApi.Domain
 {
@@ -25,8 +26,7 @@ namespace BotaNaRoda.WebApi.Domain
 
         public bool Status { get; set; }
 
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public GeoJson2DGeographicCoordinates Coordinates { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
         public string CountryCode { get; set; }
@@ -45,8 +45,7 @@ namespace BotaNaRoda.WebApi.Domain
             Description = model.Description;
             CategoryType = model.CategoryType;
             ProductImages = model.ProductImages;
-            Latitude = model.Latitude;
-            Longitude = model.Longitude;
+            Coordinates = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
             City = model.City;
             CountryCode = model.CountryCode;
