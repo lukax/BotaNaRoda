@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid", "BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj", "{59399593-215A-44AD-A273-4B32515D0D39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid", "src\BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj", "{59399593-215A-44AD-A273-4B32515D0D39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid.Test", "BotaNaRoda.Ndroid.Test\BotaNaRoda.Ndroid.Test.csproj", "{F932C763-C71A-4560-81DD-BE9116573FD4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{86A72732-CF05-486F-A671-636CE6649E49}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4B1812A4-B0EA-4567-94E8-4CFC20F50B51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid.Test", "test\BotaNaRoda.Ndroid.Test\BotaNaRoda.Ndroid.Test.csproj", "{F932C763-C71A-4560-81DD-BE9116573FD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,5 +32,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{59399593-215A-44AD-A273-4B32515D0D39} = {86A72732-CF05-486F-A671-636CE6649E49}
+		{F932C763-C71A-4560-81DD-BE9116573FD4} = {4B1812A4-B0EA-4567-94E8-4CFC20F50B51}
 	EndGlobalSection
 EndGlobal

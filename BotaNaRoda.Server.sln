@@ -3,9 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BotaNaRoda.WebApi", "BotaNaRoda.WebApi\BotaNaRoda.WebApi.xproj", "{7A71D5CB-91EA-4673-9F43-458360152354}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BotaNaRoda.WebApi", "src\BotaNaRoda.WebApi\BotaNaRoda.WebApi.xproj", "{7A71D5CB-91EA-4673-9F43-458360152354}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BotaNaRoda.WebApi.Test", "BotaNaRoda.WebApi.Test\BotaNaRoda.WebApi.Test.xproj", "{3F706F13-33BF-48E9-90A9-B1EB21B5725D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5541752-3C33-4390-8181-DFAFAEE8D657}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B516BBAB-909D-4E7A-ABF5-0BEF609BBEF8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B409216F-512C-4794-A7CE-0D2A72E49B3D}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BotaNaRoda.WebApi.Test", "test\BotaNaRoda.WebApi.Test\BotaNaRoda.WebApi.Test.xproj", "{3F706F13-33BF-48E9-90A9-B1EB21B5725D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +33,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7A71D5CB-91EA-4673-9F43-458360152354} = {B516BBAB-909D-4E7A-ABF5-0BEF609BBEF8}
+		{3F706F13-33BF-48E9-90A9-B1EB21B5725D} = {B409216F-512C-4794-A7CE-0D2A72E49B3D}
 	EndGlobalSection
 EndGlobal

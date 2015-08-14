@@ -68,7 +68,7 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj">
+    <ProjectReference Include="..\..\src\BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj">
       <Project>{59399593-215a-44ad-a273-4b32515d0d39}</Project>
       <Name>BotaNaRoda.Ndroid</Name>
     </ProjectReference>
