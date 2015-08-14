@@ -11,6 +11,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
 using Thinktecture.IdentityServer.Core.Configuration;
 using Thinktecture.IdentityServer.Core.Logging;
@@ -58,7 +59,7 @@ namespace BotaNaRoda.WebApi
         }
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IApplicationEnvironment env)
+        public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
         {
             LogProvider.SetCurrentLogProvider(new DiagnosticsTraceLogProvider());
 
@@ -70,7 +71,7 @@ namespace BotaNaRoda.WebApi
                 var factory = InMemoryFactory.Create(
                                 clients: Clients.Get(),
                                 scopes: Scopes.Get());
-                factory.UserService = new Registration<IUserService>(resolver => new UserService());
+                factory.UserService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings)));
 
                 var idsrvOptions = new IdentityServerOptions
                 {

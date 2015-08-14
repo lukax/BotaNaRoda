@@ -30,20 +30,19 @@ namespace BotaNaRoda.WebApi.Controllers
         [HttpGet]
         public async Task<List<Item>> Get(double latitude, double longitude, double radius, int offset)
         {
+            const double earthRadiusInKm = 6371.009;
+
             return await _itemsContext.Items.Find(new BsonDocument
             {
-                { "coordinates",
-                    new BsonDocument("$geoWithin",  
-                        new BsonDocument("$centerSphere", 
-                            new BsonArray
+                { "loc", new BsonDocument
+                    {
+                        { "$geoWithin", new BsonDocument
                             {
-                                new BsonArray { longitude, latitude },
-                                radius
+                                { "$centerSphere", new BsonArray { new BsonArray { longitude, latitude }, radius / earthRadiusInKm } }
                             }
-                        )
-                    )
+                        } 
+                    }
                 }
-
             }).Skip(offset).Limit(20).ToListAsync();
         }
 
@@ -51,7 +50,7 @@ namespace BotaNaRoda.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            var item = await _itemsContext.Items.Find(x => x.Id == id).FirstAsync();
+            var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (item == null)
             {
                 return HttpNotFound();

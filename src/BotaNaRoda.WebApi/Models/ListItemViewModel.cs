@@ -19,8 +19,8 @@ namespace BotaNaRoda.WebApi.Models
             ProductImages = item.ProductImages;
             ImageThumb = item.ImageThumb;
             Status = item.Status;
-            Latitude = item.Coordinates.Latitude;
-            Longitude = item.Coordinates.Longitude;
+            Latitude = item.Loc.Latitude;
+            Longitude = item.Loc.Longitude;
             Address = item.Address;
             
         }

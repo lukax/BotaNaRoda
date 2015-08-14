@@ -9,6 +9,6 @@ namespace BotaNaRoda.WebApi.Domain
         string CountryCode { get; set; }
         string ZipCode { get; set; }
 
-        GeoJson2DGeographicCoordinates Coordinates { get; set; }
+        GeoJson2DGeographicCoordinates Loc { get; set; }
     }
 }
