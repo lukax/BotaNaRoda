@@ -19,12 +19,12 @@ namespace BotaNaRoda.WebApi.Domain
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public CategoryType CategoryType { get; set; }
+        public CategoryType Category { get; set; }
 
-        public string[] ProductImages { get; set; }
-        public string ImageThumb { get; set; }
+        public string[] Images { get; set; }
+        public string ThumbImage { get; set; }
 
-        public bool Status { get; set; }
+        public ItemStatus Status { get; set; }
 
         public GeoJson2DGeographicCoordinates Loc { get; set; }
         public string Address { get; set; }
@@ -43,8 +43,8 @@ namespace BotaNaRoda.WebApi.Domain
             Name = model.Name;
             UserId = userId;
             Description = model.Description;
-            CategoryType = model.CategoryType;
-            ProductImages = model.ProductImages;
+            Category = model.CategoryType;
+            Images = model.ProductImages;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
             City = model.City;

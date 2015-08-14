@@ -49,7 +49,7 @@ namespace BotaNaRoda.WebApi.Controllers
 
             await _itemsContext.Users.InsertOneAsync(user);
 
-            return Created(Request.Path + user.Id, null);
+            return Created(Request.Path + "/" + user.Id, null);
         }
     }
 }

@@ -25,6 +25,9 @@ namespace BotaNaRoda.WebApi.Domain
         public string CountryCode { get; set; }
         public string ZipCode { get; set; }
 
+        public int Credits { get; set; }
+        public int Score { get; set; }
+
         public User()
         {
             Id = ObjectId.GenerateNewId().ToString();

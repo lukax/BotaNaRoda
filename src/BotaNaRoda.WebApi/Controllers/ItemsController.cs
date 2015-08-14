@@ -28,11 +28,11 @@ namespace BotaNaRoda.WebApi.Controllers
 
         // GET: api/items
         [HttpGet]
-        public async Task<List<Item>> Get(double latitude, double longitude, double radius, int offset)
+        public async Task<IEnumerable<ItemListViewModel>> GetAll(double latitude, double longitude, double radius, int offset)
         {
             const double earthRadiusInKm = 6371.009;
 
-            return await _itemsContext.Items.Find(new BsonDocument
+            var items = await _itemsContext.Items.Find(new BsonDocument
             {
                 { "loc", new BsonDocument
                     {
@@ -44,11 +44,12 @@ namespace BotaNaRoda.WebApi.Controllers
                     }
                 }
             }).Skip(offset).Limit(20).ToListAsync();
+            return items.Select(x => new ItemListViewModel(x));
         }
 
         // GET api/items/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetOne(string id)
         {
             var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (item == null)
@@ -57,7 +58,7 @@ namespace BotaNaRoda.WebApi.Controllers
             }
 
             var user = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
-            return new ObjectResult(new ListItemViewModel(item, new UserViewModel(user)));
+            return new ObjectResult(new ItemDetailViewModel(item, new UserViewModel(user)));
         }
 
         // POST api/items
@@ -72,7 +73,7 @@ namespace BotaNaRoda.WebApi.Controllers
 
             var item = new Item(model, User.GetSubjectId());
             await _itemsContext.Items.InsertOneAsync(item);
-            return Created(Request.Path + item.Id, null);
+            return Created(Request.Path + "/" + item.Id, null);
         }
 
         // DELETE api/items/5

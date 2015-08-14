@@ -31,6 +31,7 @@ namespace BotaNaRoda.WebApi.Data
         private async void CreateIndexes()
         {
             await Items.Indexes.CreateOneAsync(Builders<Item>.IndexKeys.Geo2DSphere(x => x.Loc));
+            await Items.Indexes.CreateOneAsync(Builders<Item>.IndexKeys.Ascending(x => x.Status));
             await Users.Indexes.CreateOneAsync(Builders<User>.IndexKeys.Geo2DSphere(x => x.Loc));
         }
     }
