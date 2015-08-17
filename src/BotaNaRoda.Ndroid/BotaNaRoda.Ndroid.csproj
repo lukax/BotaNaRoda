@@ -131,6 +131,7 @@
     <Compile Include="Data\ItemData.cs" />
     <Compile Include="Controllers\ItemDetailActivity.cs" />
     <Compile Include="Controllers\ItemCreateActivity.cs" />
+    <Compile Include="Controllers\LoginActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -142,6 +143,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\Chat.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\Login.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
