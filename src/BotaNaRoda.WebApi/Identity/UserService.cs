@@ -23,9 +23,31 @@ namespace BotaNaRoda.WebApi.Identity
             _itemsContext = itemsContext;
         }
 
-        public Task<AuthenticateResult> AuthenticateExternalAsync(ExternalIdentity externalUser, SignInMessage message)
+        public async Task<AuthenticateResult> AuthenticateExternalAsync(ExternalIdentity externalUser, SignInMessage message)
         {
-            return Task.FromResult<AuthenticateResult>(null);
+            // look for the user in our local identity system from the external identifiers
+            var user = await _itemsContext.Users.Find(x => x.Provider == externalUser.Provider && x.ProviderId == externalUser.ProviderId).FirstOrDefaultAsync();
+
+            string username = externalUser.ProviderId;
+            if (user == null)
+            {
+                // new user, so add them here
+                var nameClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
+                var emailClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Email);
+                if (nameClaim != null) username = nameClaim.Value;
+                if (emailClaim != null) username = emailClaim.Value;
+
+                user = new User
+                {
+                    Provider = externalUser.Provider,
+                    ProviderId = externalUser.ProviderId,
+                    Username = username
+                };
+                await _itemsContext.Users.InsertOneAsync(user);
+            }
+
+            // user is registered so continue
+            return await Task.FromResult(new AuthenticateResult(user.Id, user.Username, identityProvider: user.Provider));
         }
 
         public async Task<AuthenticateResult> AuthenticateLocalAsync(string username, string password, SignInMessage message)

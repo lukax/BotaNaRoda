@@ -13,6 +13,8 @@ using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
+using Microsoft.Owin.Security.Facebook;
+using Owin;
 using Thinktecture.IdentityServer.Core.Configuration;
 using Thinktecture.IdentityServer.Core.Logging;
 using Thinktecture.IdentityServer.Core.Services;
@@ -76,11 +78,17 @@ namespace BotaNaRoda.WebApi
                 var idsrvOptions = new IdentityServerOptions
                 {
                     IssuerUri = "https://botanaroda.com.br",
-                    Factory = factory,
+                    SiteName = "Bota na Roda",
+
                     RequireSsl = false,
                     SigningCertificate = new X509Certificate2(env.ApplicationBasePath + "\\Identity\\idsrv3test.pfx", "idsrv3test"),
-
+                    Factory = factory,
                     CorsPolicy = CorsPolicy.AllowAll,
+
+                    AuthenticationOptions = new AuthenticationOptions
+                    {
+                        IdentityProviders = ConfigureAdditionalIdentityProviders
+                    },
 
                     EventsOptions = new EventsOptions
                     {
@@ -93,6 +101,19 @@ namespace BotaNaRoda.WebApi
 
                 core.UseIdentityServer(idsrvOptions);
             });
+        }
+
+
+        public static void ConfigureAdditionalIdentityProviders(IAppBuilder app, string signInAsType)
+        {
+            var fb = new FacebookAuthenticationOptions
+            {
+                AuthenticationType = "Facebook",
+                SignInAsAuthenticationType = signInAsType,
+                AppId = "450077978528041",
+                AppSecret = "662a479402ffad82d300a1c6d87c6d8f"
+            };
+            app.UseFacebookAuthentication(fb);
         }
     }
 }

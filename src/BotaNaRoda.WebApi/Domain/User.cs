@@ -29,6 +29,9 @@ namespace BotaNaRoda.WebApi.Domain
         public int Credits { get; set; }
         public List<UserRating> Ratings { get; set; }
 
+        public string Provider { get; set; }
+        public string ProviderId { get; set; }
+
         public User()
         {
             Id = ObjectId.GenerateNewId().ToString();
