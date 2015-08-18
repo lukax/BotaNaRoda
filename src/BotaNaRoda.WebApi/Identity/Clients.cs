@@ -78,6 +78,11 @@ namespace BotaNaRoda.WebApi.Identity
                         "http://localhost:23453/frame.html",
                         "http://localhost:23453/modal.html",
 
+                        "https://localhost:44333/core",
+                        "http://localhost:42000/core",
+                        "http://192.168.1.106:42001/core",
+                        "http://botanarodaapi.azurewebsites.net/core",
+
                         // WPF client
                         "oob://localhost/wpfclient",
 

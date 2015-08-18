@@ -32,10 +32,8 @@ namespace BotaNaRoda.WebApi.Identity
             if (user == null)
             {
                 // new user, so add them here
-                var nameClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
-                var emailClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Email);
+                var nameClaim = externalUser.Claims.FirstOrDefault(x => x.Type == Constants.ClaimTypes.Name);
                 if (nameClaim != null) username = nameClaim.Value;
-                if (emailClaim != null) username = emailClaim.Value;
 
                 user = new User
                 {

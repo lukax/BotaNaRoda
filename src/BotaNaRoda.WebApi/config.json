@@ -1,7 +1,7 @@
 ﻿{
   "AppSettings": {
     "BotaNaRodaConnectionString": "mongodb://localhost",
-    "BotaNaRodaDatabaseName":  "BotaNaRoda"
+    "BotaNaRodaDatabaseName":  "botanaroda"
   }
   //"Data": {
   //  "DefaultConnection": {

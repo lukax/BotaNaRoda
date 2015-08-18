@@ -28,18 +28,12 @@ namespace BotaNaRoda.WebApi
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             // Setup configuration sources.
-
             var builder = new ConfigurationBuilder(appEnv.ApplicationBasePath)
+                .AddEnvironmentVariables()
                 .AddJsonFile("config.json")
-                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
 
-            if (env.IsDevelopment())
-            {
-                // This reads the configuration keys from the secret store.
-                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                //builder.AddUserSecrets();
-            }
-            builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
@@ -58,6 +52,7 @@ namespace BotaNaRoda.WebApi
             // services.AddWebApiConventions();
 
             services.AddDataProtection();
+            services.AddLogging();
         }
 
         // Configure is called after ConfigureServices is called.
