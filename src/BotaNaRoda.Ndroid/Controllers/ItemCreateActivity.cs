@@ -19,7 +19,7 @@ using Uri = Android.Net.Uri;
 namespace BotaNaRoda.Ndroid.Controllers
 {
 	[Activity (Label = "ItemCreateActivity",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]			
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]	
 	public class ItemCreateActivity : Activity, ILocationListener
 	{
         private const int CapturePhoto = 0;
@@ -38,7 +38,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.ItemCreate);
-		
+            ActionBar.SetDisplayHomeAsUpEnabled(true);
+
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
 			_itemTitleView = FindViewById<EditText> (Resource.Id.itemTitle);

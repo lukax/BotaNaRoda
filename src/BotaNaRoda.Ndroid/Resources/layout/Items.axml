@@ -19,7 +19,7 @@
             android:stretchMode="columnWidth"
             android:gravity="center" />
         <Button
-            android:text="Botar na Roda"
+            android:text="Bota na Roda"
             android:layout_height="50dp"
             android:layout_width="fill_parent"
             android:layout_alignParentBottom="true"

@@ -8,8 +8,11 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
+using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -105,7 +108,15 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		private void NewItem(object sender, EventArgs args)
 		{
-			StartActivity(typeof(ItemCreateActivity));
+		    IEnumerable<Account> accounts = AccountStore.Create(this).FindAccountsForService("BotaNaRoda");
+		    if (accounts.Any())
+		    {
+		        StartActivity(typeof (ItemCreateActivity));
+		    }
+		    else
+		    {
+		        StartActivity(typeof(LoginActivity));
+		    }
 		}
 
         private void Refresh()

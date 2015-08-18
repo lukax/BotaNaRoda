@@ -18,7 +18,7 @@ using BotaNaRoda.Ndroid.Entity;
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "ItemDetailActivity",
-        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]
+        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]
     public class ItemDetailActivity : Activity
     {
         private ImageView _itemImageView;
@@ -35,8 +35,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
-
-            // Create your application here
+            ActionBar.SetDisplayHomeAsUpEnabled(true);
 
             _itemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage);
             _itemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor);
