@@ -11,13 +11,17 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
 using Microsoft.Owin.Security.Facebook;
+using NLog;
 using Owin;
 using Thinktecture.IdentityServer.Core.Configuration;
 using Thinktecture.IdentityServer.Core.Logging;
+using Thinktecture.IdentityServer.Core.Logging.LogProviders;
 using Thinktecture.IdentityServer.Core.Services;
+using LogLevel = Thinktecture.IdentityServer.Core.Logging.LogLevel;
 
 namespace BotaNaRoda.WebApi
 {
@@ -52,15 +56,15 @@ namespace BotaNaRoda.WebApi
             // services.AddWebApiConventions();
 
             services.AddDataProtection();
-            services.AddLogging();
         }
 
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
         {
-            LogProvider.SetCurrentLogProvider(new DiagnosticsTraceLogProvider());
+            //To get the hold of the logger: ILog Logger = LogProvider.GetCurrentClassLogger();
+            LogProvider.SetCurrentLogProvider(new NLogLogProvider());
 
-            //app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseMvc();
 
             app.Map("/core", core =>

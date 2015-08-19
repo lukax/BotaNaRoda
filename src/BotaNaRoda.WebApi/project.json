@@ -1,40 +1,44 @@
 {
-    "webroot": "wwwroot",
-    "version": "1.0.0-*",
+  "webroot": "wwwroot",
+  "version": "1.0.0-*",
 
-    "dependencies": {
-        "Microsoft.AspNet.Mvc": "6.0.0-beta5",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta5",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5",
-        "Microsoft.Framework.Configuration.Json": "1.0.0-beta5",
-        "MongoDB.Driver": "2.0.1",
-        "Microsoft.Owin": "3.0.1",
-        "Microsoft.AspNet.Owin": "1.0.0-beta5",
-        "Microsoft.AspNet.DataProtection": "1.0.0-beta5",
-        "Microsoft.AspNet.Identity": "3.0.0-beta5",
-        "Thinktecture.IdentityServer3": "1.5.0",
-        "Microsoft.Owin.Security.Facebook": "3.0.1"
-    },
+  "dependencies": {
+    "Microsoft.AspNet.Mvc": "6.0.0-*",
+    "Microsoft.AspNet.Server.IIS": "1.0.0-*",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-*",
+    "Microsoft.AspNet.Owin": "1.0.0-*",
+    "Microsoft.Owin": "3.0.1",
+    "Microsoft.Framework.Configuration.Json": "1.0.0-*",
+    "Microsoft.AspNet.DataProtection": "1.0.0-*",
+    "Microsoft.AspNet.Identity": "3.0.0-*",
+    "Thinktecture.IdentityServer3": "1.5.0",
+    "MongoDB.Driver": "2.0.1",
+    "Microsoft.Owin.Security.Facebook": "3.0.1",
+    "NLog.Config": "4.0.1"
+  },
 
-    "commands": {
-        "web": "Microsoft.AspNet.Hosting --config hosting.ini"
-    },
+  "commands": {
+    "web": "Microsoft.AspNet.Hosting --config hosting.ini"
+  },
 
-    "frameworks": {
-        "dnx451": { }
-    },
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+      }
+    }
+  },
 
-    "exclude": [
-        "wwwroot",
-        "node_modules",
-        "bower_components"
-    ],
-    "publishExclude": [
-        "node_modules",
-        "bower_components",
-        "**.xproj",
-        "**.user",
-        "**.vspscc"
-    ]
+  "exclude": [
+    "wwwroot",
+    "node_modules",
+    "bower_components"
+  ],
+  "publishExclude": [
+    "node_modules",
+    "bower_components",
+    "**.xproj",
+    "**.user",
+    "**.vspscc"
+  ]
 }
