@@ -21,15 +21,10 @@ namespace BotaNaRoda.Ndroid
 			SetContentView (Resource.Layout.Login);
             ActionBar.SetDisplayHomeAsUpEnabled(true);
 
-		    var facebook = FindViewById<Button>(Resource.Id.loginWithFacebook);
-            facebook.Click += delegate
-            {
-                LoginToFacebook(false);
-            };
-
+            Login(false);
 		}
 
-        void LoginToFacebook(bool allowCancel)
+        void Login(bool allowCancel)
         {
             var auth = new OAuth2Authenticator(
                 clientId: "implicitclient",
@@ -45,24 +40,22 @@ namespace BotaNaRoda.Ndroid
             };
             // If authorization succeeds or is canceled, .Completed will be fired.
             auth.Completed += (s, ee) => {
-                //if (!ee.IsAuthenticated)
-                //{
-                //    var builder = new AlertDialog.Builder(this);
-                //    builder.SetMessage("Not Authenticated");
-                //    builder.SetPositiveButton("Ok", (o, e) => { });
-                //    builder.Create().Show();
-                //    return;
-                //}
+                if (!ee.IsAuthenticated)
+                {
+                    var builder = new AlertDialog.Builder(this);
+                    builder.SetMessage("Not Authenticated");
+                    builder.SetPositiveButton("Ok", (o, e) => { });
+                    builder.Create().Show();
+                    return;
+                }
 
-
+                //Stores account
+                AccountStore.Create(this).Save(ee.Account, "BotaNaRoda");
             };
 
             var intent = auth.GetUI(this);
             StartActivity(intent);
         }
-
-
-        private static readonly TaskScheduler UIScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     }
 }
