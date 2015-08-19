@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
@@ -14,13 +16,17 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
+using Microsoft.Net.Http.Server;
 using Microsoft.Owin.Security.Facebook;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using Owin;
 using Thinktecture.IdentityServer.Core.Configuration;
 using Thinktecture.IdentityServer.Core.Logging;
 using Thinktecture.IdentityServer.Core.Logging.LogProviders;
 using Thinktecture.IdentityServer.Core.Services;
+using Constants = Thinktecture.IdentityServer.Core.Constants;
 using LogLevel = Thinktecture.IdentityServer.Core.Logging.LogLevel;
 
 namespace BotaNaRoda.WebApi
@@ -33,7 +39,6 @@ namespace BotaNaRoda.WebApi
         {
             // Setup configuration sources.
             var builder = new ConfigurationBuilder(appEnv.ApplicationBasePath)
-                .AddEnvironmentVariables()
                 .AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
@@ -62,7 +67,7 @@ namespace BotaNaRoda.WebApi
         public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
         {
             //To get the hold of the logger: ILog Logger = LogProvider.GetCurrentClassLogger();
-            LogProvider.SetCurrentLogProvider(new NLogLogProvider());
+            LogProvider.SetCurrentLogProvider(new DiagnosticsTraceLogProvider());
 
             app.UseStaticFiles();
             app.UseMvc();
@@ -110,9 +115,35 @@ namespace BotaNaRoda.WebApi
                 AuthenticationType = "Facebook",
                 SignInAsAuthenticationType = signInAsType,
                 AppId = "450077978528041",
-                AppSecret = "662a479402ffad82d300a1c6d87c6d8f"
+                AppSecret = "662a479402ffad82d300a1c6d87c6d8f",
+                Scope = { "public_profile", "email" },
+                Provider = new FacebookAuthenticationProvider
+                {
+                    OnAuthenticated = async context =>
+                    {
+                        string userInformationEndpoint = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" +  Uri.EscapeDataString(context.AccessToken);
+                        
+                        HttpResponseMessage graphResponse = await new HttpClient().GetAsync(userInformationEndpoint);
+                        graphResponse.EnsureSuccessStatusCode();
+                        var text = await graphResponse.Content.ReadAsStringAsync();
+                        JObject user = JObject.Parse(text);
+
+                        foreach (var x in user)
+                        {
+                            var claimType = $"urn:facebook:{x.Key}";
+                            string claimValue = x.Value.ToString();
+                            if (!context.Identity.HasClaim(claimType, claimValue))
+                                context.Identity.AddClaim(new Claim(claimType, claimValue, XmlSchemaString, "Facebook"));
+                        }
+
+                        //Parse facebook picture object into our custom avatar url claim
+                        context.Identity.AddClaim(new Claim("avatar", (string) user["picture"]["data"]["url"]));
+                    }
+                }
             };
             app.UseFacebookAuthentication(fb);
         }
+
+        const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Domain;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
 using MongoDB.Driver;
 using Thinktecture.IdentityServer.Core;
 using Thinktecture.IdentityServer.Core.Extensions;
@@ -28,23 +29,24 @@ namespace BotaNaRoda.WebApi.Identity
             // look for the user in our local identity system from the external identifiers
             var user = await _itemsContext.Users.Find(x => x.Provider == externalUser.Provider && x.ProviderId == externalUser.ProviderId).FirstOrDefaultAsync();
 
-            string username = externalUser.ProviderId;
             if (user == null)
             {
                 // new user, so add them here
-                var nameClaim = externalUser.Claims.FirstOrDefault(x => x.Type == Constants.ClaimTypes.Name);
-                if (nameClaim != null) username = nameClaim.Value;
+                var nameClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
+                var emailClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Email);
+                var avatarClaim = externalUser.Claims.FirstOrDefault(x => x.Type == "avatar");
 
                 user = new User
                 {
                     Provider = externalUser.Provider,
                     ProviderId = externalUser.ProviderId,
-                    Username = username
+                    Username = emailClaim.Value,
+                    Name = nameClaim.Value,
+                    Avatar = avatarClaim?.Value
                 };
                 await _itemsContext.Users.InsertOneAsync(user);
             }
 
-            // user is registered so continue
             return await Task.FromResult(new AuthenticateResult(user.Id, user.Username, identityProvider: user.Provider));
         }
 
