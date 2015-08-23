@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BotaNaRoda.WebApi.Domain;
-using BotaNaRoda.WebApi.Util;
-using MongoDB.Driver.GeoJsonObjectModel;
+using BotaNaRoda.WebApi.Entity;
 
 namespace BotaNaRoda.WebApi.Models
 {
@@ -35,8 +30,8 @@ namespace BotaNaRoda.WebApi.Models
         public string Description { get; set; }
         public CategoryType Category { get; set; }
 
-        public string[] Images { get; set; }
-        public string ThumbImage { get; set; }
+        public ImageInfo[] Images { get; set; }
+        public ImageInfo ThumbImage { get; set; }
 
         public ItemStatus Status { get; set; }
 

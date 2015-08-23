@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BotaNaRoda.WebApi.Domain;
+using BotaNaRoda.WebApi.Entity;
 
 namespace BotaNaRoda.WebApi.Models
 {
@@ -22,7 +19,7 @@ namespace BotaNaRoda.WebApi.Models
         public string Id { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Name { get; set; }
-        public string ThumbImage { get; set; }
+        public ImageInfo ThumbImage { get; set; }
         public ItemStatus Status { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }

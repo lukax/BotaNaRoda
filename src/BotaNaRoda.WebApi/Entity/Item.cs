@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
 
-namespace BotaNaRoda.WebApi.Domain
+namespace BotaNaRoda.WebApi.Entity
 {
-    public class User : ILocalization
+    public class Item : ILocalization
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
-
         public string Name { get; set; }
-        public string Avatar { get; set; }
+        public string Description { get; set; }
+        public CategoryType Category { get; set; }
+
+        public ImageInfo[] Images { get; set; }
+        public ImageInfo ThumbImage { get; set; }
+
+        public ItemStatus Status { get; set; }
 
         public GeoJson2DGeographicCoordinates Loc { get; set; }
         public string Address { get; set; }
@@ -27,24 +32,21 @@ namespace BotaNaRoda.WebApi.Domain
         public string CountryCode { get; set; }
         public string ZipCode { get; set; }
 
-        public int Credits { get; set; }
-        public List<UserRating> Ratings { get; set; }
-
-        public string Provider { get; set; }
-        public string ProviderId { get; set; }
-
-        public User()
+        public Item()
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
         }
 
-        public User(RegisterUserBindingModel model)
+        public Item(ItemCreateBindingModel model, string userId) 
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
-            Username = model.Username;
-            Avatar = model.Avatar;
+            Name = model.Name;
+            UserId = userId;
+            Description = model.Description;
+            Category = model.Category;
+            Images = model.Images;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
             City = model.City;

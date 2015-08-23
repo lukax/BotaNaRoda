@@ -1,4 +1,4 @@
-﻿namespace BotaNaRoda.WebApi.Models
+﻿namespace BotaNaRoda.Ndroid.Models
 {
     public class RegisterUserBindingModel
     {

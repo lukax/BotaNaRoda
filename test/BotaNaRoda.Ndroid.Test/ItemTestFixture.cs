@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using BotaNaRoda.Ndroid.Data;
-using BotaNaRoda.Ndroid.Entity;
+using BotaNaRoda.Ndroid.Models;
 using NUnit.Framework;
 
 namespace BotaNaRoda.Ndroid.Test
@@ -9,7 +9,7 @@ namespace BotaNaRoda.Ndroid.Test
     [TestFixture]
     public class TestsSample
     {
-        private IItemDataService _itemService;
+        private IItemService _itemService;
 
         [SetUp]
         public void Setup()
@@ -26,14 +26,12 @@ namespace BotaNaRoda.Ndroid.Test
         [Test]
         public void CreateItem()
         {
-            Item newItem = new Item();
-            newItem.Description = "Luva de neve";
-            
-            _itemService.SaveItem(newItem);
-            string testId = newItem.Id;
+            ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
+
+            string id = _itemService.SaveItem(newItem).Result;
 
             _itemService.RefreshCache();
-            Item item = _itemService.GetItem(testId);
+            ItemDetailViewModel item = _itemService.GetItem(id).Result;
             Assert.IsNotNull(item);
             Assert.AreEqual("Luva de neve", item.Description);
         }
@@ -41,21 +39,22 @@ namespace BotaNaRoda.Ndroid.Test
         [Test]
         public void UpdateItem()
         {
-            Item newItem = new Item();
-            newItem.Description = "Luva de neve";
+            ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
 
-            _itemService.SaveItem(newItem);
-            string testId = newItem.Id;
+            string testId = _itemService.SaveItem(newItem).Result;
 
             _itemService.RefreshCache();
-            Item item = _itemService.GetItem(testId);
+            ItemDetailViewModel item = _itemService.GetItem(testId).Result;
             item.Description = "Luva de neve novíssima";
 
-            _itemService.SaveItem(item);
+            _itemService.SaveItem(new ItemCreateBindingModel
+            {
+                Description = item.Description
+            });
 
             _itemService.RefreshCache();
 
-            item = _itemService.GetItem(testId);
+            item = _itemService.GetItem(testId).Result;
             Assert.IsNotNull(item);
             Assert.AreEqual("Luva de neve novíssima", item.Description);
         }
@@ -63,19 +62,17 @@ namespace BotaNaRoda.Ndroid.Test
         [Test]
         public void DeleteItem()
         {
-            Item newItem = new Item();
-            newItem.Description = "Luva de neve";
+            ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
 
-            _itemService.SaveItem(newItem);
-            string testId = newItem.Id;
+            string testId = _itemService.SaveItem(newItem).Result;
 
             _itemService.RefreshCache();
-            Item item = _itemService.GetItem(testId);
+            ItemDetailViewModel item = _itemService.GetItem(testId).Result;
             Assert.IsNotNull(item);
-            _itemService.DeleteItem(item);
+            _itemService.DeleteItem(item.Id);
 
             _itemService.RefreshCache();
-            item = _itemService.GetItem(testId);
+            item = _itemService.GetItem(testId).Result;
             Assert.Null(item);
         }
     }

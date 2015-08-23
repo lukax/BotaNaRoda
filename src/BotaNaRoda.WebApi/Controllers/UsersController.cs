@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
-using BotaNaRoda.WebApi.Domain;
+using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;

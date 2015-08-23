@@ -1,7 +1,8 @@
 ﻿{
   "AppSettings": {
     "BotaNaRodaConnectionString": "mongodb://localhost",
-    "BotaNaRodaDatabaseName":  "botanaroda"
+    "BotaNaRodaDatabaseName": "botanaroda",
+    "StorageConnectionString":  "DefaultEndpointsProtocol=https;AccountName=storagesample;AccountKey=nYV0gln9fT7bvY+rxu2iWAEyzPNITGkhM88J8HUoyofpK7C8fHcZc2kIZp6cKgYRUM74lHI84L50Iau1+9hPjB=="
   }
   //"Data": {
   //  "DefaultConnection": {

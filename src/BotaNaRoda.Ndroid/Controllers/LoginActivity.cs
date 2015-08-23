@@ -1,62 +1,69 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.App;
-using Android.OS;
 using Android.Content.PM;
-using Android.Widget;
-using BotaNaRoda.Ndroid.Controllers;
-using Newtonsoft.Json;
+using Android.OS;
+using BotaNaRoda.Ndroid.Auth;
+using BotaNaRoda.Ndroid.Data;
 using Xamarin.Auth;
 
-namespace BotaNaRoda.Ndroid
+namespace BotaNaRoda.Ndroid.Controllers
 {
 	[Activity (Label = "LoginActivity",
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]
 	public class LoginActivity : Activity
 	{
+		private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+		private UserService _userService;
 
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			SetContentView (Resource.Layout.Login);
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
+			//SetContentView (Resource.Layout.Login);
+            //ActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            Login(false);
+            _userService = new UserService(this);
+            Login();
 		}
 
-        void Login(bool allowCancel)
-        {
-            var auth = new OAuth2Authenticator(
-                clientId: "implicitclient",
-                scope: "read",
-                authorizeUrl: new Uri("http://botanarodaapi.azurewebsites.net/core/connect/authorize"),
-                redirectUrl: new Uri("http://botanarodaapi.azurewebsites.net/core"));
+		protected override void OnResume ()
+		{
+			base.OnResume ();
+			Finish ();
+		}
 
-            auth.AllowCancel = allowCancel;
+        void Login()
+        {
+            var auth = new CustomOAuth2Authenticator(
+                clientId: "mobile.botanaroda.com.br",
+                scope: "read",
+                authorizeUrl: new Uri("https://botanaroda.azurewebsites.net/core/connect/authorize"),
+                redirectUrl: new Uri("https://botanaroda.azurewebsites.net/core"))
+            {
+                AllowCancel = true,
+				Title = "Login",
+				ShowUIErrors = false, 
+			};
 
             auth.Error += (sender, args) =>
             {
-                Console.WriteLine(args.Message);
+            
             };
             // If authorization succeeds or is canceled, .Completed will be fired.
             auth.Completed += (s, ee) => {
                 if (!ee.IsAuthenticated)
                 {
-                    var builder = new AlertDialog.Builder(this);
-                    builder.SetMessage("Not Authenticated");
-                    builder.SetPositiveButton("Ok", (o, e) => { });
-                    builder.Create().Show();
                     return;
                 }
 
                 //Stores account
-                AccountStore.Create(this).Save(ee.Account, "BotaNaRoda");
+                _userService.SaveCurrentUser(ee.Account);
             };
 
             var intent = auth.GetUI(this);
             StartActivity(intent);
         }
 
-    }
+	}
 }
 

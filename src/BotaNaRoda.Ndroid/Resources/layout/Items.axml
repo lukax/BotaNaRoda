@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/refresher"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <GridView
             android:id="@+id/itemsGridView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:columnWidth="130dp"
             android:numColumns="auto_fit"
             android:verticalSpacing="1dp"
             android:horizontalSpacing="5dp"
             android:layout_marginBottom="50dp"
-            android:stretchMode="columnWidth"
-            android:gravity="center" />
-        <Button
-            android:text="Bota na Roda"
-            android:layout_height="50dp"
-            android:layout_width="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/newItem" />
-    </RelativeLayout>
+            android:stretchMode="columnWidth" />
+        <com.refractored.fab.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white_24dp"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/accent_pressed"
+            fab:fab_colorRipple="@color/ripple" />
+    </FrameLayout>
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Xamarin.Auth;
+using com.refractored.fab;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -20,19 +21,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]
 	public class ItemsActivity : Activity, ILocationListener
     {
-		GridView _itemsListView;
-		ItemsListAdapter _adapter;
-		LocationManager _locMgr;
+        private GridView _itemsListView;
+        private ItemsListAdapter _adapter;
+        private LocationManager _locMgr;
         private SwipeRefreshLayout _refresher;
+        private UserService _userService;
+        private ItemData _itemData;
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 			SetContentView(Resource.Layout.Items);
 
-			//ItemData.Service.SaveItem (new Item {Description="item1"});
-			//ItemData.Service.SaveItem (new Item {Description="item2"});
-			//ItemData.Service.SaveItem (new Item {Description="item3"});
+            _itemData = new ItemData();
+            _userService = new UserService(this);
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
             _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
@@ -41,9 +43,9 @@ namespace BotaNaRoda.Ndroid.Controllers
                 Refresh();
             };
 
-			FindViewById<Button> (Resource.Id.newItem).Click += NewItem;
+			FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 			_itemsListView = FindViewById<GridView> (Resource.Id.itemsGridView);
-			_adapter = new ItemsListAdapter (this);
+			_adapter = new ItemsListAdapter (this, _itemData);
 			_itemsListView.Adapter = _adapter;
 			_itemsListView.ItemClick += _itemsListView_ItemClick;
 		}
@@ -68,10 +70,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 			base.OnResume ();
             Refresh();
 
-			Criteria criteria = new Criteria ();
-			criteria.Accuracy = Accuracy.Coarse;
-			criteria.PowerRequirement = Power.NoRequirement;
-			string provider = _locMgr.GetBestProvider (criteria, true);
+		    Criteria criteria = new Criteria
+		    {
+		        Accuracy = Accuracy.Coarse,
+		        PowerRequirement = Power.NoRequirement
+		    };
+		    string provider = _locMgr.GetBestProvider (criteria, true);
 			_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
 		}
 
@@ -108,8 +112,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		private void NewItem(object sender, EventArgs args)
 		{
-		    IEnumerable<Account> accounts = AccountStore.Create(this).FindAccountsForService("BotaNaRoda");
-		    if (accounts.Any())
+		    if (_userService.IsLoggedIn)
 		    {
 		        StartActivity(typeof (ItemCreateActivity));
 		    }
@@ -122,10 +125,10 @@ namespace BotaNaRoda.Ndroid.Controllers
         private void Refresh()
         {
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
+            worker.DoWork += async (sender, args) =>
             {
-                ItemData.Service.RefreshCache();
-                Thread.Sleep(3000);
+                _itemData.Service.RefreshCache();
+                _adapter.Items = await _itemData.Service.GetAllItems();
             };
             worker.RunWorkerCompleted += (sender, args) => {
                 RunOnUiThread(() =>

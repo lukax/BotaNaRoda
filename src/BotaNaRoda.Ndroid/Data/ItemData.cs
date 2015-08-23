@@ -7,11 +7,16 @@ namespace BotaNaRoda.Ndroid.Data
 {
 	public class ItemData
 	{
-		public static readonly IItemDataService Service = new ItemJsonService(Path.Combine(
-			Environment.ExternalStorageDirectory.Path, "BotaNaRoda"));
+	    public ItemJsonService Service { get; set; }
 
+	    public ItemData()
+	    {
+	        Service = new ItemJsonService(Path.Combine(
+            Environment.ExternalStorageDirectory.Path, "BotaNaRoda"));
 
-		public static Bitmap GetImageFile(string itemId, int width, int height)
+	    }
+
+	    public Bitmap GetImageFile(string itemId, int width, int height)
 		{
 			string filename = Service.GetImageFileName (itemId);
 			var img = new Java.IO.File (filename);
@@ -21,7 +26,7 @@ namespace BotaNaRoda.Ndroid.Data
 		    return null;
 		}
 
-		private static Bitmap LoadAndResizeBitmap(string fileName, int width, int height)
+		private Bitmap LoadAndResizeBitmap(string fileName, int width, int height)
 		{
 			// First we get the the dimensions of the file on disk
 			BitmapFactory.Options options = new BitmapFactory.Options { InJustDecodeBounds = true };

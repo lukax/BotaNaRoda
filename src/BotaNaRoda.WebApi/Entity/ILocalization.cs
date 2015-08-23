@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver.GeoJsonObjectModel;
 
-namespace BotaNaRoda.WebApi.Domain
+namespace BotaNaRoda.WebApi.Entity
 {
     public interface ILocalization
     {

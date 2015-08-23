@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BotaNaRoda.Ndroid.Entity;
+using System.Threading.Tasks;
+using BotaNaRoda.Ndroid.Models;
 using Newtonsoft.Json;
 
 namespace BotaNaRoda.Ndroid.Data
 {
-	public class ItemJsonService : IItemDataService
+    public class ItemJsonService : IItemService
     {
         private readonly string _storagePath;
-        private readonly List<Item> _items = new List<Item>();
- 
+        private readonly List<ItemDetailViewModel> _items = new List<ItemDetailViewModel>();
+
         public ItemJsonService(string storagePath)
         {
             _storagePath = storagePath;
@@ -22,9 +23,18 @@ namespace BotaNaRoda.Ndroid.Data
             RefreshCache();
         }
 
-		public IReadOnlyList<Item> GetAllItems()
+        public Task<IEnumerable<ItemListViewModel>> GetAllItems()
         {
-            return _items;
+            return Task.Run(() => _items.Select(x => new ItemListViewModel
+            {
+                CreatedAt = x.CreatedAt,
+                Id = x.Id,
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
+                Name = x.Name,
+                Status = x.Status,
+                ThumbImage = x.ThumbImage
+            }));
         }
 
         public void RefreshCache()
@@ -35,52 +45,62 @@ namespace BotaNaRoda.Ndroid.Data
             foreach (var fileName in fileNames)
             {
                 string itemString = File.ReadAllText(fileName);
-                Item item = JsonConvert.DeserializeObject<Item>(itemString);
+                ItemDetailViewModel item = JsonConvert.DeserializeObject<ItemDetailViewModel>(itemString);
                 _items.Add(item);
             }
         }
 
-        public Item GetItem(string id)
+        public Task<ItemDetailViewModel> GetItem(string id)
         {
-			return _items.FirstOrDefault(x => x.Id == id);
+            return Task.Run(() => _items.FirstOrDefault(x => x.Id == id));
         }
 
-        public void SaveItem(Item item)
+        public Task<string> SaveItem(ItemCreateBindingModel item)
         {
-            bool newItem = item.Id == null;
-            if (newItem)
+            var theItem = new ItemDetailViewModel
             {
-                item.Id = Guid.NewGuid().ToString();
-            }
-            item.CreatedAt = DateTime.UtcNow;
+                Id = Guid.NewGuid().ToString(),
+                CreatedAt = DateTime.UtcNow,
+                Longitude = item.Longitude,
+                Latitude = item.Latitude,
+                Address = item.Address,
+                Category = item.Category,
+                Description = item.Description,
+                Images = item.ProductImages,
+                Name = item.Name
+            };
 
-            var itemString = JsonConvert.SerializeObject(item);
-            File.WriteAllText(GetFilename(item.Id), itemString);
-        
-            if(newItem)
-                _items.Add(item);
+            var itemString = JsonConvert.SerializeObject(theItem);
+            File.WriteAllText(GetFilename(theItem.Id), itemString);
+
+            _items.Add(theItem);
+
+            return Task.Run(() => theItem.Id);
         }
 
-        public void DeleteItem(Item item)
+        public Task<bool> DeleteItem(string id)
         {
-			if(File.Exists(GetFilename(item.Id))){
-				File.Delete(GetFilename(item.Id));
-			}
-			if (File.Exists (GetImageFileName (item.Id))) {
-				File.Delete (GetImageFileName (item.Id));
-			}
+            if (File.Exists(GetFilename(id)))
+            {
+                File.Delete(GetFilename(id));
+            }
+            if (File.Exists(GetImageFileName(id)))
+            {
+                File.Delete(GetImageFileName(id));
+            }
+            _items.Remove(_items.FirstOrDefault(x => x.Id == id));
 
-			_items.Remove(item);
+            return Task.Run(() => true);
         }
 
         private string GetFilename(string id)
         {
-            return Path.Combine(_storagePath, string.Format("item_{0}.json", id));
+			return Path.Combine(_storagePath, string.Format("item_{0}.json", id));
         }
 
-		public string GetImageFileName (string id)
-		{
-			return Path.Combine (_storagePath, string.Format("itemImg_{0}.jpg", id));
-		}
+        public string GetImageFileName(string id)
+        {
+			return Path.Combine(_storagePath, string.Format("itemImg_{0}.jpg", id));
+        }
     }
 }

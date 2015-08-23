@@ -1,25 +1,31 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Android.App;
 using Android.Graphics;
 using Android.Locations;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
-using BotaNaRoda.Ndroid.Entity;
+using BotaNaRoda.Ndroid.Models;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	public class ItemsListAdapter : BaseAdapter<Item>
+	public class ItemsListAdapter : BaseAdapter<ItemListViewModel>
 	{
-		Activity context;
-		public Location CurrentLocation { get; set; }
+	    private readonly Activity _context;
+	    private readonly ItemData _itemData;
 
-		public ItemsListAdapter (Activity context)
+	    public IEnumerable<ItemListViewModel> Items { get; set; }
+	    public Location CurrentLocation { get; set; }
+
+		public ItemsListAdapter (Activity context, ItemData itemData)
 		{
-			this.context = context;
+		    _context = context;
+		    _itemData = itemData;
+		    Items = new List<ItemListViewModel> ();
 		}
 
-		#region implemented abstract members of BaseAdapter
+	    #region implemented abstract members of BaseAdapter
 
 		public override long GetItemId (int position)
 		{
@@ -28,18 +34,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public override View GetView (int position, View convertView, ViewGroup parent)
 		{
-			var view = convertView ?? context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, null);
+			var view = convertView ?? _context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, null);
 
 			var item = this [position];
-			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Description;
+			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Name;
 
 			//calculate distance
-			if ((CurrentLocation != null) && (item.Latitude.HasValue) && (item.Longitude.HasValue)) {
-				Location itemLocation = new Location ("");
-				itemLocation.Latitude = item.Latitude.Value;
-				itemLocation.Longitude = item.Longitude.Value;
-				float distance = CurrentLocation.DistanceTo (itemLocation);
-				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = String.Format("{0:0,0.00}m", distance);
+			if (CurrentLocation != null) {
+			    Location itemLocation = new Location("")
+			    {
+			        Latitude = item.Latitude,
+			        Longitude = item.Longitude
+			    };
+			    float distance = CurrentLocation.DistanceTo (itemLocation);
+				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = string.Format("{0:0,0.00}m", distance);
 			}
 			else {
 				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = "??";
@@ -47,7 +55,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 			var imgView = view.FindViewById<ImageView> (Resource.Id.itemsImageView);
 			//load image
-			using (Bitmap itemImage = ItemData.GetImageFile (item.Id, imgView.Width, imgView.Height)) {
+			using (Bitmap itemImage = _itemData.GetImageFile (item.Id, imgView.Width, imgView.Height)) {
 				imgView.SetImageBitmap (itemImage);
 			}
 			// Dispose of the Java side bitmap.
@@ -55,23 +63,21 @@ namespace BotaNaRoda.Ndroid.Controllers
 			return view;
 		}
 
-		public override int Count {
-			get {
-				return ItemData.Service.GetAllItems ().Count;
-			}
+		public override int Count
+		{
+		    get { return Items.Count(); }
 		}
 
-		#endregion
+	    #endregion
 
 		#region implemented abstract members of BaseAdapter
 
-		public override Item this [int index] {
-			get {
-				return ItemData.Service.GetAllItems () [index];
-			}
+		public override ItemListViewModel this [int index]
+		{
+		    get { return Items.ElementAt(index); }
 		}
 
-		#endregion
+	    #endregion
 	}
 }
 

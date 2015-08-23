@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace BotaNaRoda.WebApi.Domain
+namespace BotaNaRoda.WebApi.Entity
 {
     public class Conversation
     {

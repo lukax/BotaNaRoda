@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BotaNaRoda.WebApi.Domain;
-
-namespace BotaNaRoda.WebApi.Models
+﻿namespace BotaNaRoda.Ndroid.Models
 {
-    public class PostItemBindingModel
+    public class ItemCreateBindingModel
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public CategoryType CategoryType { get; set; }
+        public CategoryType Category { get; set; }
 
         public string[] ProductImages { get; set; }
 

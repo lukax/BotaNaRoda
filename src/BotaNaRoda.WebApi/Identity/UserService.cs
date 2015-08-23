@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
-using BotaNaRoda.WebApi.Domain;
+using BotaNaRoda.WebApi.Entity;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using MongoDB.Driver;
@@ -34,7 +34,7 @@ namespace BotaNaRoda.WebApi.Identity
                 // new user, so add them here
                 var nameClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
                 var emailClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Email);
-                var avatarClaim = externalUser.Claims.FirstOrDefault(x => x.Type == "avatar");
+                var avatarClaim = externalUser.Claims.First(x => x.Type == "avatar");
 
                 user = new User
                 {
@@ -42,7 +42,7 @@ namespace BotaNaRoda.WebApi.Identity
                     ProviderId = externalUser.ProviderId,
                     Username = emailClaim.Value,
                     Name = nameClaim.Value,
-                    Avatar = avatarClaim?.Value
+                    Avatar = avatarClaim.Value
                 };
                 await _itemsContext.Users.InsertOneAsync(user);
             }

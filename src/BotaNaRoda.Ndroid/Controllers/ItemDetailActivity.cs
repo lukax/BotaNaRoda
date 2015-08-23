@@ -1,42 +1,44 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
-using Android.Locations;
 using Android.OS;
-using Android.Support.V4.Widget;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
-using BotaNaRoda.Ndroid.Entity;
+using BotaNaRoda.Ndroid.Models;
+using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "ItemDetailActivity",
         ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]
-    public class ItemDetailActivity : Activity
+    public class ItemDetailActivity : Activity, IOnMapReadyCallback
     {
+        private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         private ImageView _itemImageView;
         private TextView _itemAuthorView;
         private TextView _itemDescriptionView;
-        private Item _item = new Item();
-        private GoogleMap _mMap;
+        private ItemDetailViewModel _item;
         private Button _reserveButton;
         private TextView _itemTitleView;
         private TextView _itemLocationView;
         private Button _reportFraudButton;
+        private IMenu _menu;
+        private Account _currentUser;
+        private ItemData _itemData;
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
             ActionBar.SetDisplayHomeAsUpEnabled(true);
-
+            _itemData = new ItemData();
+            _currentUser = new UserService(this).GetCurrentUser();
             _itemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage);
             _itemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor);
             _itemTitleView = FindViewById<TextView>(Resource.Id.itemsDetailTitle);
@@ -53,12 +55,12 @@ namespace BotaNaRoda.Ndroid.Controllers
         protected override void OnResume()
         {
             base.OnResume();
-            SetUpMapIfNeeded();
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.ItemDetailMenu, menu);
+            _menu = menu;
             return base.OnCreateOptionsMenu(menu);
         }
 
@@ -97,7 +99,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void ConfirmDelete(object sender, EventArgs e)
         {
-            ItemData.Service.DeleteItem(_item);
+            _itemData.Service.DeleteItem(_item.Id);
             Toast toast = Toast.MakeText(this, "Item removido", ToastLength.Short);
             toast.Show();
             Finish();
@@ -106,77 +108,41 @@ namespace BotaNaRoda.Ndroid.Controllers
         void Refresh()
         {
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
+            worker.DoWork += async (sender, args) =>
             {
-                _item = ItemData.Service.GetAllItems()[Intent.GetIntExtra("itemId", -1)];
-                Thread.Sleep(3000);
+                _item = await _itemData.Service.GetItem(Intent.GetStringExtra("itemId"));
             };
             worker.RunWorkerCompleted += (sender, args) =>
             {
                 RunOnUiThread(() =>
                 {
-                    using (Bitmap itemImage = ItemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
+                    FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
+
+                    _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _currentUser.Username);
+                    using (Bitmap itemImage = _itemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
                     {
                         _itemAuthorView.Text = "Lucas";
                         _itemTitleView.Text = _item.Name;
                         _itemDescriptionView.Text = _item.Description;
                         _itemLocationView.Text = _item.Address;
                         _itemImageView.SetImageBitmap(itemImage);
-                        SetUpMapIfNeeded();
                     }
                 });
             };
             worker.RunWorkerAsync();
         }
 
-        /**
-        * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-        * installed) and the map has not already been instantiated.. This will ensure that we only ever
-        * call {@link #setUpMap()} once when {@link #mMap} is not null.
-        * <p>
-        * If it isn't installed {@link SupportMapFragment} (and
-        * {@link com.google.android.gms.maps.MapView
-        * MapView}) will show a prompt for the user to install/update the Google Play services APK on
-        * their device.
-        * <p>
-        * A user can return to this Activity after following the prompt and correctly
-        * installing/updating/enabling the Google Play services. Since the Activity may not have been
-        * completely destroyed during this process (it is likely that it would only be stopped or
-        * paused), {@link #onCreate(Bundle)} may not be called again so we should call this method in
-        * {@link #onResume()} to guarantee that it will be called.
-        */
-        private void SetUpMapIfNeeded()
+        public void OnMapReady(GoogleMap googleMap)
         {
-            // Do a null check to confirm that we have not already instantiated the map.
-            if (_mMap == null)
-            {
-                // Try to obtain the map from the SupportMapFragment.
-                _mMap = (FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment)).Map;
-                // Check if we were successful in obtaining the map.
-                if (_mMap != null)
-                {
-                    SetUpMap();
-                }
-            }
-        }
-
-        /**
-        * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-        * just add a marker near Africa.
-        * <p>
-        * This should only be called once and when we are sure that {@link #mMap} is not null.
-        */
-        private void SetUpMap()
-        {
-            LatLng location = new LatLng(_item.Latitude.GetValueOrDefault(), _item.Longitude.GetValueOrDefault());
+            LatLng location = new LatLng(_item.Latitude, _item.Longitude);
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
             builder.Zoom(18);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
-            _mMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
-            _mMap.MoveCamera(cameraUpdate);
+            googleMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
+            googleMap.MoveCamera(cameraUpdate);
         }
 
     }

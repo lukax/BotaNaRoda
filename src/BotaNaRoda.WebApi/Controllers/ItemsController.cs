@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
-using BotaNaRoda.WebApi.Domain;
+using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
+using BotaNaRoda.WebApi.Util;
 using Microsoft.AspNet.Authorization;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.OptionsModel;
+using Microsoft.Net.Http.Headers;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
@@ -20,10 +29,12 @@ namespace BotaNaRoda.WebApi.Controllers
     public class ItemsController : Controller
     {
         private readonly ItemsContext _itemsContext;
+        private readonly IOptions<AppSettings> _appSettings;
 
-        public ItemsController(ItemsContext itemsContext)
+        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings>  appSettings)
         {
             _itemsContext = itemsContext;
+            _appSettings = appSettings;
         }
 
         // GET: api/items
@@ -65,7 +76,7 @@ namespace BotaNaRoda.WebApi.Controllers
         // POST api/items
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Post([FromBody] PostItemBindingModel model)
+        public async Task<IActionResult> Post([FromBody] ItemCreateBindingModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -90,6 +101,66 @@ namespace BotaNaRoda.WebApi.Controllers
                 return new HttpStatusCodeResult(204); // No content
             //}
             //return HttpNotFound();
+        }
+
+        [Route("uploadImage")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult PostItem(IList<IFormFile> files)
+        {
+            if (!ModelState.IsValid || files.Count > 3)
+            {
+                return HttpBadRequest(ModelState);
+            }
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_appSettings.Options.StorageConnectionString);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            // Retrieve a reference to a container.
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+            // Create the container if it doesn't already exist.
+            container.CreateIfNotExists();
+            container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
+
+            string productId = ObjectId.GenerateNewId().ToString();
+            string imagePartUrl = $"{User.Identity.GetSubjectId()}/{productId}/";
+
+            List<ImageInfo> imageInfoList = new List<ImageInfo>();
+            foreach (var file in files)
+            {
+                if (file.Length > 2000000 || file.ContentType != "image/jpeg")
+                {
+                    return HttpBadRequest("Imagem inválida");
+                }
+
+                var imageInfo = new ImageInfo
+                {
+                    Name = imagePartUrl + $"image_{files.IndexOf(file)}.jpg"
+                };
+                imageInfoList.Add(imageInfo);
+
+                // Retrieve reference to a blob named "myblob".
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference(imageInfo.Name);
+
+                // Create or overwrite the "myblob" blob with contents from a local file.
+                blockBlob.UploadFromStream(file.OpenReadStream());
+                imageInfo.Url = blockBlob.Uri.ToString();
+            }
+
+            //Thumbnail image processing
+            Bitmap thumbnail = ImageUtil.ResizeImageProportionally(files.First().OpenReadStream(), 200);
+            var memoryStream = new MemoryStream();
+            thumbnail.Save(memoryStream, ImageFormat.Jpeg);
+
+            var thumbImage = new ImageInfo
+            {
+                Name = imagePartUrl + "image_thumb.jpg"
+            };
+            CloudBlockBlob blockBlobb = container.GetBlockBlobReference(thumbImage.Name);
+            blockBlobb.UploadFromStream(memoryStream);
+
+            imageInfoList.Add(thumbImage);
+
+            return new ObjectResult(imageInfoList);
         }
     }
 }

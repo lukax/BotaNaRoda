@@ -14,42 +14,23 @@ namespace BotaNaRoda.WebApi.Identity
         {
             return new List<Client>
             {
+                //TODO Verify origin
                 new Client
                 {
-                    ClientName = "Code Flow Client Demo",
-                    Enabled = true,
-
-                    ClientId = "codeclient",
-                    ClientSecrets = new List<ClientSecret>
-                    {
-                        new ClientSecret("secret".Sha256())
-                    },
-
-                    Flow = Flows.AuthorizationCode,
-
-                    RequireConsent = true,
-                    AllowRememberConsent = true,
-
-                    ClientUri = "http://www.thinktecture.com",
+                    ClientName = "Bota na Roda",
+                    ClientId = "mobile.botanaroda.com.br",
+                    Flow = Flows.Implicit,
+                    ClientUri = "https://botanaroda.com.br",
+                    RequireConsent = false,
                     RedirectUris = new List<string>
                     {
-                        // MVC code client manual
-                        "https://localhost:44312/callback",
+                        "https://botanaroda.azurewebsites.net/core",
                     },
-
-                    ScopeRestrictions = new List<string>
-                    {
-                        Constants.StandardScopes.OpenId,
-                        Constants.StandardScopes.Profile,
-                        Constants.StandardScopes.Email,
-                        Constants.StandardScopes.OfflineAccess,
-                        "read",
-                        "write"
-                    },
-
-                    AccessTokenType = AccessTokenType.Reference,
+                    IdentityTokenLifetime = 360,
+                    AccessTokenLifetime = 3600
                 },
 
+#if DEBUG
                 new Client
                 {
                     ClientName = "Implicit Client Demo",
@@ -113,6 +94,7 @@ namespace BotaNaRoda.WebApi.Identity
                     IdentityTokenLifetime = 360,
                     AccessTokenLifetime = 3600
                 },
+#endif
             };
         }
     }

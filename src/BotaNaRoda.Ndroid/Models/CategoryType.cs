@@ -1,4 +1,4 @@
-﻿namespace BotaNaRoda.WebApi.Domain
+namespace BotaNaRoda.Ndroid.Models
 {
     public enum CategoryType
     {
