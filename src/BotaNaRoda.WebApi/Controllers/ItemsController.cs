@@ -106,7 +106,7 @@ namespace BotaNaRoda.WebApi.Controllers
         [Route("uploadImage")]
         [HttpPost]
         [Authorize]
-        public IActionResult PostItem(IList<IFormFile> files)
+        public async Task<IActionResult> PostItem(IList<IFormFile> files)
         {
             if (!ModelState.IsValid || files.Count > 3)
             {
@@ -116,7 +116,7 @@ namespace BotaNaRoda.WebApi.Controllers
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_appSettings.Options.StorageConnectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             // Retrieve a reference to a container.
-            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+            CloudBlobContainer container = blobClient.GetContainerReference("item_images");
             // Create the container if it doesn't already exist.
             container.CreateIfNotExists();
             container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
@@ -136,29 +136,39 @@ namespace BotaNaRoda.WebApi.Controllers
                 {
                     Name = imagePartUrl + $"image_{files.IndexOf(file)}.jpg"
                 };
-                imageInfoList.Add(imageInfo);
 
                 // Retrieve reference to a blob named "myblob".
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(imageInfo.Name);
-
+                
                 // Create or overwrite the "myblob" blob with contents from a local file.
-                blockBlob.UploadFromStream(file.OpenReadStream());
+                using (var fs = file.OpenReadStream())
+                {
+                    await blockBlob.UploadFromStreamAsync(fs);
+                }
+
                 imageInfo.Url = blockBlob.Uri.ToString();
+                imageInfoList.Add(imageInfo);
             }
 
             //Thumbnail image processing
-            Bitmap thumbnail = ImageUtil.ResizeImageProportionally(files.First().OpenReadStream(), 200);
-            var memoryStream = new MemoryStream();
-            thumbnail.Save(memoryStream, ImageFormat.Jpeg);
-
-            var thumbImage = new ImageInfo
+            var thumbImageInfo = new ImageInfo
             {
                 Name = imagePartUrl + "image_thumb.jpg"
             };
-            CloudBlockBlob blockBlobb = container.GetBlockBlobReference(thumbImage.Name);
-            blockBlobb.UploadFromStream(memoryStream);
 
-            imageInfoList.Add(thumbImage);
+            Bitmap thumbBitmap = ImageUtil.ResizeImageProportionally(files.First().OpenReadStream(), 200);
+            var thumbMs = new MemoryStream();
+            thumbBitmap.Save(thumbMs, ImageFormat.Jpeg);
+            thumbMs.Position = 0;
+
+            CloudBlockBlob thumbBlockBlob = container.GetBlockBlobReference(thumbImageInfo.Name);
+            using (thumbMs)
+            {
+                await thumbBlockBlob.UploadFromStreamAsync(thumbMs);
+            }
+
+            thumbImageInfo.Url = thumbBlockBlob.Uri.ToString();
+            imageInfoList.Add(thumbImageInfo);
 
             return new ObjectResult(imageInfoList);
         }
