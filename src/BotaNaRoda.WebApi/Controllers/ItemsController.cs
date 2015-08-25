@@ -103,7 +103,7 @@ namespace BotaNaRoda.WebApi.Controllers
             //return HttpNotFound();
         }
 
-        [Route("uploadImage")]
+        [Route("images")]
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> PostItem(IList<IFormFile> files)
@@ -121,8 +121,8 @@ namespace BotaNaRoda.WebApi.Controllers
             container.CreateIfNotExists();
             container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
 
-            string productId = ObjectId.GenerateNewId().ToString();
-            string imagePartUrl = $"{User.Identity.GetSubjectId()}/{productId}/";
+            string imagesId = ObjectId.GenerateNewId().ToString();
+            string imagePartUrl = $"{User.Identity.GetSubjectId()}/{imagesId}/";
 
             List<ImageInfo> imageInfoList = new List<ImageInfo>();
             foreach (var file in files)

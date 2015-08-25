@@ -46,6 +46,10 @@
     <Reference Include="OkHttp">
       <HintPath>..\..\Components\modernhttpclient-2.4.2\lib\android\OkHttp.dll</HintPath>
     </Reference>
+    <Reference Include="Square.Picasso, Version=2.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Square.Picasso.2.5.2.1\lib\MonoAndroid\Square.Picasso.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -143,6 +147,8 @@
     <Compile Include="Data\ItemRestService.cs" />
     <Compile Include="Data\UserService.cs" />
     <Compile Include="Models\CategoryType.cs" />
+    <Compile Include="Models\ILocation.cs" />
+    <Compile Include="Models\ImageInfo.cs" />
     <Compile Include="Models\ItemCreateBindingModel.cs" />
     <Compile Include="Models\ItemDetailViewModel.cs" />
     <Compile Include="Models\ItemListViewModel.cs" />
@@ -157,6 +163,7 @@
     <Compile Include="Controllers\ItemDetailActivity.cs" />
     <Compile Include="Controllers\ItemCreateActivity.cs" />
     <Compile Include="Controllers\LoginActivity.cs" />
+    <Compile Include="Util\GeoUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -176,6 +183,8 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_add_white_24dp.png" />
     <AndroidResource Include="Resources\values\Colors.xml" />
     <AndroidResource Include="Resources\values\Styles.xml" />
+    <AndroidResource Include="Resources\drawable\error.jpg" />
+    <AndroidResource Include="Resources\drawable\placeholder.jpg" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />
@@ -206,6 +215,7 @@
     </AndroidResource>
     <AndroidResource Include="Resources\drawable-hdpi\ic_keyboard_arrow_right_black_24dp.png" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_menu_black.png" />
+    <AndroidResource Include="Resources\values\Dimens.xml" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="json.net">
@@ -219,6 +229,10 @@
     <XamarinComponentReference Include="modernhttpclient">
       <Version>2.4.2</Version>
       <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="square.picasso">
+      <Visible>False</Visible>
+      <Version>2.5.2.1</Version>
     </XamarinComponentReference>
     <XamarinComponentReference Include="xamandroidsupportv4-18">
       <Version>22.2.0.0</Version>

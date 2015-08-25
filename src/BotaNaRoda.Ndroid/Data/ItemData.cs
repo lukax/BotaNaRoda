@@ -7,18 +7,23 @@ namespace BotaNaRoda.Ndroid.Data
 {
 	public class ItemData
 	{
+	    private readonly string _storagePath;
 	    public ItemJsonService Service { get; set; }
 
 	    public ItemData()
 	    {
-	        Service = new ItemJsonService(Path.Combine(
-            Environment.ExternalStorageDirectory.Path, "BotaNaRoda"));
-
+	        _storagePath = Path.Combine(Environment.ExternalStorageDirectory.Path, "BotaNaRoda");
+            Service = new ItemJsonService(_storagePath);
 	    }
 
-	    public Bitmap GetImageFile(string itemId, int width, int height)
+        public string GetLocalImageFileName(string id, int imageNumber)
+        {
+            return Path.Combine(_storagePath, string.Format("itemImg_{0}_{1}.jpg", id, imageNumber));
+        }
+
+        public Bitmap GetImageFile(string itemId, int imageNumber, int width, int height)
 		{
-			string filename = Service.GetImageFileName (itemId);
+			string filename = GetLocalImageFileName(itemId, imageNumber);
 			var img = new Java.IO.File (filename);
 			if (img.Exists()) {
 				return LoadAndResizeBitmap (img.Path, width, height);

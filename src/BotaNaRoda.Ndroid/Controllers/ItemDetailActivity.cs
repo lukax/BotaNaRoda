@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
@@ -11,6 +12,7 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
+using Square.Picasso;
 using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
@@ -20,17 +22,12 @@ namespace BotaNaRoda.Ndroid.Controllers
     public class ItemDetailActivity : Activity, IOnMapReadyCallback
     {
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-        private ImageView _itemImageView;
-        private TextView _itemAuthorView;
-        private TextView _itemDescriptionView;
         private ItemDetailViewModel _item;
-        private Button _reserveButton;
-        private TextView _itemTitleView;
-        private TextView _itemLocationView;
-        private Button _reportFraudButton;
+
         private IMenu _menu;
         private Account _currentUser;
         private ItemData _itemData;
+        private ViewHolder _holder;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -39,15 +36,19 @@ namespace BotaNaRoda.Ndroid.Controllers
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             _itemData = new ItemData();
             _currentUser = new UserService(this).GetCurrentUser();
-            _itemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage);
-            _itemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor);
-            _itemTitleView = FindViewById<TextView>(Resource.Id.itemsDetailTitle);
-            _itemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription);
-            _itemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation);
-			_reserveButton = FindViewById<Button>(Resource.Id.reserveButton);
-            _reserveButton.Click += ReserveItem;
-            _reportFraudButton = FindViewById<Button>(Resource.Id.reportFraudButton);
-            _reportFraudButton.Click += ReportFraudButtonOnClick;
+            _holder = new ViewHolder
+            {
+                ItemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage),
+                ItemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor),
+                ItemTitleView = FindViewById<TextView>(Resource.Id.itemsDetailTitle),
+                ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
+                ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
+                ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
+                ReportFraudButton = FindViewById<Button>(Resource.Id.reportFraudButton)
+            };
+
+            _holder.ReserveButton.Click += ReserveItem;
+            _holder.ReportFraudButton.Click += ReportFraudButtonOnClick;
 
             Refresh();
         }
@@ -76,15 +77,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
 
-		void ReserveItem (object sender, EventArgs e)
-		{
-		    _reserveButton.Text = "Reserved";
-		    _reserveButton.Enabled = false;
-		}
+        void ReserveItem(object sender, EventArgs e)
+        {
+            _holder.ReserveButton.Text = "Reserved";
+            _holder.ReserveButton.Enabled = false;
+        }
 
         private void ReportFraudButtonOnClick(object sender, EventArgs eventArgs)
         {
-            _reportFraudButton.Visibility = ViewStates.Invisible;
+            _holder.ReportFraudButton.Visibility = ViewStates.Invisible;
         }
 
         void DeleteItem()
@@ -114,20 +115,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             };
             worker.RunWorkerCompleted += (sender, args) =>
             {
-                RunOnUiThread(() =>
-                {
-                    FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
-
-                    _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _currentUser.Username);
-                    using (Bitmap itemImage = _itemData.GetImageFile(_item.Id, _itemImageView.Width, _itemImageView.Height))
-                    {
-                        _itemAuthorView.Text = "Lucas";
-                        _itemTitleView.Text = _item.Name;
-                        _itemDescriptionView.Text = _item.Description;
-                        _itemLocationView.Text = _item.Address;
-                        _itemImageView.SetImageBitmap(itemImage);
-                    }
-                });
+                RunOnUiThread(UpdateUi);
             };
             worker.RunWorkerAsync();
         }
@@ -145,6 +133,33 @@ namespace BotaNaRoda.Ndroid.Controllers
             googleMap.MoveCamera(cameraUpdate);
         }
 
+        private void UpdateUi()
+        {
+            FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
+            _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _currentUser.Username);
+
+            _holder.ItemAuthorView.Text = _item.User.Username;
+            _holder.ItemTitleView.Text = _item.Name;
+            _holder.ItemDescriptionView.Text = _item.Description;
+            _holder.ItemLocationView.Text = _item.Address;
+
+            Picasso.With(this)
+               .Load(_item.Images.First().Url)
+               .Fit()
+               .Tag(this)
+               .Into(_holder.ItemImageView);
+        }
+
+        private class ViewHolder
+        {
+            internal ImageView ItemImageView;
+            internal TextView ItemAuthorView;
+            internal TextView ItemDescriptionView;
+            internal TextView ItemTitleView;
+            internal TextView ItemLocationView;
+            internal Button ReserveButton;
+            internal Button ReportFraudButton;
+        }
     }
 }
 

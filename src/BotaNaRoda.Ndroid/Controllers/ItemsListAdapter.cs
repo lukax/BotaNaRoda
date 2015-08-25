@@ -7,6 +7,8 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
+using BotaNaRoda.Ndroid.Util;
+using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -25,8 +27,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    Items = new List<ItemListViewModel> ();
 		}
 
-	    #region implemented abstract members of BaseAdapter
-
 		public override long GetItemId (int position)
 		{
 			return position;
@@ -34,33 +34,29 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public override View GetView (int position, View convertView, ViewGroup parent)
 		{
-			var view = convertView ?? _context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, null);
+			var view = convertView ?? _context.LayoutInflater.Inflate (Resource.Layout.ItemsListItem, parent, false);
+		    var holder = view.Tag as ViewHolder ?? new ViewHolder
+		    {
+                Image = view.FindViewById<ImageView>(Resource.Id.itemsImageView),
+                Distance = view.FindViewById<TextView>(Resource.Id.itemsDistance),
+                Name = view.FindViewById<TextView>(Resource.Id.itemsDescription)
+            };
 
 			var item = this [position];
-			view.FindViewById<TextView> (Resource.Id.itemsDescription).Text = item.Name;
 
-			//calculate distance
-			if (CurrentLocation != null) {
-			    Location itemLocation = new Location("")
-			    {
-			        Latitude = item.Latitude,
-			        Longitude = item.Longitude
-			    };
-			    float distance = CurrentLocation.DistanceTo (itemLocation);
-				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = string.Format("{0:0,0.00}m", distance);
-			}
-			else {
-				view.FindViewById<TextView>(Resource.Id.itemsDistance).Text = "??";
-			}
+			holder.Name.Text = item.Name;
+		    holder.Distance.Text = GeoUtil.GetDistance(CurrentLocation, item);
 
-			var imgView = view.FindViewById<ImageView> (Resource.Id.itemsImageView);
-			//load image
-			using (Bitmap itemImage = _itemData.GetImageFile (item.Id, imgView.Width, imgView.Height)) {
-				imgView.SetImageBitmap (itemImage);
-			}
-			// Dispose of the Java side bitmap.
-			//GC.Collect();
-			return view;
+            Picasso.With(_context)
+                   .Load(item.ThumbImage.Url)
+                   .Placeholder(Resource.Drawable.placeholder)
+                   .Error(Resource.Drawable.error)
+                   .ResizeDimen(Resource.Dimension.list_detail_image_size, Resource.Dimension.list_detail_image_size)
+                   .CenterInside()
+                   .Tag(_context)
+                   .Into(holder.Image);
+
+            return view;
 		}
 
 		public override int Count
@@ -68,16 +64,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    get { return Items.Count(); }
 		}
 
-	    #endregion
-
-		#region implemented abstract members of BaseAdapter
-
 		public override ItemListViewModel this [int index]
 		{
 		    get { return Items.ElementAt(index); }
 		}
 
-	    #endregion
-	}
+        private class ViewHolder : Java.Lang.Object
+        {
+            internal ImageView Image;
+            internal TextView Name;
+            internal TextView Distance;
+        }
+    }
 }
 

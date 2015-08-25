@@ -5,9 +5,8 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public CategoryType Category { get; set; }
-
-        public string[] ProductImages { get; set; }
-
+        public ImageInfo[] Images { get; set; }
+        public ImageInfo ThumbImage { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string Address { get; set; }

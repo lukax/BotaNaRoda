@@ -11,6 +11,5 @@ namespace BotaNaRoda.Ndroid.Data
         Task<ItemDetailViewModel> GetItem(string id);
         Task<string> SaveItem(ItemCreateBindingModel item);
         Task<bool> DeleteItem(string id);
-		string GetImageFileName(string id);
     }
 }

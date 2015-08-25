@@ -66,7 +66,7 @@ namespace BotaNaRoda.Ndroid.Data
                 Address = item.Address,
                 Category = item.Category,
                 Description = item.Description,
-                Images = item.ProductImages,
+                Images = item.Images,
                 Name = item.Name
             };
 
@@ -100,7 +100,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public string GetImageFileName(string id)
         {
-			return Path.Combine(_storagePath, string.Format("itemImg_{0}.jpg", id));
+            return Path.Combine(_storagePath, string.Format("itemImg_{0}_{1}.jpg", id, 0));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -47,6 +48,7 @@ namespace BotaNaRoda.WebApi.Entity
             Description = model.Description;
             Category = model.Category;
             Images = model.Images;
+            ThumbImage = model.ThumbImage;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
             City = model.City;

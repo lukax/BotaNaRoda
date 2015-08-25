@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -42,13 +44,24 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<ItemDetailViewModel> GetItem(string id)
         {
-            var json = await _httpClient.GetStringAsync(BotaNaRodaItemsEndpoint + "/" + id);
+            var json = await _httpClient.GetStringAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
             return JsonConvert.DeserializeObject<ItemDetailViewModel>(json);
         }
 
         public async Task<string> SaveItem(ItemCreateBindingModel item)
         {
-            var response = await _httpClient.PostAsync(BotaNaRodaItemsEndpoint, new StringContent(JsonConvert.SerializeObject(item)));
+            if (item.Images == null || item.Images.Length > 3)
+            {
+                throw new ArgumentException("item.Images");
+            }
+
+            var imgs = await UploadImages(item.Images.Select(x => x.Url).ToArray());
+            item.ThumbImage = imgs.Last();
+            imgs.Remove(imgs.Last());
+            item.Images = imgs.ToArray();
+
+            var response = await _httpClient.PostAsync(BotaNaRodaItemsEndpoint, 
+                new StringContent(JsonConvert.SerializeObject(item)));
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
@@ -56,15 +69,29 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-        public async Task<bool> DeleteItem(string id)
+        private async Task<IList<ImageInfo>> UploadImages(string[] imgsUrl)
         {
-            var response = await _httpClient.DeleteAsync(BotaNaRodaItemsEndpoint + "/" + id);
-            return response.IsSuccessStatusCode;
+            using (var content = new MultipartFormDataContent())
+            {
+                foreach (var name in imgsUrl)
+                {
+                    var fs = new FileStream(Path.Combine(_storagePath, name), FileMode.Open);
+                    content.Add(new StreamContent(fs));
+                }
+                var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaItemsEndpoint, "images"), content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var imageInfosJson = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<IList<ImageInfo>>(imageInfosJson);
+                }
+            }
+            return null;
         }
 
-        public string GetImageFileName(string id)
-		{
-			return Path.Combine(_storagePath, string.Format("itemImg_{0}.jpg", id));
+        public async Task<bool> DeleteItem(string id)
+        {
+            var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
+            return response.IsSuccessStatusCode;
         }
     }
 }
