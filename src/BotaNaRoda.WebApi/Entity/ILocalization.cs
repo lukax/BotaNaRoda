@@ -5,9 +5,9 @@ namespace BotaNaRoda.WebApi.Entity
     public interface ILocalization
     {
         string Address { get; set; }
-        string City { get; set; }
+        string Locality { get; set; }
         string CountryCode { get; set; }
-        string ZipCode { get; set; }
+        string PostalCode { get; set; }
 
         GeoJson2DGeographicCoordinates Loc { get; set; }
     }

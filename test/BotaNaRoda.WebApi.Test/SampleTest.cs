@@ -17,13 +17,13 @@ namespace BotaNaRoda.WebApi.Test
             {
                 Username = "lucas",
                 Address = "123 st",
-                City = "Niteroi",
+                Locality = "Niteroi",
                 CountryCode = "BR",
                 Email = "espdlucas@gmail.com",
                 Latitude = -22.9068467,
                 Longitude = -43.1728965,
                 Password = "passw0rd",
-                ZipCode = "123456-789",
+                PostalCode = "123456-789",
                 Avatar = ""
             };
             Console.WriteLine(user.ToJson());

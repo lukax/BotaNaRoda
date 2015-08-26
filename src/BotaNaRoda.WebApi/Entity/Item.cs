@@ -29,9 +29,9 @@ namespace BotaNaRoda.WebApi.Entity
 
         public GeoJson2DGeographicCoordinates Loc { get; set; }
         public string Address { get; set; }
-        public string City { get; set; }
+        public string Locality { get; set; }
         public string CountryCode { get; set; }
-        public string ZipCode { get; set; }
+        public string PostalCode { get; set; }
 
         public Item()
         {
@@ -51,9 +51,9 @@ namespace BotaNaRoda.WebApi.Entity
             ThumbImage = model.ThumbImage;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
-            City = model.City;
+            Locality = model.City;
             CountryCode = model.CountryCode;
-            ZipCode = model.ZipCode;
+            PostalCode = model.ZipCode;
         }
     }
 }

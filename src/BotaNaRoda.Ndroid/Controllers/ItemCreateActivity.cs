@@ -144,13 +144,17 @@ namespace BotaNaRoda.Ndroid.Controllers
                 return;
             }
 
+	        var addr = _addresses.First();
 		    var item = new ItemCreateBindingModel
 		    {
                 Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.ToString() }).ToArray(),
 		        Name = _holder.ItemTitleView.Text,
 		        Description = _holder.ItemDescriptionView.Text,
 		        Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
-		        Address = _addresses.First().FeatureName,
+		        Address = addr.FeatureName,
+                PostalCode = addr.PostalCode,
+                CountryCode = addr.CountryCode,
+                Locality = addr.Locality,
 		        Latitude = _currentLocation.Latitude,
 		        Longitude = _currentLocation.Longitude
 		    };

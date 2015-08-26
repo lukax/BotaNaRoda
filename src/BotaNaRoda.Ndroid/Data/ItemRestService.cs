@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using BotaNaRoda.Ndroid.Models;
-using ModernHttpClient;
 using Newtonsoft.Json;
 using Xamarin.Auth;
+using ModernHttpClient;
 
 namespace BotaNaRoda.Ndroid.Data
 {
@@ -76,7 +76,7 @@ namespace BotaNaRoda.Ndroid.Data
                 foreach (var name in imgsUrl)
                 {
                     var fs = new FileStream(Path.Combine(_storagePath, name), FileMode.Open);
-                    content.Add(new StreamContent(fs));
+                    content.Add(new StreamContent(fs), "files");
                 }
                 var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaItemsEndpoint, "images"), content);
                 if (response.IsSuccessStatusCode)

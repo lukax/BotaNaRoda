@@ -12,9 +12,7 @@ namespace BotaNaRoda.WebApi.Models
         }
 
         public string Id { get; set; }
-
         public string Username { get; set; }
-
         public string Avatar { get; set; }
     }
 }

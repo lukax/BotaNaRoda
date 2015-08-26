@@ -108,7 +108,7 @@ namespace BotaNaRoda.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> PostItem(IList<IFormFile> files)
         {
-            if (!ModelState.IsValid || files.Count > 3)
+            if (!ModelState.IsValid || !files.Any() || files.Count > 3)
             {
                 return HttpBadRequest(ModelState);
             }
@@ -116,13 +116,13 @@ namespace BotaNaRoda.WebApi.Controllers
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_appSettings.Options.StorageConnectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             // Retrieve a reference to a container.
-            CloudBlobContainer container = blobClient.GetContainerReference("item_images");
+            CloudBlobContainer container = blobClient.GetContainerReference("item-imgs");
             // Create the container if it doesn't already exist.
-            container.CreateIfNotExists();
+            await container.CreateIfNotExistsAsync();
             container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
 
             string imagesId = ObjectId.GenerateNewId().ToString();
-            string imagePartUrl = $"{User.Identity.GetSubjectId()}/{imagesId}/";
+            string imagePartUrl = $"{imagesId}/";
 
             List<ImageInfo> imageInfoList = new List<ImageInfo>();
             foreach (var file in files)
