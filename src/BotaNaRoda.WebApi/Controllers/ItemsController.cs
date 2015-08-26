@@ -10,6 +10,7 @@ using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
 using BotaNaRoda.WebApi.Util;
+using IdentityServer3.Core.Extensions;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
@@ -21,7 +22,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
-using Thinktecture.IdentityServer.Core.Extensions;
 
 namespace BotaNaRoda.WebApi.Controllers
 {
@@ -85,7 +85,7 @@ namespace BotaNaRoda.WebApi.Controllers
 
             var item = new Item(model, User.GetSubjectId());
             await _itemsContext.Items.InsertOneAsync(item);
-            return Created(Request.Path + "/" + item.Id, null);
+            return new EmptyResult();
         }
 
         // DELETE api/items/5
@@ -122,7 +122,7 @@ namespace BotaNaRoda.WebApi.Controllers
             container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
 
             string imagesId = ObjectId.GenerateNewId().ToString();
-            string imagePartUrl = $"{imagesId}/";
+            string imagePartUrl = $"{User.GetSubjectId()}/{imagesId}/";
 
             List<ImageInfo> imageInfoList = new List<ImageInfo>();
             foreach (var file in files)

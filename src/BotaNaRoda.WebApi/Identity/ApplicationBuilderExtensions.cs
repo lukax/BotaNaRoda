@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer3.Core.Configuration;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.DataProtection;
 using Microsoft.Framework.DependencyInjection;
 using Owin;
-using Thinktecture.IdentityServer.Core.Configuration;
 
 namespace BotaNaRoda.WebApi.Identity
 {

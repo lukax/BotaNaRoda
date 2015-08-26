@@ -1,33 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IdentityModel.Tokens;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Identity;
+using IdentityServer3.Core.Configuration;
+using IdentityServer3.Core.Services;
+using IdentityServer3.Core.Services.Default;
+using IdentityServer3.Core.Logging;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Cors.Core;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Framework.Runtime;
-using Microsoft.Net.Http.Server;
 using Microsoft.Owin.Security.Facebook;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NLog;
 using Owin;
-using Thinktecture.IdentityServer.Core.Configuration;
-using Thinktecture.IdentityServer.Core.Logging;
-using Thinktecture.IdentityServer.Core.Logging.LogProviders;
-using Thinktecture.IdentityServer.Core.Services;
-using Constants = Thinktecture.IdentityServer.Core.Constants;
-using LogLevel = Thinktecture.IdentityServer.Core.Logging.LogLevel;
+using Serilog;
+using IdentityServer3;
 
 namespace BotaNaRoda.WebApi
 {
@@ -66,19 +60,24 @@ namespace BotaNaRoda.WebApi
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
         {
-            //To get the hold of the logger: ILog Logger = LogProvider.GetCurrentClassLogger();
-            LogProvider.SetCurrentLogProvider(new DiagnosticsTraceLogProvider());
+            // logging
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo
+                .Trace(outputTemplate: "{Timestamp:HH:MM} [{Level}] ({Name:l}){NewLine} {Message}{NewLine}{Exception}")
+                .CreateLogger();
 
-            app.UseStaticFiles();
-            app.UseMvc();
+            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+            app.UseOAuthBearerAuthentication(options =>
+            {
+                options.Authority = appSettings.Options.IdSvrAuthority;
+                options.Audience = "https://botanaroda.com.br/resources";
+                options.AutomaticAuthentication = true;
+            });
+
+            app.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.ApiScope });
 
             app.Map("/core", core =>
             {
-                var factory = InMemoryFactory.Create(
-                                clients: Clients.Get(),
-                                scopes: Scopes.Get());
-                factory.UserService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings)));
-
                 var idsrvOptions = new IdentityServerOptions
                 {
                     IssuerUri = "https://botanaroda.com.br",
@@ -86,8 +85,14 @@ namespace BotaNaRoda.WebApi
 
                     RequireSsl = false,
                     SigningCertificate = new X509Certificate2(env.ApplicationBasePath + "\\Identity\\idsrv3test.pfx", "idsrv3test"),
-                    Factory = factory,
-                    CorsPolicy = CorsPolicy.AllowAll,
+                    Factory = new IdentityServerServiceFactory()
+                        {
+                            UserService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings))),
+                            CorsPolicyService = new Registration<ICorsPolicyService>(new DefaultCorsPolicyService { AllowAll = true })
+                        }
+                        .UseInMemoryClients(Clients.Get())
+                        .UseInMemoryScopes(Scopes.Get()),
+                    
 
                     AuthenticationOptions = new AuthenticationOptions
                     {
@@ -105,6 +110,9 @@ namespace BotaNaRoda.WebApi
 
                 core.UseIdentityServer(idsrvOptions);
             });
+
+            //app.UseStaticFiles();
+            app.UseMvc();
         }
 
 
@@ -121,8 +129,8 @@ namespace BotaNaRoda.WebApi
                 {
                     OnAuthenticated = async context =>
                     {
-                        string userInformationEndpoint = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" +  Uri.EscapeDataString(context.AccessToken);
-                        
+                        string userInformationEndpoint = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" + Uri.EscapeDataString(context.AccessToken);
+
                         HttpResponseMessage graphResponse = await new HttpClient().GetAsync(userInformationEndpoint);
                         graphResponse.EnsureSuccessStatusCode();
                         var text = await graphResponse.Content.ReadAsStringAsync();
@@ -137,7 +145,7 @@ namespace BotaNaRoda.WebApi
                         }
 
                         //Parse facebook picture object into our custom avatar url claim
-                        context.Identity.AddClaim(new Claim("avatar", (string) user["picture"]["data"]["url"]));
+                        context.Identity.AddClaim(new Claim("avatar", (string)user["picture"]["data"]["url"]));
                     }
                 }
             };

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Thinktecture.IdentityServer.Core;
-using Thinktecture.IdentityServer.Core.Models;
+using IdentityServer3.Core.Models;
 
 namespace BotaNaRoda.WebApi.Identity
 {
@@ -18,10 +17,11 @@ namespace BotaNaRoda.WebApi.Identity
                 new Client
                 {
                     ClientName = "Bota na Roda",
-                    ClientId = "mobile.botanaroda.com.br",
+                    ClientId = "android.botanaroda.com.br",
                     Flow = Flows.Implicit,
                     ClientUri = "https://botanaroda.com.br",
                     RequireConsent = false,
+                    AllowAccessToAllScopes = true,
                     RedirectUris = new List<string>
                     {
                         "https://botanaroda.azurewebsites.net/core",
@@ -37,9 +37,9 @@ namespace BotaNaRoda.WebApi.Identity
                     Enabled = true,
 
                     ClientId = "implicitclient",
-                    ClientSecrets = new List<ClientSecret>
+                    ClientSecrets = new List<Secret>
                     {
-                        new ClientSecret("secret".Sha256())
+                        new Secret("secret".Sha256())
                     },
 
                     Flow = Flows.Implicit,
@@ -47,7 +47,7 @@ namespace BotaNaRoda.WebApi.Identity
                     ClientUri = "http://www.thinktecture.com",
                     RequireConsent = true,
                     AllowRememberConsent = true,
-
+                    AllowAccessToAllScopes = true,
                     RedirectUris = new List<string>
                     {
                         // "simple JS client"

@@ -2,24 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Thinktecture.IdentityServer.Core;
-using Thinktecture.IdentityServer.Core.Models;
+using IdentityServer3.Core.Models;
 
 namespace BotaNaRoda.WebApi.Identity
 {
     public class Scopes
     {
+        public const string ApiScope = "https://api.botanaroda.com.br";
+
         public static IEnumerable<Scope> Get()
         {
             return new[]
             {
                 StandardScopes.OpenId,
-                StandardScopes.Profile,
-                StandardScopes.Email,
-                StandardScopes.Address,
-                StandardScopes.OfflineAccess,
-                StandardScopes.RolesAlwaysInclude,
-                StandardScopes.AllClaims,
+                StandardScopes.ProfileAlwaysInclude,
+                StandardScopes.EmailAlwaysInclude,
 
                 ////////////////////////
                 // resource scopes
@@ -27,31 +24,9 @@ namespace BotaNaRoda.WebApi.Identity
 
                 new Scope
                 {
-                    Name = "read",
-                    DisplayName = "Read data",
+                    Name = ApiScope,
+                    DisplayName = "Bota na Roda API",
                     Type = ScopeType.Resource,
-                    Emphasize = false,
-                },
-                new Scope
-                {
-                    Name = "write",
-                    DisplayName = "Write data",
-                    Type = ScopeType.Resource,
-                    Emphasize = true,
-                },
-                new Scope
-                {
-                    Name = "idmgr",
-                    DisplayName = "IdentityManager",
-                    Type = ScopeType.Resource,
-                    Emphasize = true,
-                    ShowInDiscoveryDocument = false,
-
-                    Claims = new List<ScopeClaim>
-                    {
-                        new ScopeClaim(Constants.ClaimTypes.Name),
-                        new ScopeClaim(Constants.ClaimTypes.Role)
-                    }
                 }
             };
         }

@@ -35,8 +35,8 @@ namespace BotaNaRoda.Ndroid.Controllers
         void Login()
         {
             var auth = new CustomOAuth2Authenticator(
-                clientId: "mobile.botanaroda.com.br",
-                scope: "read",
+                clientId: "android.botanaroda.com.br",
+                scope: "https://api.botanaroda.com.br",
                 authorizeUrl: new Uri("https://botanaroda.azurewebsites.net/core/connect/authorize"),
                 redirectUrl: new Uri("https://botanaroda.azurewebsites.net/core"))
             {

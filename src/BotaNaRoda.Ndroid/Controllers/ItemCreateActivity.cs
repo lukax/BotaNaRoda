@@ -182,7 +182,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
             cameraIntent.PutExtra(MediaStore.ExtraOutput, imageUri);
-            cameraIntent.PutExtra(MediaStore.ExtraSizeLimit, 1 * 1024);
+            //cameraIntent.PutExtra(MediaStore.ExtraSizeLimit, 1 * 1024);
 
             PackageManager packageManager = PackageManager;
             IList<ResolveInfo> activities =

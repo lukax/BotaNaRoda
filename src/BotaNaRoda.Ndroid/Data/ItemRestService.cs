@@ -5,10 +5,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Android.Graphics;
+using Android.Media;
 using BotaNaRoda.Ndroid.Models;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 using ModernHttpClient;
+using Path = System.IO.Path;
 
 namespace BotaNaRoda.Ndroid.Data
 {
@@ -30,6 +33,7 @@ namespace BotaNaRoda.Ndroid.Data
             if (account != null)
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", account.Properties["access_token"]);
+
             }
         }
 

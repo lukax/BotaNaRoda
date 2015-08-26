@@ -1,12 +1,8 @@
 ﻿{
   "AppSettings": {
+    "IdSvrAuthority": "https://localhost:44333/core",
     "BotaNaRodaConnectionString": "mongodb://localhost",
     "BotaNaRodaDatabaseName": "botanaroda",
-    "StorageConnectionString":  ""
+    "StorageConnectionString": ""
   }
-  //"Data": {
-  //  "DefaultConnection": {
-  //    "ConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME;Trusted_Connection=True;"
-  //  }
-  //}
 }

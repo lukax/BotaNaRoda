@@ -51,9 +51,9 @@ namespace BotaNaRoda.WebApi.Entity
             ThumbImage = model.ThumbImage;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
             Address = model.Address;
-            Locality = model.City;
+            Locality = model.Locality;
             CountryCode = model.CountryCode;
-            PostalCode = model.ZipCode;
+            PostalCode = model.PostalCode;
         }
     }
 }

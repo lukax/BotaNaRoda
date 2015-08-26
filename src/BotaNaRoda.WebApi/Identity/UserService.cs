@@ -5,17 +5,18 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
+using IdentityServer3.Core;
+using IdentityServer3.Core.Extensions;
+using IdentityServer3.Core.Models;
+using IdentityServer3.Core.Services;
+using IdentityServer3.Core.Services.Default;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using MongoDB.Driver;
-using Thinktecture.IdentityServer.Core;
-using Thinktecture.IdentityServer.Core.Extensions;
-using Thinktecture.IdentityServer.Core.Models;
-using Thinktecture.IdentityServer.Core.Services;
 
 namespace BotaNaRoda.WebApi.Identity
 {
-    public class UserService : IUserService
+    public class UserService : UserServiceBase
     {
         private readonly ItemsContext _itemsContext;
 
@@ -24,22 +25,39 @@ namespace BotaNaRoda.WebApi.Identity
             _itemsContext = itemsContext;
         }
 
-        public async Task<AuthenticateResult> AuthenticateExternalAsync(ExternalIdentity externalUser, SignInMessage message)
+        public override async Task AuthenticateLocalAsync(LocalAuthenticationContext context)
+        {
+            var user = await _itemsContext.Users.Find(x => x.Username == context.UserName).FirstOrDefaultAsync();
+
+            PasswordHasher<User> hasher = new PasswordHasher<User>();
+            if (user == null ||
+                hasher.VerifyHashedPassword(user, user.PasswordHash, context.Password) ==
+                PasswordVerificationResult.Failed)
+            {
+                context.AuthenticateResult = new AuthenticateResult("Invalid username and password");
+            }
+            else
+            {
+                context.AuthenticateResult = new AuthenticateResult(user.Id, user.Username);
+            }
+        }
+
+        public override async Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
         {
             // look for the user in our local identity system from the external identifiers
-            var user = await _itemsContext.Users.Find(x => x.Provider == externalUser.Provider && x.ProviderId == externalUser.ProviderId).FirstOrDefaultAsync();
+            var user = await _itemsContext.Users.Find(x => x.Provider == context.ExternalIdentity.Provider && x.ProviderId == context.ExternalIdentity.ProviderId).FirstOrDefaultAsync();
 
             if (user == null)
             {
                 // new user, so add them here
-                var nameClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
-                var emailClaim = externalUser.Claims.First(x => x.Type == Constants.ClaimTypes.Email);
-                var avatarClaim = externalUser.Claims.First(x => x.Type == "avatar");
+                var nameClaim = context.ExternalIdentity.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
+                var emailClaim = context.ExternalIdentity.Claims.First(x => x.Type.Contains(Constants.ClaimTypes.Email));
+                var avatarClaim = context.ExternalIdentity.Claims.First(x => x.Type == "avatar");
 
                 user = new User
                 {
-                    Provider = externalUser.Provider,
-                    ProviderId = externalUser.ProviderId,
+                    Provider = context.ExternalIdentity.Provider,
+                    ProviderId = context.ExternalIdentity.ProviderId,
                     Username = emailClaim.Value,
                     Name = nameClaim.Value,
                     Avatar = avatarClaim.Value
@@ -47,52 +65,27 @@ namespace BotaNaRoda.WebApi.Identity
                 await _itemsContext.Users.InsertOneAsync(user);
             }
 
-            return await Task.FromResult(new AuthenticateResult(user.Id, user.Username, identityProvider: user.Provider));
+            // user is registered so continue
+            context.AuthenticateResult = new AuthenticateResult(user.Id, user.Name, identityProvider: user.Provider);
         }
 
-        public async Task<AuthenticateResult> AuthenticateLocalAsync(string username, string password, SignInMessage message)
-        {
-            var user = await _itemsContext.Users.Find(x => x.Username == username).FirstOrDefaultAsync();
-
-            PasswordHasher<User> hasher = new PasswordHasher<User>();
-            if (user == null || hasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
+        public override async Task GetProfileDataAsync(ProfileDataRequestContext context)
+        {            
+            User user = await _itemsContext.Users.Find(x => x.Id == context.Subject.GetSubjectId()).FirstOrDefaultAsync();
+            if (user != null)
             {
-                return await Task.FromResult<AuthenticateResult>(null);
+                //TODO setup claims
+                context.IssuedClaims = new List<Claim>
+                {
+                    new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
+                };
             }
-
-            return await Task.FromResult(new AuthenticateResult(user.Id, user.Username));
         }
 
-        public async Task<IEnumerable<Claim>> GetProfileDataAsync(ClaimsPrincipal subject, IEnumerable<string> requestedClaimTypes = null)
+        public override async Task IsActiveAsync(IsActiveContext context)
         {
-            // issue the claims for the user
-            User user = await _itemsContext.Users.Find(x => x.Id == subject.GetSubjectId()).FirstOrDefaultAsync();
-            if (user == null)
-            {
-                return await Task.FromResult<IEnumerable<Claim>>(null);
-            }
-
-            //TODO setup claims
-            return await Task.FromResult(new List<Claim>
-            {
-                new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
-            }.AsEnumerable());
-        }
-
-        public async Task<bool> IsActiveAsync(ClaimsPrincipal subject)
-        {
-            User user = await _itemsContext.Users.Find(x => x.Id == subject.GetSubjectId()).FirstOrDefaultAsync();
-            return await Task.FromResult(user != null);
-        }
-
-        public Task<AuthenticateResult> PreAuthenticateAsync(SignInMessage message)
-        {
-            return Task.FromResult<AuthenticateResult>(null);
-        }
-
-        public Task SignOutAsync(ClaimsPrincipal subject)
-        {
-            return Task.FromResult(0);
+            User user = await _itemsContext.Users.Find(x => x.Id == context.Subject.GetSubjectId()).FirstOrDefaultAsync();
+            context.IsActive = user != null;
         }
     }
 }
