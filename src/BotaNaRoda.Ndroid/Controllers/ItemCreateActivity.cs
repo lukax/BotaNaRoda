@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Graphics;
 using Android.Locations;
 using Android.OS;
 using Android.Provider;
-using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using Java.IO;
 using Square.Picasso;
+using Xamarin.Auth;
 using Uri = Android.Net.Uri;
 
 namespace BotaNaRoda.Ndroid.Controllers
@@ -30,14 +29,13 @@ namespace BotaNaRoda.Ndroid.Controllers
         private const int CapturePhoto3 = 2;
         private LocationManager _locMgr;
         private Location _currentLocation;
-        private ProgressDialog _progressDialog;
 	    private bool _imageTaken;
 	    private IList<Address> _addresses;
 	    private ArrayAdapter _categoriesAdapter;
 	    private ItemData _itemData;
 	    private ViewHolder _holder;
-	    private readonly string _newItemGuid = Guid.NewGuid().ToString();
         private readonly Dictionary<int, Uri> _captureCodeImageUrlDictionary = new Dictionary<int, Uri>(3);
+	    private UserService _userService;
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -46,7 +44,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             ActionBar.SetDisplayHomeAsUpEnabled(true);
 
 			_locMgr = GetSystemService(LocationService) as LocationManager;
-            _itemData = new ItemData();
+            _userService = new UserService(this);
+            _itemData = new ItemData(_userService.GetCurrentUser());
 
             _holder = new ViewHolder
             {
@@ -95,7 +94,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                     Picasso.With(this)
                            .Load(imgUrl)
                            .Fit()
-                           .CenterInside()
+						   .CenterCrop()
                            .Tag(this)
                            .Into(holder);
 				}
@@ -115,7 +114,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_currentLocation = location;
             Geocoder geocdr = new Geocoder(this);
             _addresses = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1);
-            _progressDialog.Cancel ();
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -133,9 +131,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-				Toast toast = Toast.MakeText (this, "Não é possivel salvar item sem a localização!", ToastLength.Short);
-				toast.Show ();
-				return;
+				var progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
+			    Task.Delay(2000).ContinueWith(t =>
+			    {
+                    progressDialog.Cancel();
+			    }, UiScheduler);
+
+                return;
 			}
             if (!_imageTaken)
             {
@@ -147,7 +149,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        var addr = _addresses.First();
 		    var item = new ItemCreateBindingModel
 		    {
-                Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.ToString() }).ToArray(),
+                Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
 		        Name = _holder.ItemTitleView.Text,
 		        Description = _holder.ItemDescriptionView.Text,
 		        Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
@@ -158,6 +160,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 		        Latitude = _currentLocation.Latitude,
 		        Longitude = _currentLocation.Longitude
 		    };
+
+
+            ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();
 	        worker.DoWork += async (o, args) =>
@@ -171,7 +176,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 	    void TakePicture(int capturePhotoCode)
 	    {
-            File imageFile = new File(_itemData.GetLocalImageFileName(_newItemGuid, capturePhotoCode));
+            File imageFile = new File(_itemData.GetTempImageFilename(capturePhotoCode));
             var imageUri = Uri.FromFile(imageFile);
             _captureCodeImageUrlDictionary.Add(capturePhotoCode, imageUri);
 
@@ -204,7 +209,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		        PowerRequirement = Power.High
 		    };
 		    _locMgr.RequestSingleUpdate (criteria, this, null);
-			_progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
 		}
 
 	    private class ViewHolder

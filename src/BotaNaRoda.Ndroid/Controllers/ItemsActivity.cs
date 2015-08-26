@@ -33,8 +33,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             base.OnCreate(bundle);
 			SetContentView(Resource.Layout.Items);
 
-            _itemData = new ItemData();
             _userService = new UserService(this);
+            _itemData = new ItemData(_userService.GetCurrentUser());
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
             _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
@@ -70,12 +70,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 			base.OnResume ();
             Refresh();
 
-		    Criteria criteria = new Criteria
-		    {
-		        Accuracy = Accuracy.Coarse,
-		        PowerRequirement = Power.NoRequirement
-		    };
-		    string provider = _locMgr.GetBestProvider (criteria, true);
+			string provider = _locMgr.GetBestProvider (new Criteria
+				{
+					Accuracy = Accuracy.Coarse,
+					PowerRequirement = Power.NoRequirement
+				}, true);
 			_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
 		}
 

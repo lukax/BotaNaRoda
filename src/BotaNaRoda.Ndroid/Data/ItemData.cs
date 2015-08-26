@@ -2,28 +2,33 @@
 using Android.Graphics;
 using Android.OS;
 using Path = System.IO.Path;
+using System;
+using Android.Content;
+using BotaNaRoda.Ndroid.Controllers;
+using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Data
 {
 	public class ItemData
 	{
 	    private readonly string _storagePath;
-	    public ItemJsonService Service { get; set; }
+	    public ItemRestService Service { get; set; }
 
-	    public ItemData()
+	    public ItemData(Account account)
 	    {
-	        _storagePath = Path.Combine(Environment.ExternalStorageDirectory.Path, "BotaNaRoda");
-            Service = new ItemJsonService(_storagePath);
+	        _storagePath = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, "BotaNaRoda");
+            Service = new ItemRestService(_storagePath, account);
 	    }
 
-        public string GetLocalImageFileName(string id, int imageNumber)
+        public string GetTempImageFilename(int imageNumber)
         {
-            return Path.Combine(_storagePath, string.Format("itemImg_{0}_{1}.jpg", id, imageNumber));
+            return Path.Combine(_storagePath, string.Format("itemImg_{0}.jpg", imageNumber));
         }
 
-        public Bitmap GetImageFile(string itemId, int imageNumber, int width, int height)
+		[Obsolete]
+        public Bitmap GetImageFile(int imageNumber, int width, int height)
 		{
-			string filename = GetLocalImageFileName(itemId, imageNumber);
+			string filename = GetTempImageFilename(imageNumber);
 			var img = new Java.IO.File (filename);
 			if (img.Exists()) {
 				return LoadAndResizeBitmap (img.Path, width, height);

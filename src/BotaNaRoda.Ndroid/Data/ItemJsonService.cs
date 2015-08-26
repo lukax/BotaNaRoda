@@ -45,8 +45,13 @@ namespace BotaNaRoda.Ndroid.Data
             foreach (var fileName in fileNames)
             {
                 string itemString = File.ReadAllText(fileName);
-                ItemDetailViewModel item = JsonConvert.DeserializeObject<ItemDetailViewModel>(itemString);
-                _items.Add(item);
+				try{
+					ItemDetailViewModel item = JsonConvert.DeserializeObject<ItemDetailViewModel>(itemString);
+					_items.Add(item);
+				}
+				catch{
+					Console.WriteLine ("Error loading item json");
+				}
             }
         }
 
