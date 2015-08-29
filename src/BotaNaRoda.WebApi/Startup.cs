@@ -66,15 +66,7 @@ namespace BotaNaRoda.WebApi
                 .Trace(outputTemplate: "{Timestamp:HH:MM} [{Level}] ({Name:l}){NewLine} {Message}{NewLine}{Exception}")
                 .CreateLogger();
 
-            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
-            app.UseOAuthBearerAuthentication(options =>
-            {
-                options.Authority = appSettings.Options.IdSvrAuthority;
-                options.Audience = "https://botanaroda.com.br/resources";
-                options.AutomaticAuthentication = true;
-            });
-
-            app.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.ApiScope });
+            //JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
 
             app.Map("/core", core =>
             {
@@ -111,8 +103,20 @@ namespace BotaNaRoda.WebApi
                 core.UseIdentityServer(idsrvOptions);
             });
 
-            //app.UseStaticFiles();
-            app.UseMvc();
+            app.Map("/api", api =>
+            {
+                api.UseOAuthBearerAuthentication(options =>
+                {
+                    options.Authority = appSettings.Options.IdSvrAuthority;
+                    options.Audience = "https://botanaroda.com.br/resources";
+                    options.MetadataAddress = appSettings.Options.IdSvrAuthority + "/.well-known/openid-configuration";
+                    options.AutomaticAuthentication = true;
+                });
+
+                api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.ApiScope });
+
+                api.UseMvc();
+            });
         }
 
 

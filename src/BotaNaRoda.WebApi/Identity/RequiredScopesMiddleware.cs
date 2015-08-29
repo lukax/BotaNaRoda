@@ -25,7 +25,7 @@ namespace BotaNaRoda.WebApi.Identity
             {
                 if (!ScopePresent(context.User))
                 {
-                    context.Response.OnSendingHeaders(Send403, context);
+                    context.Response.OnStarting(Send403, context);
                     return;
                 }
             }
@@ -38,10 +38,11 @@ namespace BotaNaRoda.WebApi.Identity
             return principal.FindAll("scope").Any(scope => _requiredScopes.Contains(scope.Value));
         }
 
-        private void Send403(object contextObject)
+        private Task Send403(object contextObject)
         {
             var context = contextObject as HttpContext;
             context.Response.StatusCode = 403;
+            return Task.FromResult(0);
         }
     }
 }

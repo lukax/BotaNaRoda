@@ -12,7 +12,7 @@ using MongoDB.Driver;
 
 namespace BotaNaRoda.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class UsersController : Controller
     {
         private readonly ItemsContext _itemsContext;

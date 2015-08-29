@@ -25,7 +25,7 @@ using MongoDB.Driver.Linq;
 
 namespace BotaNaRoda.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ItemsController : Controller
     {
         private readonly ItemsContext _itemsContext;
