@@ -35,7 +35,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    private ItemData _itemData;
 	    private ViewHolder _holder;
         private readonly Dictionary<int, Uri> _captureCodeImageUrlDictionary = new Dictionary<int, Uri>(3);
-	    private UserService _userService;
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -44,8 +43,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             ActionBar.SetDisplayHomeAsUpEnabled(true);
 
 			_locMgr = GetSystemService(LocationService) as LocationManager;
-            _userService = new UserService(this);
-            _itemData = new ItemData(_userService.GetCurrentUser());
+            _itemData = new ItemData(this);
 
             _holder = new ViewHolder
             {

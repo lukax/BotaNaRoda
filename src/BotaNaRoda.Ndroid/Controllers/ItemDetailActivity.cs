@@ -35,7 +35,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             SetContentView(Resource.Layout.ItemDetail);
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             _currentUser = new UserService(this).GetCurrentUser();
-            _itemData = new ItemData(_currentUser);
+            _itemData = new ItemData(this);
 
             _holder = new ViewHolder
             {

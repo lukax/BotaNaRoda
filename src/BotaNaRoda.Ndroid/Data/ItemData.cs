@@ -14,10 +14,10 @@ namespace BotaNaRoda.Ndroid.Data
 	    private readonly string _storagePath;
 	    public ItemRestService Service { get; set; }
 
-	    public ItemData(Account account)
+	    public ItemData(Context context)
 	    {
 	        _storagePath = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, "BotaNaRoda");
-            Service = new ItemRestService(_storagePath, account);
+            Service = new ItemRestService(context, _storagePath, new UserService(context));
 	    }
 
         public string GetTempImageFilename(int imageNumber)

@@ -34,7 +34,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			SetContentView(Resource.Layout.Items);
 
             _userService = new UserService(this);
-            _itemData = new ItemData(_userService.GetCurrentUser());
+            _itemData = new ItemData(this);
 			_locMgr = GetSystemService(LocationService) as LocationManager;
 
             _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);

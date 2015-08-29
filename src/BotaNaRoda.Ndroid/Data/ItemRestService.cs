@@ -5,8 +5,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Graphics;
 using Android.Media;
+using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
 using Newtonsoft.Json;
 using Xamarin.Auth;
@@ -17,30 +19,36 @@ namespace BotaNaRoda.Ndroid.Data
 {
     public class ItemRestService : IItemService
     {
+        private readonly Context _context;
+        private readonly UserService _userService;
         private const string BotaNaRodaItemsEndpoint = "https://botanaroda.azurewebsites.net/api/items";
         private readonly HttpClient _httpClient;
-        private readonly string _storagePath;
 
-        public ItemRestService(string storagePath, Account account)
+        public ItemRestService(Context context, string storagePath, UserService userService)
         {
-            _storagePath = storagePath;
+            _context = context;
+            _userService = userService;
 
-            if (!Directory.Exists(_storagePath))
-                Directory.CreateDirectory(_storagePath);
+            if (!Directory.Exists(storagePath))
+                Directory.CreateDirectory(storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
             _httpClient = new HttpClient(new NativeMessageHandler());
-            if (account != null)
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", account.Properties["access_token"]);
-
-            }
         }
 
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems()
         {
-            var json = await _httpClient.GetStringAsync(BotaNaRodaItemsEndpoint);
-            return JsonConvert.DeserializeObject<IEnumerable<ItemListViewModel>>(json);
+            SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<ItemListViewModel>>(json);
+            }
+
+            LoginUserIfUnauthorizedResponse(response);
+            return new List<ItemListViewModel>();
         }
 
         public void RefreshCache()
@@ -49,12 +57,23 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<ItemDetailViewModel> GetItem(string id)
         {
-            var json = await _httpClient.GetStringAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
-            return JsonConvert.DeserializeObject<ItemDetailViewModel>(json);
+            SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ItemDetailViewModel>(json);
+            }
+
+            LoginUserIfUnauthorizedResponse(response);
+            return null;
         }
 
         public async Task<string> SaveItem(ItemCreateBindingModel item)
         {
+            SetupAuthorizationHeader();
+
             if (item.Images == null || item.Images.Length > 3)
             {
                 throw new ArgumentException(nameof(item));
@@ -76,7 +95,19 @@ namespace BotaNaRoda.Ndroid.Data
             {
                 return await response.Content.ReadAsStringAsync();
             }
+
+            LoginUserIfUnauthorizedResponse(response);
             return null;
+        }
+
+
+        public async Task<bool> DeleteItem(string id)
+        {
+            SetupAuthorizationHeader();
+
+            var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
+            LoginUserIfUnauthorizedResponse(response);
+            return response.IsSuccessStatusCode;
         }
 
         private async Task<IList<ImageInfo>> UploadImages(string[] imgPaths)
@@ -98,10 +129,21 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-        public async Task<bool> DeleteItem(string id)
+        private void SetupAuthorizationHeader()
         {
-            var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
-            return response.IsSuccessStatusCode;
+            var account = _userService.GetCurrentUser();
+            if (account != null)
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", account.Properties["access_token"]);
+            }
+        }
+
+        private void LoginUserIfUnauthorizedResponse(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode && _httpClient.DefaultRequestHeaders.Authorization != null)
+            {
+                _context.StartActivity(typeof(LoginActivity));
+            }
         }
     }
 }
