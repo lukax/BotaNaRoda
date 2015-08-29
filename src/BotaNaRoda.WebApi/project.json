@@ -20,7 +20,7 @@
     "xunit": "2.0.0",
     "WindowsAzure.Storage": "5.0.0",
     "Serilog": "1.5.9",
-    "Serilog.Sinks.Literate": "1.2.0"
+    "Serilog.Sinks.Loggly": "2.0.7"
   },
 
   "commands": {

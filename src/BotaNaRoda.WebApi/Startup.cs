@@ -22,6 +22,8 @@ using Newtonsoft.Json.Linq;
 using Owin;
 using Serilog;
 using IdentityServer3;
+using Loggly;
+using Loggly.Config;
 
 namespace BotaNaRoda.WebApi
 {
@@ -60,13 +62,7 @@ namespace BotaNaRoda.WebApi
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
         {
-            // logging
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo
-                .Trace(outputTemplate: "{Timestamp:HH:MM} [{Level}] ({Name:l}){NewLine} {Message}{NewLine}{Exception}")
-                .CreateLogger();
-
-            //JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+            ConfigureLogging(app, appSettings);
 
             app.Map("/core", core =>
             {
@@ -105,6 +101,8 @@ namespace BotaNaRoda.WebApi
 
             app.Map("/api", api =>
             {
+                //JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+
                 api.UseOAuthBearerAuthentication(options =>
                 {
                     options.Authority = appSettings.Options.IdSvrAuthority;
@@ -119,6 +117,21 @@ namespace BotaNaRoda.WebApi
             });
         }
 
+        public static void ConfigureLogging(IApplicationBuilder app, IOptions<AppSettings> appSettings)
+        {
+            LogglyConfig.Instance.ApplicationName = appSettings.Options.AppName;
+            LogglyConfig.Instance.CustomerToken = appSettings.Options.LogglyCustomerToken;
+            LogglyConfig.Instance.Transport = new TransportConfiguration
+            {
+                EndpointHostname = "logs-01.loggly.com",
+                EndpointPort = 443,
+                LogTransport = LogTransport.Https
+            };
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Trace(outputTemplate: "{Timestamp:HH:MM} [{Level}] ({Name:l}){NewLine} {Message}{NewLine}{Exception}")
+                .WriteTo.Loggly()
+                .CreateLogger();
+        }
 
         public static void ConfigureAdditionalIdentityProviders(IAppBuilder app, string signInAsType)
         {

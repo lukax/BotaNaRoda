@@ -1,8 +1,10 @@
 ﻿{
   "AppSettings": {
+    "AppName": "BotaNaRoda Api",
     "IdSvrAuthority": "https://localhost:44333/core",
     "BotaNaRodaConnectionString": "mongodb://localhost",
     "BotaNaRodaDatabaseName": "botanaroda",
-    "StorageConnectionString": ""
+    "StorageConnectionString": "",
+    "LogglyCustomerToken":  ""
   }
 }
