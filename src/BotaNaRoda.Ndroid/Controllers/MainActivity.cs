@@ -25,7 +25,6 @@ namespace BotaNaRoda.Ndroid
 		List<string> mLeftDataSet;
 		ArrayAdapter<string> mLeftAdapter;
 		MyActionBarDrawerToggle mDrawerToggle;
-		Fragment mContainer;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -38,8 +37,8 @@ namespace BotaNaRoda.Ndroid
 			SupportActionBar.SetHomeButtonEnabled(true);
 
 			mLeftDataSet = new List<string>();
-			mLeftDataSet.Add ("Left Item 1");
-			mLeftDataSet.Add ("Left Item 2");
+			mLeftDataSet.Add ("Itens próximos a mim");
+			mLeftDataSet.Add ("Conversas");
 			mLeftAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, mLeftDataSet);
 			mLeftDrawer.Adapter = mLeftAdapter;
 
