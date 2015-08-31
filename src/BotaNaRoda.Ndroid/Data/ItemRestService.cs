@@ -12,7 +12,6 @@ using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
 using Newtonsoft.Json;
 using Xamarin.Auth;
-using ModernHttpClient;
 using Path = System.IO.Path;
 
 namespace BotaNaRoda.Ndroid.Data
@@ -33,7 +32,8 @@ namespace BotaNaRoda.Ndroid.Data
                 Directory.CreateDirectory(storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
-            _httpClient = new HttpClient(new NativeMessageHandler());
+            //_httpClient = new HttpClient(new NativeMessageHandler());
+			_httpClient = new HttpClient();
         }
 
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems()
@@ -76,13 +76,13 @@ namespace BotaNaRoda.Ndroid.Data
 
             if (item.Images == null || item.Images.Length > 3)
             {
-                throw new ArgumentException(nameof(item));
+                throw new ArgumentException("item");
             }
 
             var imgs = await UploadImages(item.Images.Select(x => x.Url).ToArray());
             if (imgs == null)
             {
-                throw new ArgumentException("Não foi possível carregar imagens", nameof(item));    
+                throw new ArgumentException("Não foi poss¨ªvel carregar imagens", nameof(item));    
             }
 
             item.ThumbImage = imgs.Last();

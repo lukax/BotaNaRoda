@@ -132,14 +132,11 @@
     <Reference Include="Square.OkIO">
       <HintPath>..\..\packages\Square.OkIO.1.5.0.0\lib\MonoAndroid\Square.OkIO.dll</HintPath>
     </Reference>
-    <Reference Include="Square.OkHttp">
-      <HintPath>..\..\packages\Square.OkHttp.2.4.0.1\lib\MonoAndroid\Square.OkHttp.dll</HintPath>
-    </Reference>
     <Reference Include="Square.Picasso">
       <HintPath>..\..\packages\Square.Picasso.2.5.2.1\lib\MonoAndroid\Square.Picasso.dll</HintPath>
     </Reference>
-    <Reference Include="ModernHttpClient">
-      <HintPath>..\..\Components\modernhttpclient-2.4.2\lib\android\ModernHttpClient.dll</HintPath>
+    <Reference Include="Square.OkHttp">
+      <HintPath>..\..\packages\Square.OkHttp.2.4.0.3\lib\MonoAndroid\Square.OkHttp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -159,13 +156,15 @@
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\ItemsActivity.cs" />
     <Compile Include="Controllers\ItemsListAdapter.cs" />
     <Compile Include="Data\ItemData.cs" />
     <Compile Include="Controllers\ItemDetailActivity.cs" />
     <Compile Include="Controllers\ItemCreateActivity.cs" />
     <Compile Include="Controllers\LoginActivity.cs" />
     <Compile Include="Util\GeoUtil.cs" />
+    <Compile Include="Controllers\MainActivity.cs" />
+    <Compile Include="Controllers\MyActionBarDrawerToggle.cs" />
+    <Compile Include="Controllers\ItemsFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -190,6 +189,9 @@
     <None Include="Properties\AndroidManifest.xml">
       <SubType>Designer</SubType>
     </None>
+    <AndroidResource Include="Resources\layout\Main.axml" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_action_help.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_action_refresh.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />
@@ -244,8 +246,8 @@
       <Version>2.5.2.2</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
-    <XamarinComponentReference Include="modernhttpclient">
-      <Version>2.4.2</Version>
+    <XamarinComponentReference Include="xamandroidsupportv7appcompat">
+      <Version>22.2.0.0</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>
@@ -257,4 +259,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Resources\drawable-xxhdpi\" />
+  </ItemGroup>
 </Project>

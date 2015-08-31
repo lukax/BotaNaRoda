@@ -10,7 +10,7 @@ using Xamarin.Auth;
 namespace BotaNaRoda.Ndroid.Controllers
 {
 	[Activity (Label = "LoginActivity",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsFragment))]
 	public class LoginActivity : Activity
 	{
 		private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();

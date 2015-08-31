@@ -17,9 +17,8 @@ using com.refractored.fab;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-    [Activity(Label = "BotaNaRoda.Android", MainLauncher = true, Icon = "@drawable/icon",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]
-	public class ItemsActivity : Activity, ILocationListener
+    [Activity(Label = "Bota na Roda")]
+	public class ItemsFragment : Android.Support.V4.App.Fragment, ILocationListener
     {
         private GridView _itemsListView;
         private ItemsListAdapter _adapter;
@@ -28,65 +27,55 @@ namespace BotaNaRoda.Ndroid.Controllers
         private UserService _userService;
         private ItemData _itemData;
 
-        protected override void OnCreate(Bundle bundle)
-        {
-            base.OnCreate(bundle);
-			SetContentView(Resource.Layout.Items);
+		public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
+			_userService = new UserService(Activity);
+			_itemData = new ItemData(Activity);
 
-            _userService = new UserService(this);
-            _itemData = new ItemData(this);
-			_locMgr = GetSystemService(LocationService) as LocationManager;
+			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+			_refresher.Refresh += delegate
+			{
+				Refresh();
+			};
 
-            _refresher = FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            _refresher.Refresh += delegate
-            {
-                Refresh();
-            };
-
-			FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
-			_itemsListView = FindViewById<GridView> (Resource.Id.itemsGridView);
-			_adapter = new ItemsListAdapter (this, _itemData);
+			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
+			_itemsListView = view.FindViewById<GridView> (Resource.Id.itemsGridView);
+			_adapter = new ItemsListAdapter (Activity, _itemData);
 			_itemsListView.Adapter = _adapter;
 			_itemsListView.ItemClick += _itemsListView_ItemClick;
+
+			return view;
 		}
 
-		public override bool OnCreateOptionsMenu (IMenu menu)
+		public override void OnStart ()
 		{
-			MenuInflater.Inflate (Resource.Menu.ItemsMenu, menu);
-			return base.OnCreateOptionsMenu (menu);
+			base.OnStart ();
+			//_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 		}
 
-		public override bool OnOptionsItemSelected (IMenuItem item)
-		{
-			switch (item.ItemId) 
-			{
-				default:
-					return base.OnOptionsItemSelected (item);
-			}
-		}
-
-		protected override void OnResume ()
+		public override void OnResume ()
 		{
 			base.OnResume ();
             Refresh();
 
-			string provider = _locMgr.GetBestProvider (new Criteria
-				{
-					Accuracy = Accuracy.Coarse,
-					PowerRequirement = Power.NoRequirement
-				}, true);
-			_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
+			//string provider = _locMgr.GetBestProvider (new Criteria
+			//	{
+			//		Accuracy = Accuracy.Coarse,
+			//		PowerRequirement = Power.NoRequirement
+			//	}, true);
+			//_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
 		}
 
-		protected override void OnPause ()
+		public override void OnPause ()
 		{
 			base.OnPause ();
-			_locMgr.RemoveUpdates (this);
+			//_locMgr.RemoveUpdates (this);
 		}
 
 		void _itemsListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
 		{
-			Intent itemDetailIntent = new Intent (this, typeof(ItemDetailActivity));
+			Intent itemDetailIntent = new Intent (Activity, typeof(ItemDetailActivity));
 			itemDetailIntent.PutExtra ("itemId", e.Position);
 			StartActivity (itemDetailIntent);
 		}
@@ -113,11 +102,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		    if (_userService.IsLoggedIn)
 		    {
-		        StartActivity(typeof (ItemCreateActivity));
+		        Activity.StartActivity(typeof (ItemCreateActivity));
 		    }
 		    else
 		    {
-		        StartActivity(typeof(LoginActivity));
+		        Activity.StartActivity(typeof(LoginActivity));
 		    }
 		}
 
@@ -130,15 +119,15 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _adapter.Items = await _itemData.Service.GetAllItems();
             };
             worker.RunWorkerCompleted += (sender, args) => {
-                RunOnUiThread(() =>
+                Activity.RunOnUiThread(() =>
                 {
                     _refresher.Refreshing = false;
                     _adapter.NotifyDataSetChanged();
                 });
             };
             worker.RunWorkerAsync();
+       }
 
-        }
 	}
 }
 

@@ -18,7 +18,7 @@ using Xamarin.Auth;
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "ItemDetailActivity",
-        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]
+        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsFragment))]
     public class ItemDetailActivity : Activity, IOnMapReadyCallback
     {
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();

@@ -20,7 +20,7 @@ using Uri = Android.Net.Uri;
 namespace BotaNaRoda.Ndroid.Controllers
 {
 	[Activity (Label = "ItemCreateActivity",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsActivity))]	
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsFragment))]	
 	public class ItemCreateActivity : Activity, ILocationListener
 	{
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();

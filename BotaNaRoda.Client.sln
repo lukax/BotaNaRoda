@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
+# Visual Studio 2012
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid", "src\BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj", "{59399593-215A-44AD-A273-4B32515D0D39}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{86A72732-CF05-486F-A671-636CE6649E49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.Ndroid", "src\BotaNaRoda.Ndroid\BotaNaRoda.Ndroid.csproj", "{59399593-215A-44AD-A273-4B32515D0D39}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4B1812A4-B0EA-4567-94E8-4CFC20F50B51}"
 EndProject
@@ -15,10 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		nuget.config = nuget.config
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.UI.Ndroid", "src\BotaNaRoda.UI.Ndroid\BotaNaRoda.UI.Ndroid.csproj", "{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotaNaRoda.UI.Core", "src\BotaNaRoda.UI.Core\BotaNaRoda.UI.Core.csproj", "{6AE907A9-FCCC-4759-9C51-213F792FCD7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,24 +34,12 @@ Global
 		{F932C763-C71A-4560-81DD-BE9116573FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F932C763-C71A-4560-81DD-BE9116573FD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F932C763-C71A-4560-81DD-BE9116573FD4}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{6AE907A9-FCCC-4759-9C51-213F792FCD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6AE907A9-FCCC-4759-9C51-213F792FCD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6AE907A9-FCCC-4759-9C51-213F792FCD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6AE907A9-FCCC-4759-9C51-213F792FCD7A}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{59399593-215A-44AD-A273-4B32515D0D39} = {86A72732-CF05-486F-A671-636CE6649E49}
 		{F932C763-C71A-4560-81DD-BE9116573FD4} = {4B1812A4-B0EA-4567-94E8-4CFC20F50B51}
-		{A34BD60A-9456-4EA9-9614-C4F6526D2DC8} = {86A72732-CF05-486F-A671-636CE6649E49}
-		{6AE907A9-FCCC-4759-9C51-213F792FCD7A} = {86A72732-CF05-486F-A671-636CE6649E49}
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
