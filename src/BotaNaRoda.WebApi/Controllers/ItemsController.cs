@@ -14,6 +14,7 @@ using IdentityServer3.Core.Extensions;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 using Microsoft.Net.Http.Headers;
 using Microsoft.WindowsAzure.Storage;
@@ -30,11 +31,13 @@ namespace BotaNaRoda.WebApi.Controllers
     {
         private readonly ItemsContext _itemsContext;
         private readonly IOptions<AppSettings> _appSettings;
+        private readonly ILogger<ItemsController> _logger;
 
-        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings>  appSettings)
+        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings>  appSettings, ILogger<ItemsController> logger)
         {
             _itemsContext = itemsContext;
             _appSettings = appSettings;
+            _logger = logger;
         }
 
         // GET: api/items
@@ -45,16 +48,16 @@ namespace BotaNaRoda.WebApi.Controllers
 
             var items = await _itemsContext.Items.Find(new BsonDocument
             {
-                { "loc", new BsonDocument
-                    {
-                        { "$geoWithin", new BsonDocument
-                            {
-                                { "$centerSphere", new BsonArray { new BsonArray { longitude, latitude }, radius / earthRadiusInKm } }
-                            }
-                        } 
-                    }
-                },
-                { "status", 0 }
+                //{ "loc", new BsonDocument
+                //    {
+                //        { "$geoWithin", new BsonDocument
+                //            {
+                //                { "$centerSphere", new BsonArray { new BsonArray { longitude, latitude }, radius / earthRadiusInKm } }
+                //            }
+                //        } 
+                //    }
+                //},
+                //{ "status", 0 }
             }).Skip(offset).Limit(20).ToListAsync();
             return items.Select(x => new ItemListViewModel(x));
         }
@@ -66,6 +69,7 @@ namespace BotaNaRoda.WebApi.Controllers
             var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (item == null)
             {
+                _logger.LogError("Unable to find item with id: " + id);
                 return HttpNotFound();
             }
 
@@ -80,12 +84,13 @@ namespace BotaNaRoda.WebApi.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogError("Tried to post item with invalid model. " + ModelState.GetValues());
                 return HttpBadRequest(ModelState);
             }
 
             var item = new Item(model, User.GetSubjectId());
             await _itemsContext.Items.InsertOneAsync(item);
-            return new EmptyResult();
+            return new JsonResult(item.Id);
         }
 
         // DELETE api/items/5
@@ -106,10 +111,11 @@ namespace BotaNaRoda.WebApi.Controllers
         [Route("images")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> PostItem(IList<IFormFile> files)
+        public async Task<IActionResult> PostImage(IList<IFormFile> files)
         {
             if (!ModelState.IsValid || !files.Any() || files.Count > 3)
             {
+                _logger.LogWarning("Tried to access items/images endpoint with invalid files. " + ModelState.GetValues());
                 return HttpBadRequest(ModelState);
             }
 
@@ -118,7 +124,15 @@ namespace BotaNaRoda.WebApi.Controllers
             // Retrieve a reference to a container.
             CloudBlobContainer container = blobClient.GetContainerReference("item-imgs");
             // Create the container if it doesn't already exist.
-            await container.CreateIfNotExistsAsync();
+            try
+            {
+                await container.CreateIfNotExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unable to create storage container", ex);
+                throw;
+            }
             container.SetPermissions(new BlobContainerPermissions{ PublicAccess = BlobContainerPublicAccessType.Blob });
 
             string imagesId = ObjectId.GenerateNewId().ToString();
@@ -129,6 +143,7 @@ namespace BotaNaRoda.WebApi.Controllers
             {
                 if (file.Length > 2000000 || file.ContentType != "image/jpeg")
                 {
+                    _logger.LogError("Tried to access items/images endpoint with image too large: " + file.Length);
                     return HttpBadRequest("Imagem inválida");
                 }
 
@@ -139,11 +154,19 @@ namespace BotaNaRoda.WebApi.Controllers
 
                 // Retrieve reference to a blob named "myblob".
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(imageInfo.Name);
-                
+
                 // Create or overwrite the "myblob" blob with contents from a local file.
-                using (var fs = file.OpenReadStream())
+                try
                 {
-                    await blockBlob.UploadFromStreamAsync(fs);
+                    using (var fs = file.OpenReadStream())
+                    {
+                        await blockBlob.UploadFromStreamAsync(fs);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Unable to upload image to azure storage", ex);
+                    throw;
                 }
 
                 imageInfo.Url = blockBlob.Uri.ToString();

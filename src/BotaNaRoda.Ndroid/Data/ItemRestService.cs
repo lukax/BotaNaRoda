@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,6 +14,7 @@ using BotaNaRoda.Ndroid.Models;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 using Path = System.IO.Path;
+using ModernHttpClient;
 
 namespace BotaNaRoda.Ndroid.Data
 {
@@ -32,15 +34,15 @@ namespace BotaNaRoda.Ndroid.Data
                 Directory.CreateDirectory(storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
-            //_httpClient = new HttpClient(new NativeMessageHandler());
-			_httpClient = new HttpClient();
+			_httpClient = new HttpClient(new NativeMessageHandler());
+			//_httpClient = new HttpClient();
         }
 
-        public async Task<IEnumerable<ItemListViewModel>> GetAllItems()
+		public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon)
         {
             SetupAuthorizationHeader();
 
-            var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint);
+			var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint + string.Format("?latitude={0}&longitude={1}&radius={2}&offset={3}", lat, lon, 10000, 0));
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
@@ -82,7 +84,7 @@ namespace BotaNaRoda.Ndroid.Data
             var imgs = await UploadImages(item.Images.Select(x => x.Url).ToArray());
             if (imgs == null)
             {
-                throw new ArgumentException("N鉶 foi possível carregar imagens", nameof(item));    
+                throw new ArgumentException("Não foi possível carregar imagens", "item");    
             }
 
             item.ThumbImage = imgs.Last();
@@ -90,7 +92,7 @@ namespace BotaNaRoda.Ndroid.Data
             item.Images = imgs.ToArray();
 
             var response = await _httpClient.PostAsync(BotaNaRodaItemsEndpoint, 
-                new StringContent(JsonConvert.SerializeObject(item)));
+				new StringContent(JsonConvert.SerializeObject(item), System.Text.Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();
@@ -117,14 +119,21 @@ namespace BotaNaRoda.Ndroid.Data
                 foreach (var path in imgPaths)
                 {
                     var fs = new FileStream(path, FileMode.Open);
-                    content.Add(new StreamContent(fs), "files");
+                    var imageContent = new StreamContent(fs);
+					imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse ("image/jpeg"); 
+                    content.Add(imageContent, "files", "image.jpg");
                 }
-                var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaItemsEndpoint, "images"), content);
-                if (response.IsSuccessStatusCode)
-                {
-                    var imageInfosJson = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<ImageInfo[]>(imageInfosJson).ToList();
-                }
+				try{
+					var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaItemsEndpoint, "images"), content);
+					if (response.IsSuccessStatusCode)
+					{
+						var imageInfosJson = await response.Content.ReadAsStringAsync();
+						return JsonConvert.DeserializeObject<ImageInfo[]>(imageInfosJson).ToList();
+					}
+				}catch(Exception ex){
+					Console.WriteLine (ex);
+				}
+
             }
             return null;
         }

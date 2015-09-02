@@ -6,7 +6,7 @@ namespace BotaNaRoda.Ndroid.Data
 {
     public interface IItemService
     {
-		Task<IEnumerable<ItemListViewModel>> GetAllItems();
+		Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon);
         void RefreshCache();
         Task<ItemDetailViewModel> GetItem(string id);
         Task<string> SaveItem(ItemCreateBindingModel item);

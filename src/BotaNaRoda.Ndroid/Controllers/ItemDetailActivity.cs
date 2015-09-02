@@ -12,8 +12,8 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
-using Square.Picasso;
 using Xamarin.Auth;
+using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {

@@ -24,6 +24,7 @@ using Serilog;
 using IdentityServer3;
 using Loggly;
 using Loggly.Config;
+using Microsoft.Framework.Logging;
 
 namespace BotaNaRoda.WebApi
 {
@@ -60,9 +61,9 @@ namespace BotaNaRoda.WebApi
         }
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings)
+        public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings, ILoggerFactory loggerFactory)
         {
-            ConfigureLogging(app, appSettings);
+            ConfigureLogging(app, appSettings, loggerFactory);
 
             app.Map("/core", core =>
             {
@@ -101,7 +102,8 @@ namespace BotaNaRoda.WebApi
 
             app.Map("/api", api =>
             {
-                //JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+                //Really? yet??
+                JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
 
                 api.UseOAuthBearerAuthentication(options =>
                 {
@@ -117,7 +119,7 @@ namespace BotaNaRoda.WebApi
             });
         }
 
-        public static void ConfigureLogging(IApplicationBuilder app, IOptions<AppSettings> appSettings)
+        public static void ConfigureLogging(IApplicationBuilder app, IOptions<AppSettings> appSettings, ILoggerFactory loggerFactory)
         {
             LogglyConfig.Instance.ApplicationName = appSettings.Options.AppName;
             LogglyConfig.Instance.CustomerToken = appSettings.Options.LogglyCustomerToken;
@@ -131,6 +133,8 @@ namespace BotaNaRoda.WebApi
                 .WriteTo.Trace(outputTemplate: "{Timestamp:HH:MM} [{Level}] ({Name:l}){NewLine} {Message}{NewLine}{Exception}")
                 .WriteTo.Loggly()
                 .CreateLogger();
+
+            loggerFactory.AddSerilog();
         }
 
         public static void ConfigureAdditionalIdentityProviders(IAppBuilder app, string signInAsType)

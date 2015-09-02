@@ -13,9 +13,9 @@ using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using Java.IO;
-using Square.Picasso;
 using Xamarin.Auth;
 using Uri = Android.Net.Uri;
+using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -151,7 +151,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		        Name = _holder.ItemTitleView.Text,
 		        Description = _holder.ItemDescriptionView.Text,
 		        Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
-		        Address = addr.FeatureName,
+		        Address = addr.Thoroughfare,
                 PostalCode = addr.PostalCode,
                 CountryCode = addr.CountryCode,
                 Locality = addr.Locality,
@@ -163,11 +163,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();
-	        worker.DoWork += async (o, args) =>
+	        worker.DoWork += (o, args) =>
 	        {
-	            await _itemData.Service.SaveItem(item);
+				_itemData.Service.SaveItem(item).Wait();
 	        };
-	        worker.RunWorkerCompleted += (o, args) => Task.FromResult(0).ContinueWith(t => { Finish(); }, UiScheduler);
+	        worker.RunWorkerCompleted += (o, args) => 
+				Task.FromResult(0).ContinueWith(t => 
+					{ 
+						Finish();
+					}, UiScheduler);
             worker.RunWorkerAsync();
 		}
 

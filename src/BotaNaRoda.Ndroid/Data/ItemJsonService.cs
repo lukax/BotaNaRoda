@@ -23,7 +23,7 @@ namespace BotaNaRoda.Ndroid.Data
             RefreshCache();
         }
 
-        public Task<IEnumerable<ItemListViewModel>> GetAllItems()
+		public Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon)
         {
             return Task.Run(() => _items.Select(x => new ItemListViewModel
             {

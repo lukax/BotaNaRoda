@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using Android.Support.V7.Widget;
 using Xamarin.Auth;
 using com.refractored.fab;
 
@@ -20,12 +21,13 @@ namespace BotaNaRoda.Ndroid.Controllers
     [Activity(Label = "Bota na Roda")]
 	public class ItemsFragment : Android.Support.V4.App.Fragment, ILocationListener
     {
-        private GridView _itemsListView;
+        private RecyclerView _itemsRecyclerView;
         private ItemsListAdapter _adapter;
         private LocationManager _locMgr;
         private SwipeRefreshLayout _refresher;
         private UserService _userService;
         private ItemData _itemData;
+		private Location _location = new Location("");
 
 		public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
@@ -34,16 +36,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_itemData = new ItemData(Activity);
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+			_refresher.Refreshing = true;
 			_refresher.Refresh += delegate
 			{
 				Refresh();
 			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
-			_itemsListView = view.FindViewById<GridView> (Resource.Id.itemsGridView);
-			_adapter = new ItemsListAdapter (Activity, _itemData);
-			_itemsListView.Adapter = _adapter;
-			_itemsListView.ItemClick += _itemsListView_ItemClick;
+
+			_itemsRecyclerView = view.FindViewById<RecyclerView> (Resource.Id.itemsGridView);
+			_adapter = new ItemsListAdapter(Activity);
+			_itemsRecyclerView.SetAdapter(_adapter);
+            _itemsRecyclerView.SetLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical));
+
+			//_itemsRecyclerView.Click += ItemsRecyclerViewItemClick;
 
 			return view;
 		}
@@ -51,7 +57,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public override void OnStart ()
 		{
 			base.OnStart ();
-			//_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
+			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 		}
 
 		public override void OnResume ()
@@ -59,21 +65,21 @@ namespace BotaNaRoda.Ndroid.Controllers
 			base.OnResume ();
             Refresh();
 
-			//string provider = _locMgr.GetBestProvider (new Criteria
-			//	{
-			//		Accuracy = Accuracy.Coarse,
-			//		PowerRequirement = Power.NoRequirement
-			//	}, true);
-			//_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
+			string provider = _locMgr.GetBestProvider (new Criteria
+				{
+					Accuracy = Accuracy.Coarse,
+					PowerRequirement = Power.NoRequirement
+				}, true);
+			_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
 		}
 
 		public override void OnPause ()
 		{
 			base.OnPause ();
-			//_locMgr.RemoveUpdates (this);
+			_locMgr.RemoveUpdates (this);
 		}
 
-		void _itemsListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+		void ItemsRecyclerViewItemClick (object sender, AdapterView.ItemClickEventArgs e)
 		{
 			Intent itemDetailIntent = new Intent (Activity, typeof(ItemDetailActivity));
 			itemDetailIntent.PutExtra ("itemId", e.Position);
@@ -82,6 +88,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
+			_location = location;
 			_adapter.CurrentLocation = location;
 			_adapter.NotifyDataSetChanged ();
 		}
@@ -112,11 +119,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private void Refresh()
         {
+			_refresher.Refreshing = true;
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += async (sender, args) =>
+            worker.DoWork += (sender, args) =>
             {
                 _itemData.Service.RefreshCache();
-                _adapter.Items = await _itemData.Service.GetAllItems();
+				_adapter.Items = _itemData.Service.GetAllItems(_location.Latitude, _location.Longitude).Result;
             };
             worker.RunWorkerCompleted += (sender, args) => {
                 Activity.RunOnUiThread(() =>

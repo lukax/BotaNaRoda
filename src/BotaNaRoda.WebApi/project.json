@@ -19,8 +19,9 @@
     "Microsoft.Owin.Security.Facebook": "3.0.1",
     "xunit": "2.0.0",
     "WindowsAzure.Storage": "5.0.0",
-    "Serilog": "1.5.9",
-    "Serilog.Sinks.Loggly": "2.0.7"
+    "Microsoft.Framework.Logging": "1.0.0-beta6",
+    "Serilog.Sinks.Loggly": "2.0.7",
+    "Serilog.Framework.Logging":  "1.0.0-beta6-10048"
   },
 
   "commands": {

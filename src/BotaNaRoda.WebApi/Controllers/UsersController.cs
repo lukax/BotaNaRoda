@@ -8,6 +8,8 @@ using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Framework.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BotaNaRoda.WebApi.Controllers
@@ -16,10 +18,12 @@ namespace BotaNaRoda.WebApi.Controllers
     public class UsersController : Controller
     {
         private readonly ItemsContext _itemsContext;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(ItemsContext itemsContext)
+        public UsersController(ItemsContext itemsContext, ILogger<UsersController> logger)
         {
             _itemsContext = itemsContext;
+            _logger = logger;
         }
 
         // GET api/users/5
@@ -29,6 +33,7 @@ namespace BotaNaRoda.WebApi.Controllers
             var user = await _itemsContext.Users.Find(x => x.Id == id).FirstAsync();
             if (user == null)
             {
+                _logger.LogError("Could not find user by id: " + id);
                 return HttpNotFound();
             }
 
@@ -41,6 +46,7 @@ namespace BotaNaRoda.WebApi.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogError("Tried to register user with invalid model. " + ModelState.ToJson());
                 return HttpBadRequest(ModelState);
             }
 
