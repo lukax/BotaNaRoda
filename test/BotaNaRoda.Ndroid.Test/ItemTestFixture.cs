@@ -15,7 +15,7 @@ namespace BotaNaRoda.Ndroid.Test
         public void Setup()
         {
             var storagePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _itemService = new ItemJsonService(storagePath);
+            _itemService = null;//new ItemJsonService(storagePath);
 
             foreach (var fileName in Directory.EnumerateFiles(storagePath, "*.json"))
             {

@@ -32,7 +32,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    private bool _imageTaken;
 	    private IList<Address> _addresses;
 	    private ArrayAdapter _categoriesAdapter;
-	    private ItemData _itemData;
+	    private ItemRestService _itemService;
 	    private ViewHolder _holder;
         private readonly Dictionary<int, Uri> _captureCodeImageUrlDictionary = new Dictionary<int, Uri>(3);
 
@@ -43,7 +43,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             ActionBar.SetDisplayHomeAsUpEnabled(true);
 
 			_locMgr = GetSystemService(LocationService) as LocationManager;
-            _itemData = new ItemData(this);
+            _itemService = new ItemRestService(this, new UserRepository(this));
 
             _holder = new ViewHolder
             {
@@ -165,7 +165,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             BackgroundWorker worker = new BackgroundWorker();
 	        worker.DoWork += (o, args) =>
 	        {
-				_itemData.Service.SaveItem(item).Wait();
+				_itemService.SaveItem(item).Wait();
 	        };
 	        worker.RunWorkerCompleted += (o, args) => 
 				Task.FromResult(0).ContinueWith(t => 
@@ -178,7 +178,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 	    void TakePicture(int capturePhotoCode)
 	    {
-            File imageFile = new File(_itemData.GetTempImageFilename(capturePhotoCode));
+            File imageFile = new File(_itemService.GetTempImageFilename(capturePhotoCode));
             var imageUri = Uri.FromFile(imageFile);
             _captureCodeImageUrlDictionary.Add(capturePhotoCode, imageUri);
 

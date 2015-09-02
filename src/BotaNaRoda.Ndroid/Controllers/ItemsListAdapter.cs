@@ -20,19 +20,19 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemsListAdapter : RecyclerView.Adapter
 	{
 	    private readonly Context _context;
+	    private readonly ItemsLoader _itemsLoader;
 
-	    public IEnumerable<ItemListViewModel> Items { get; set; }
 	    public Location CurrentLocation { get; set; }
 
-		public ItemsListAdapter (Context context)
+		public ItemsListAdapter (Context context, ItemsLoader itemsLoader)
 		{
 		    _context = context;
-		    Items = new List<ItemListViewModel> ();
+		    _itemsLoader = itemsLoader;
 		}
 
         public override int ItemCount
         {
-            get { return Items.Count(); }
+            get { return _itemsLoader.Items.Count; }
         }
 
         public override long GetItemId (int position)
@@ -50,7 +50,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            var item = Items.ElementAt(position);
+            var item = _itemsLoader.Items.ElementAt(position);
 
             // you could also put an 'item type' enum field or property in your 
             // data item and do a 'switch/case' on that. It's less expensive 

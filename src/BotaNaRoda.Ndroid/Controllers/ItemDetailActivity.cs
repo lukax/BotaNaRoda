@@ -26,7 +26,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private IMenu _menu;
         private Account _currentUser;
-        private ItemData _itemData;
+        private ItemRestService _itemService;
         private ViewHolder _holder;
 
         protected override void OnCreate(Bundle bundle)
@@ -34,8 +34,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
             ActionBar.SetDisplayHomeAsUpEnabled(true);
-            _currentUser = new UserService(this).GetCurrentUser();
-            _itemData = new ItemData(this);
+            _currentUser = new UserRepository(this).Get();
+            _itemService = new ItemRestService(this, new UserRepository(this));
 
             _holder = new ViewHolder
             {
@@ -101,7 +101,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void ConfirmDelete(object sender, EventArgs e)
         {
-            _itemData.Service.DeleteItem(_item.Id);
+            _itemService.DeleteItem(_item.Id);
             Toast toast = Toast.MakeText(this, "Item removido", ToastLength.Short);
             toast.Show();
             Finish();
@@ -112,7 +112,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += async (sender, args) =>
             {
-                _item = await _itemData.Service.GetItem(Intent.GetStringExtra("itemId"));
+                _item = await _itemService.GetItem(Intent.GetStringExtra("itemId"));
             };
             worker.RunWorkerCompleted += (sender, args) =>
             {

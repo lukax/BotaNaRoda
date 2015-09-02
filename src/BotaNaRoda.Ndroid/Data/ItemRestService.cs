@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
+using Android.Locations;
 using Android.Media;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
@@ -21,28 +22,38 @@ namespace BotaNaRoda.Ndroid.Data
     public class ItemRestService : IItemService
     {
         private readonly Context _context;
-        private readonly UserService _userService;
+        private readonly UserRepository _userRepository;
         private const string BotaNaRodaItemsEndpoint = "https://botanaroda.azurewebsites.net/api/items";
         private readonly HttpClient _httpClient;
+        private readonly string _storagePath;
 
-        public ItemRestService(Context context, string storagePath, UserService userService)
+        public bool CanLoadMoreItems { get; set; }
+        public bool IsBusy { get; set; }
+
+        public ItemRestService(Context context, UserRepository userRepository)
         {
             _context = context;
-            _userService = userService;
+            _userRepository = userRepository;
 
-            if (!Directory.Exists(storagePath))
-                Directory.CreateDirectory(storagePath);
+            _storagePath = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, "BotaNaRoda");
+            if (!Directory.Exists(_storagePath))
+                Directory.CreateDirectory(_storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
 			_httpClient = new HttpClient(new NativeMessageHandler());
-			//_httpClient = new HttpClient();
         }
 
-		public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon)
+        public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
+        {
+            var loc = _userRepository.GetLocation();
+            return await GetAllItems(loc.Latitude, loc.Longitude, radius, skip, limit);
+        }
+
+        public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
         {
             SetupAuthorizationHeader();
 
-			var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint + string.Format("?latitude={0}&longitude={1}&radius={2}&offset={3}", lat, lon, 10000, 0));
+			var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit));
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
@@ -102,7 +113,6 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-
         public async Task<bool> DeleteItem(string id)
         {
             SetupAuthorizationHeader();
@@ -140,7 +150,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         private void SetupAuthorizationHeader()
         {
-            var account = _userService.GetCurrentUser();
+            var account = _userRepository.Get();
             if (account != null)
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", account.Properties["access_token"]);
@@ -153,6 +163,11 @@ namespace BotaNaRoda.Ndroid.Data
             {
                 _context.StartActivity(typeof(LoginActivity));
             }
+        }
+
+        public string GetTempImageFilename(int imageNumber)
+        {
+            return Path.Combine(_storagePath, string.Format("itemImg_{0}.jpg", imageNumber));
         }
     }
 }

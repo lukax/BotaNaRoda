@@ -14,7 +14,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class LoginActivity : Activity
 	{
 		private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-		private UserService _userService;
+		private UserRepository _userRepository;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -22,7 +22,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			//SetContentView (Resource.Layout.Login);
             //ActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            _userService = new UserService(this);
+            _userRepository = new UserRepository(this);
             Login();
 		}
 
@@ -57,7 +57,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 }
 
                 //Stores account
-                _userService.SaveCurrentUser(ee.Account);
+                _userRepository.Save(ee.Account);
             };
 
             var intent = auth.GetUI(this);

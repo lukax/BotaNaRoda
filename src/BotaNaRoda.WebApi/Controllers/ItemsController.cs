@@ -42,7 +42,7 @@ namespace BotaNaRoda.WebApi.Controllers
 
         // GET: api/items
         [HttpGet]
-        public async Task<IEnumerable<ItemListViewModel>> GetAll(double latitude, double longitude, double radius, int offset)
+        public async Task<IEnumerable<ItemListViewModel>> GetAll(double latitude, double longitude, double radius, int skip = 0, int limit = 20)
         {
             const double earthRadiusInKm = 6371.009;
 
@@ -58,7 +58,7 @@ namespace BotaNaRoda.WebApi.Controllers
                 //    }
                 //},
                 //{ "status", 0 }
-            }).Skip(offset).Limit(20).ToListAsync();
+            }).Skip(skip).Limit(limit).ToListAsync();
             return items.Select(x => new ItemListViewModel(x));
         }
 
