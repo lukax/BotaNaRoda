@@ -33,7 +33,7 @@ namespace BotaNaRoda.WebApi.Controllers
         private readonly IOptions<AppSettings> _appSettings;
         private readonly ILogger<ItemsController> _logger;
 
-        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings>  appSettings, ILogger<ItemsController> logger)
+        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings> appSettings, ILogger<ItemsController> logger)
         {
             _itemsContext = itemsContext;
             _appSettings = appSettings;

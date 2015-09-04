@@ -53,6 +53,9 @@ namespace BotaNaRoda.WebApi
             services.AddTransient<ItemsContext>();
 
             services.AddMvc();
+
+            services.AddSignalR();
+            
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -64,6 +67,9 @@ namespace BotaNaRoda.WebApi
         public void Configure(IApplicationBuilder app, IApplicationEnvironment env, IOptions<AppSettings> appSettings, ILoggerFactory loggerFactory)
         {
             ConfigureLogging(app, appSettings, loggerFactory);
+
+            app.UseStaticFiles();
+
 
             app.Map("/core", core =>
             {
@@ -112,6 +118,8 @@ namespace BotaNaRoda.WebApi
                     options.MetadataAddress = appSettings.Options.IdSvrAuthority + "/.well-known/openid-configuration";
                     options.AutomaticAuthentication = true;
                 });
+
+                app.UseSignalR();
 
                 api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.ApiScope });
 

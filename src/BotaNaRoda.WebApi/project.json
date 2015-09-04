@@ -21,7 +21,8 @@
     "WindowsAzure.Storage": "5.0.0",
     "Microsoft.Framework.Logging": "1.0.0-beta6",
     "Serilog.Sinks.Loggly": "2.0.7",
-    "Serilog.Framework.Logging":  "1.0.0-beta6-10048"
+    "Serilog.Framework.Logging": "1.0.0-beta6-10048",
+    "Microsoft.AspNet.SignalR.Server": "3.0.0-beta6"
   },
 
   "commands": {

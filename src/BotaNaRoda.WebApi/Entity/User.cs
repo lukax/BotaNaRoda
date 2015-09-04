@@ -28,7 +28,7 @@ namespace BotaNaRoda.WebApi.Entity
         public string PostalCode { get; set; }
 
         public int Credits { get; set; }
-        public List<UserRating> Ratings { get; set; }
+        public ICollection<UserRating> Ratings { get; set; }
 
         public string Provider { get; set; }
         public string ProviderId { get; set; }
@@ -37,6 +37,7 @@ namespace BotaNaRoda.WebApi.Entity
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
+            Ratings = new HashSet<UserRating>();
         }
 
         public User(RegisterUserBindingModel model)

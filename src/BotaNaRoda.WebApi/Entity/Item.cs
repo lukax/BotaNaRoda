@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BotaNaRoda.WebApi.Models;
 using MongoDB.Bson;
@@ -22,7 +23,7 @@ namespace BotaNaRoda.WebApi.Entity
         public string Description { get; set; }
         public CategoryType Category { get; set; }
 
-        public ImageInfo[] Images { get; set; }
+        public ICollection<ImageInfo> Images { get; set; }
         public ImageInfo ThumbImage { get; set; }
 
         public ItemStatus Status { get; set; }
@@ -37,6 +38,7 @@ namespace BotaNaRoda.WebApi.Entity
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
+            Images = new HashSet<ImageInfo>();
         }
 
         public Item(ItemCreateBindingModel model, string userId) 
