@@ -26,7 +26,8 @@ namespace BotaNaRoda.Ndroid.Data
         }
 
 		public bool IsLoggedIn {
-			get { return AccountStore.Create (_context).FindAccountsForService (ServiceId).Any (); }
+			get { return AccountStore.Create (_context).FindAccountsForService (ServiceId).Any (
+                x => !string.IsNullOrWhiteSpace(x.Username)); }
 		}
 
         public Account Get()
@@ -39,7 +40,7 @@ namespace BotaNaRoda.Ndroid.Data
             AccountStore.Create(_context).Save(account, ServiceId);
         }
 
-        public Loc GetLocation()
+        public Loc GetUserLoc()
         {
             var usr = Get();
 
@@ -52,15 +53,12 @@ namespace BotaNaRoda.Ndroid.Data
             return loc;
         }
 
-        public void SaveLocation(double lat, double lon)
+        public void SaveUserLoc(Loc loc)
         {
-            var usr = Get();
-            if (usr != null)
-            {
-                usr.Properties.Add("lat", lat.ToString(CultureInfo.InvariantCulture));
-                usr.Properties.Add("lon", lon.ToString(CultureInfo.InvariantCulture));
-                Save(usr);
-            }
+            var usr = Get() ?? new Account();
+            usr.Properties["lat"] = Convert.ToString(loc.Latitude);
+            usr.Properties["lon"] = Convert.ToString(loc.Longitude);
+            Save(usr);
         }
     }
 }

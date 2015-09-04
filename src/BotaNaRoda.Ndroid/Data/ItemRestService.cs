@@ -45,7 +45,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
         {
-            var loc = _userRepository.GetLocation();
+            var loc = _userRepository.GetUserLoc();
             return await GetAllItems(loc.Latitude, loc.Longitude, radius, skip, limit);
         }
 

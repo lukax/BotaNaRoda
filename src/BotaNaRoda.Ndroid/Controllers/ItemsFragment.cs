@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading;
 using Android.Support.V7.Widget;
 using Android.Util;
+using BotaNaRoda.Ndroid.Util;
 using Xamarin.Auth;
 using com.refractored.fab;
 
@@ -28,7 +29,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         private SwipeRefreshLayout _refresher;
         private UserRepository _userRepository;
         private ItemRestService _itemService;
-		private Location _location = new Location("");
         private ItemsLoader _itemsLoader;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -39,11 +39,10 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemsLoader = new ItemsLoader(_itemService, 20);
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-			//_refresher.Refreshing = true;
-			//_refresher.Refresh += delegate
-			//{
-			//	Refresh();
-			//};
+			_refresher.Refresh += delegate
+			{
+				UpdateDataAdapter();
+			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
@@ -52,11 +51,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    var sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical);
             _itemsRecyclerView.SetLayoutManager(sglm);
 
-			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items);
+			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.GetUserLoc());
             _itemsRecyclerView.SetAdapter(_adapter);
             
             var scrollListener = new InfiniteScrollListener(_adapter, sglm, UpdateDataAdapter);
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
+
+            _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 
             return view;
 		}
@@ -64,21 +65,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public override void OnStart ()
 		{
 			base.OnStart ();
-			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
-
             UpdateDataAdapter();
         }
 
 		public override void OnResume ()
 		{
 			base.OnResume ();
-
-			string provider = _locMgr.GetBestProvider (new Criteria
-				{
-					Accuracy = Accuracy.Coarse,
-					PowerRequirement = Power.NoRequirement
-				}, true);
-			_locMgr.RequestLocationUpdates (provider, 20000, 100, this);
+			_locMgr.RequestLocationUpdates (_locMgr.GetBestProvider(new Criteria(), true), 20000, 100, this);
 		}
 
 		public override void OnPause ()
@@ -89,10 +82,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
-			_location = location;
-			_adapter.CurrentLocation = location;
+			_adapter.Loc = location.ToLoc();
 			_adapter.NotifyDataSetChanged ();
-            _userRepository.SaveLocation(_location.Latitude, _location.Longitude);
+            _userRepository.SaveUserLoc(location.ToLoc());
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -121,38 +113,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private void UpdateDataAdapter()
         {
-            //_refresher.Refreshing = true;
             if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
+                _refresher.Refreshing = true;
                 _itemsLoader.LoadMoreItems(() =>
                 {
                     Activity.RunOnUiThread(() =>
                     {
-                        //_refresher.Refreshing = false;
+                        _refresher.Refreshing = false;
                         _adapter.NotifyDataSetChanged();
                     });
                 });
             }
         }
-
-        private void Refresh()
-        {
-			_refresher.Refreshing = true;
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
-            {
-                _itemService.RefreshCache();
-            };
-            worker.RunWorkerCompleted += (sender, args) => {
-                Activity.RunOnUiThread(() =>
-                {
-                    _refresher.Refreshing = false;
-                    _adapter.NotifyDataSetChanged();
-                });
-            };
-            worker.RunWorkerAsync();
-       }
 
 	}
 }
