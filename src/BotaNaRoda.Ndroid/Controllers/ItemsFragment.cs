@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Android.Support.V7.Widget;
+using Android.Util;
 using Xamarin.Auth;
 using com.refractored.fab;
 
@@ -22,20 +23,22 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemsFragment : Android.Support.V4.App.Fragment, ILocationListener
     {
         private RecyclerView _itemsRecyclerView;
-        private ItemsListAdapter _adapter;
+        private ItemsAdapter _adapter;
         private LocationManager _locMgr;
         private SwipeRefreshLayout _refresher;
         private UserRepository _userRepository;
         private ItemRestService _itemService;
 		private Location _location = new Location("");
+        private ItemsLoader _itemsLoader;
 
-		public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 			_userRepository = new UserRepository(Activity);
 			_itemService = new ItemRestService(Activity, _userRepository);
+            _itemsLoader = new ItemsLoader(_itemService, 20);
 
-			//_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
 			//_refresher.Refreshing = true;
 			//_refresher.Refresh += delegate
 			//{
@@ -45,28 +48,30 @@ namespace BotaNaRoda.Ndroid.Controllers
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
             _itemsRecyclerView = view.FindViewById<RecyclerView> (Resource.Id.itemsGridView);
-		    var itemsLoader = new ItemsLoader(_itemService);
+            _itemsRecyclerView.HasFixedSize = true;
 		    var sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical);
             _itemsRecyclerView.SetLayoutManager(sglm);
-			_adapter = new ItemsListAdapter(Activity, itemsLoader);
-			_itemsRecyclerView.SetAdapter(_adapter);
-            _itemsRecyclerView.AddOnScrollListener(new InfiniteScrollListener(_adapter, sglm, 20, UpdateDataAdapter, itemsLoader));
 
-			//_itemsRecyclerView.Click += ItemsRecyclerViewItemClick;
+			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items);
+            _itemsRecyclerView.SetAdapter(_adapter);
+            
+            var scrollListener = new InfiniteScrollListener(_adapter, sglm, UpdateDataAdapter);
+            _itemsRecyclerView.AddOnScrollListener(scrollListener);
 
-			return view;
+            return view;
 		}
 
 		public override void OnStart ()
 		{
 			base.OnStart ();
 			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
-		}
+
+            UpdateDataAdapter();
+        }
 
 		public override void OnResume ()
 		{
 			base.OnResume ();
-            //Refresh();
 
 			string provider = _locMgr.GetBestProvider (new Criteria
 				{
@@ -80,13 +85,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			base.OnPause ();
 			_locMgr.RemoveUpdates (this);
-		}
-
-		void ItemsRecyclerViewItemClick (object sender, AdapterView.ItemClickEventArgs e)
-		{
-			Intent itemDetailIntent = new Intent (Activity, typeof(ItemDetailActivity));
-			itemDetailIntent.PutExtra ("itemId", e.Position);
-			StartActivity (itemDetailIntent);
 		}
 
 		public void OnLocationChanged (Location location)
@@ -123,7 +121,19 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private void UpdateDataAdapter()
         {
-            _adapter.NotifyDataSetChanged();
+            //_refresher.Refreshing = true;
+            if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
+            {
+                Log.Info("InfiniteScrollListener", "Load more items requested");
+                _itemsLoader.LoadMoreItems(() =>
+                {
+                    Activity.RunOnUiThread(() =>
+                    {
+                        //_refresher.Refreshing = false;
+                        _adapter.NotifyDataSetChanged();
+                    });
+                });
+            }
         }
 
         private void Refresh()

@@ -25,8 +25,8 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemDetailViewModel _item;
 
         private IMenu _menu;
-        private Account _currentUser;
         private ItemRestService _itemService;
+        private UserRepository _userRepository;
         private ViewHolder _holder;
 
         protected override void OnCreate(Bundle bundle)
@@ -34,7 +34,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
             ActionBar.SetDisplayHomeAsUpEnabled(true);
-            _currentUser = new UserRepository(this).Get();
+            _userRepository = new UserRepository(this);
             _itemService = new ItemRestService(this, new UserRepository(this));
 
             _holder = new ViewHolder
@@ -110,9 +110,9 @@ namespace BotaNaRoda.Ndroid.Controllers
         void Refresh()
         {
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += async (sender, args) =>
+            worker.DoWork += (sender, args) =>
             {
-                _item = await _itemService.GetItem(Intent.GetStringExtra("itemId"));
+                _item = _itemService.GetItem(Intent.GetStringExtra("itemId")).Result;
             };
             worker.RunWorkerCompleted += (sender, args) =>
             {
@@ -137,7 +137,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         private void UpdateUi()
         {
             FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
-            _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _currentUser.Username);
+            var currentUser = _userRepository.Get();
+            if (currentUser != null)
+            {
+                _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == currentUser.Username);
+            }
 
             _holder.ItemAuthorView.Text = _item.User.Username;
             _holder.ItemTitleView.Text = _item.Name;
