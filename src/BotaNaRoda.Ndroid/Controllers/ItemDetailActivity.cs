@@ -18,7 +18,8 @@ using Square.Picasso;
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "ItemDetailActivity",
-        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsFragment))]
+        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
+        ParentActivity = typeof(MainActivity))]
     public class ItemDetailActivity : Activity, IOnMapReadyCallback
     {
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
@@ -45,11 +46,9 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
-                ReportFraudButton = FindViewById<Button>(Resource.Id.reportFraudButton)
             };
 
             _holder.ReserveButton.Click += ReserveItem;
-            _holder.ReportFraudButton.Click += ReportFraudButtonOnClick;
 
             Refresh();
         }
@@ -82,11 +81,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             _holder.ReserveButton.Text = "Reserved";
             _holder.ReserveButton.Enabled = false;
-        }
-
-        private void ReportFraudButtonOnClick(object sender, EventArgs eventArgs)
-        {
-            _holder.ReportFraudButton.Visibility = ViewStates.Invisible;
         }
 
         void DeleteItem()
@@ -138,7 +132,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
             var currentUser = _userRepository.Get();
-            if (currentUser != null)
+            if (currentUser != null && _menu != null)
             {
                 _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == currentUser.Username);
             }
@@ -163,7 +157,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal TextView ItemTitleView;
             internal TextView ItemLocationView;
             internal Button ReserveButton;
-            internal Button ReportFraudButton;
         }
     }
 }

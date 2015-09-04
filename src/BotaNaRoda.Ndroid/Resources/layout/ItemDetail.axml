@@ -55,14 +55,6 @@
                 android:layout_height="200dp"
                 class="com.google.android.gms.maps.MapFragment"
                 android:layout_below="@id/itemsDetailLocation" />
-            <Button
-                android:id="@+id/reportFraudButton"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:layout_height="50dp"
-                android:layout_width="fill_parent"
-                android:text="Reportar"
-                android:layout_below="@id/mapFragment" />
         </RelativeLayout>
     </ScrollView>
     <Button

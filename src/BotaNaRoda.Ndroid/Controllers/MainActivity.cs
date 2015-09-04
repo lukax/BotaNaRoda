@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -14,67 +15,81 @@ using Android.Support.V7.App;
 using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Support.V4.Widget;
 using BotaNaRoda.Ndroid.Controllers;
+using BotaNaRoda.Ndroid.Data;
+using BotaNaRoda.Ndroid.Models;
+using Square.Picasso;
+using Fragment = Android.Support.V4.App.Fragment;
 
 namespace BotaNaRoda.Ndroid
 {
-	[Activity (Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MyTheme")]			
-	public class MainActivity : AppCompatActivity
+	[Activity (Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MyTheme")]
+    public class MainActivity : AppCompatActivity, AdapterView.IOnItemClickListener
 	{
-		DrawerLayout mDrawerLayout;
-		ListView mLeftDrawer;
-		List<string> mLeftDataSet;
-		ArrayAdapter<string> mLeftAdapter;
-		MyActionBarDrawerToggle mDrawerToggle;
+        private DrawerLayout _mDrawerLayout;
+        private ListView _mLeftDrawer;
+        private Dictionary<string, Type> _mLeftDataSet;
+        private ArrayAdapter<string> _mLeftAdapter;
+		private MyActionBarDrawerToggle _mDrawerToggle;
+	    private TextView _userLocalityTextView;
+	    private TextView _userNameTextView;
+	    private ImageView _avatarImageView;
+	    private Fragment _currentFragment;
 
-		protected override void OnCreate (Bundle bundle)
+	    protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.Main);
 
-			mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-			mLeftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
+			_mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
+			_mLeftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
 			SupportActionBar.SetDisplayHomeAsUpEnabled (true);
 			SupportActionBar.SetHomeButtonEnabled(true);
 
-			mLeftDataSet = new List<string>();
-			mLeftDataSet.Add ("Itens próximos a mim");
-			mLeftDataSet.Add ("Conversas");
-			mLeftAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, mLeftDataSet);
-			mLeftDrawer.Adapter = mLeftAdapter;
+	        _mLeftDataSet = new Dictionary<string, Type>
+	        {
+	            {"Itens próximos a mim", typeof (ItemsFragment)},
+	            {"Conversas", typeof (ChatFragment)}
+	        };
+	        _mLeftAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _mLeftDataSet.Keys.ToArray());
+			_mLeftDrawer.Adapter = _mLeftAdapter;
+            _mLeftDrawer.OnItemClickListener = this;
 
-			mDrawerToggle = new MyActionBarDrawerToggle(
+			_mDrawerToggle = new MyActionBarDrawerToggle(
 				this,								//Host Activity
-				mDrawerLayout,						//DrawerLayout
+				_mDrawerLayout,						//DrawerLayout
 				Resource.String.ApplicationName,	//Opened Message
 				Resource.String.ApplicationName		//Closed Message
 			);
 
-			mDrawerLayout.SetDrawerListener(mDrawerToggle);
-			mDrawerToggle.SyncState();
+			_mDrawerLayout.SetDrawerListener(_mDrawerToggle);
+			_mDrawerToggle.SyncState();
 
-			//Container
-			var tx = SupportFragmentManager.BeginTransaction();
-			tx.Add (Resource.Id.container, new ItemsFragment(), "ItemsFragment");
-			tx.Commit ();
+            //Profile
+            _avatarImageView = FindViewById<ImageView>(Resource.Id.avatar);
+            _userNameTextView = FindViewById<TextView>(Resource.Id.userName);
+            _userLocalityTextView = FindViewById<TextView>(Resource.Id.userLocality);
+
+            //Container
+            LoadFragment(_mLeftDataSet.First().Value);
 		}
-			
-		public override bool OnOptionsItemSelected (IMenuItem item)
+
+	    protected override void OnStart()
+	    {
+	        base.OnStart();
+            GetUserInfo();
+	    }
+
+	    public override bool OnOptionsItemSelected (IMenuItem item)
 		{		
 			switch (item.ItemId)
 			{
-			case Android.Resource.Id.Home:
-				//The hamburger icon was clicked which means the drawer toggle will handle the event
-				//all we need to do is ensure the right drawer is closed so the don't overlap
-				mDrawerToggle.OnOptionsItemSelected(item);
-				return true;
-
-			//case Resource.Id.action_refresh:
-				//Refresh
-			//	return true;
-
-
-			default:
-				return base.OnOptionsItemSelected (item);
+			    case Android.Resource.Id.Home:
+				    //The hamburger icon was clicked which means the drawer toggle will handle the event
+				    //all we need to do is ensure the right drawer is closed so the don't overlap
+				    _mDrawerToggle.OnOptionsItemSelected(item);
+				    return true;
+			    default:
+				    return base.OnOptionsItemSelected (item);
 			}
 		}
 
@@ -87,14 +102,65 @@ namespace BotaNaRoda.Ndroid
 		protected override void OnPostCreate (Bundle savedInstanceState)
 		{
 			base.OnPostCreate (savedInstanceState);
-			mDrawerToggle.SyncState();
+			_mDrawerToggle.SyncState();
 		}
 
 		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
 		{
 			base.OnConfigurationChanged (newConfig);
-			mDrawerToggle.OnConfigurationChanged(newConfig);
+			_mDrawerToggle.OnConfigurationChanged(newConfig);
 		}
+
+	    private void GetUserInfo()
+	    {
+	        ItemRestService restService = new ItemRestService(this, new UserRepository(this));
+            BackgroundWorker worker = new BackgroundWorker();
+	        worker.DoWork += (sender, args) =>
+	        {
+                UserViewModel profile = restService.GetUserProfileAsync().Result;
+	            args.Result = profile;
+	        };
+	        worker.RunWorkerCompleted += (sender, args) =>
+	        {
+	            var profile = args.Result as UserViewModel;
+	            if (profile != null)
+	            {
+                    RunOnUiThread(() =>
+                    {
+                        _userNameTextView.Text = profile.Username;
+                        _userLocalityTextView.Text = profile.Locality;
+                        Picasso.With(this)
+                           .Load(profile.Avatar)
+                           .Fit()
+                           .Tag(this)
+                           .Into(_avatarImageView);
+                    });
+                }
+	        };
+            worker.RunWorkerAsync();
+	    }
+
+        private void LoadFragment(Type value)
+        {
+            var tx = SupportFragmentManager.BeginTransaction();
+            if (_currentFragment == null)
+            {
+                _currentFragment = (Fragment) Activator.CreateInstance(value);
+                tx.Add(Resource.Id.container, _currentFragment, value.Name);
+            }
+            else
+            {
+                _currentFragment = (Fragment) Activator.CreateInstance(value);
+                tx.Replace(Resource.Id.container, _currentFragment, value.Name);
+            }
+            tx.Commit();
+        }
+
+        public void OnItemClick(AdapterView parent, View view, int position, long id)
+	    {
+            _mDrawerLayout.CloseDrawers();
+            LoadFragment(_mLeftDataSet.ElementAt(position).Value);
+	    }
 	}
 }
 

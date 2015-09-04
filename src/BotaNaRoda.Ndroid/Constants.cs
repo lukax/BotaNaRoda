@@ -10,11 +10,10 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
-namespace BotaNaRoda.Ndroid.Models
+namespace BotaNaRoda.Ndroid
 {
-    public class Loc : ILocation
+    public class Constants
     {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public const string BotaNaRodaEndpoint = "https://botanaroda.azurewebsites.net/api";
     }
 }

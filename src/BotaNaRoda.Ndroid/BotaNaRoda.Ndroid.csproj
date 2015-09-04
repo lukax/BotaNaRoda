@@ -96,10 +96,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Controllers\ChatFragment.cs" />
     <Compile Include="Controllers\InfiniteScrollListener.cs" />
     <Compile Include="Data\IItemService.cs" />
     <Compile Include="Data\ItemRestService.cs" />
     <Compile Include="Data\ItemsLoader.cs" />
+    <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Data\UserRepository.cs" />
     <Compile Include="Models\CategoryType.cs" />
     <Compile Include="Models\ILocation.cs" />
@@ -108,7 +111,6 @@
     <Compile Include="Models\ItemDetailViewModel.cs" />
     <Compile Include="Models\ItemListViewModel.cs" />
     <Compile Include="Models\ItemStatus.cs" />
-    <Compile Include="Models\Loc.cs" />
     <Compile Include="Models\RegisterUserBindingModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />

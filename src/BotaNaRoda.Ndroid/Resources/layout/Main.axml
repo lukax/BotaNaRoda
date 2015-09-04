@@ -13,7 +13,8 @@
     <RelativeLayout
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:background="#E3F2FD">
         <ImageView
             android:id="@+id/avatar"
             android:src="@android:drawable/ic_menu_gallery"
@@ -24,22 +25,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/avatar"
-            android:text="Lucas E" />
+            android:text="Anonymous" />
         <TextView
             android:id="@+id/userLocality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/avatar"
             android:layout_below="@id/userName"
-            android:text="Nova Friburgo" />
+            android:text="Brasil" />
         <ListView
             android:id="@+id/left_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:choiceMode="singleChoice"
-            android:divider="#818181"
-            android:dividerHeight="1dp"
-            android:background="#E3F2FD"
+            android:dividerHeight="5dp"
             android:layout_below="@id/avatar" />
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

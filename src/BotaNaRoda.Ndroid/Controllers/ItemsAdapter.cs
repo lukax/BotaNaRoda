@@ -20,13 +20,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 	{
 	    private readonly Context _context;
 	    private readonly IList<ItemListViewModel> _items;
-	    public Loc Loc { get; set; }
+	    public ILocation UserLocation { get; set; }
 
-		public ItemsAdapter (Context context, IList<ItemListViewModel> items, Loc loc)
+		public ItemsAdapter (Context context, IList<ItemListViewModel> items, ILocation userLocation)
 		{
 		    _context = context;
 		    _items = items;
-		    Loc = loc;
+		    UserLocation = userLocation;
 		}
 
 	    public override int ItemCount
@@ -59,7 +59,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 {
                     viewHolder.ItemId = item.Id;
                     viewHolder.Name.Text = item.Name;
-                    viewHolder.Distance.Text = string.Format("{0:0,0.00}m", item.DistanceTo(Loc));
+                    viewHolder.Distance.Text = string.Format("{0:0,0.00}m", item.DistanceTo(UserLocation));
                     Picasso.With(_context)
                             .Load(item.ThumbImage.Url)
                             .Placeholder(Resource.Drawable.placeholder)

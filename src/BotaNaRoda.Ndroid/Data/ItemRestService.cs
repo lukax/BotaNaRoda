@@ -23,7 +23,8 @@ namespace BotaNaRoda.Ndroid.Data
     {
         private readonly Context _context;
         private readonly UserRepository _userRepository;
-        private const string BotaNaRodaItemsEndpoint = "https://botanaroda.azurewebsites.net/api/items";
+        private const string BotaNaRodaItemsEndpoint = Constants.BotaNaRodaEndpoint + "/items";
+        private const string BotaNaRodaUsersEndpoint = Constants.BotaNaRodaEndpoint + "/users";
         private readonly HttpClient _httpClient;
         private readonly string _storagePath;
 
@@ -43,10 +44,14 @@ namespace BotaNaRoda.Ndroid.Data
 			_httpClient = new HttpClient(new NativeMessageHandler());
         }
 
+        public void RefreshCache()
+        {
+        }
+
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
         {
-            var loc = _userRepository.GetUserLoc();
-            return await GetAllItems(loc.Latitude, loc.Longitude, radius, skip, limit);
+            var userInfo = _userRepository.Get();
+            return await GetAllItems(userInfo.Latitude, userInfo.Longitude, radius, skip, limit);
         }
 
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
@@ -62,10 +67,6 @@ namespace BotaNaRoda.Ndroid.Data
 
             LoginUserIfUnauthorizedResponse(response);
             return new List<ItemListViewModel>();
-        }
-
-        public void RefreshCache()
-        {
         }
 
         public async Task<ItemDetailViewModel> GetItem(string id)
@@ -122,6 +123,20 @@ namespace BotaNaRoda.Ndroid.Data
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<UserViewModel> GetUserProfileAsync(string userId = "me")
+        {
+            SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(Path.Combine(BotaNaRodaUsersEndpoint, userId));
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<UserViewModel>(json);
+            }
+
+            return null;
+        }
+
         private async Task<IList<ImageInfo>> UploadImages(string[] imgPaths)
         {
             using (var content = new MultipartFormDataContent())
@@ -150,10 +165,10 @@ namespace BotaNaRoda.Ndroid.Data
 
         private void SetupAuthorizationHeader()
         {
-            var account = _userRepository.Get();
-            if (account != null)
+            var userInfo = _userRepository.Get();
+            if (userInfo != null)
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", account.Properties["access_token"]);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", userInfo.AccessToken);
             }
         }
 

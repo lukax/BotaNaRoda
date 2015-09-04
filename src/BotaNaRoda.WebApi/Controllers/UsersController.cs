@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
+using IdentityServer3.Core.Extensions;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
@@ -30,6 +32,15 @@ namespace BotaNaRoda.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
+            if (id == "me")
+            {
+                if (!User.IsSignedIn())
+                {
+                    return HttpUnauthorized();
+                }
+                id = User.GetSubjectId();
+            }
+
             var user = await _itemsContext.Users.Find(x => x.Id == id).FirstAsync();
             if (user == null)
             {

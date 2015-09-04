@@ -16,15 +16,6 @@ namespace BotaNaRoda.Ndroid.Util
 {
     public static class GeoUtil
     {
-        public static Loc ToLoc(this Location location)
-        {
-            return new Loc
-            {
-                Latitude = location.Latitude,
-                Longitude = location.Longitude
-            };
-        }
-
         public static double DistanceTo(this ILocation loc1, ILocation loc2)
         {
             return DistanceTo(loc1.Latitude, loc1.Longitude, loc2.Latitude, loc2.Longitude);

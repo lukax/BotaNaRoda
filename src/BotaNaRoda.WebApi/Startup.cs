@@ -25,6 +25,7 @@ using IdentityServer3;
 using Loggly;
 using Loggly.Config;
 using Microsoft.Framework.Logging;
+using Constants = IdentityServer3.Core.Constants;
 
 namespace BotaNaRoda.WebApi
 {
@@ -174,7 +175,7 @@ namespace BotaNaRoda.WebApi
                         }
 
                         //Parse facebook picture object into our custom avatar url claim
-                        context.Identity.AddClaim(new Claim("avatar", (string)user["picture"]["data"]["url"]));
+                        context.Identity.AddClaim(new Claim(Constants.ClaimTypes.Picture, (string)user["picture"]["data"]["url"]));
                     }
                 }
             };

@@ -27,31 +27,19 @@ namespace BotaNaRoda.Ndroid.Data
             CurrentPageValue = 0;
         }
 
-        public void LoadMoreItems(Action onLoaded = null)
+        public async Task LoadMoreItemsAsync()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
-            {
-                IsBusy = true;
+            IsBusy = true;
 
-                var loaded = _itemRestService.GetAllItems(10000, CurrentPageValue, ItemsPerPage).Result;
-                var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
+            var loaded = await _itemRestService.GetAllItems(10000, CurrentPageValue, ItemsPerPage);
+            var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
-                Items.AddRange(itemListViewModels);
+            Items.AddRange(itemListViewModels);
 
-                CurrentPageValue = Items.Count;
-                CanLoadMoreItems = ItemsPerPage == itemListViewModels.Length;
-            };
-            worker.RunWorkerCompleted += (sender, args) =>
-            {
-                IsBusy = false;
+            CurrentPageValue = Items.Count;
+            CanLoadMoreItems = ItemsPerPage == itemListViewModels.Length;
 
-                if (onLoaded != null)
-                {
-                    onLoaded();
-                }
-            };
-            worker.RunWorkerAsync();
+            IsBusy = false;
         }
 
     }

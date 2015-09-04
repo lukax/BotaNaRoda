@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Android.Support.V7.Widget;
 using Android.Util;
 using BotaNaRoda.Ndroid.Util;
@@ -32,7 +33,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemsLoader _itemsLoader;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
+        {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 			_userRepository = new UserRepository(Activity);
 			_itemService = new ItemRestService(Activity, _userRepository);
@@ -51,7 +52,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    var sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical);
             _itemsRecyclerView.SetLayoutManager(sglm);
 
-			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.GetUserLoc());
+			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
             var scrollListener = new InfiniteScrollListener(_adapter, sglm, UpdateDataAdapter);
@@ -82,9 +83,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
-			_adapter.Loc = location.ToLoc();
+            var usr = _userRepository.Get();
+            usr.Latitude = location.Latitude;
+            usr.Longitude = location.Longitude;
+            _userRepository.Save(usr);
+
+            _adapter.UserLocation = usr;
 			_adapter.NotifyDataSetChanged ();
-            _userRepository.SaveUserLoc(location.ToLoc());
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -116,18 +121,27 @@ namespace BotaNaRoda.Ndroid.Controllers
             if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
+
                 _refresher.Refreshing = true;
-                _itemsLoader.LoadMoreItems(() =>
-                {
-                    Activity.RunOnUiThread(() =>
+                _uiCancellation = new CancellationTokenSource();
+                _itemsLoader.LoadMoreItemsAsync()
+                    .ContinueWith(task =>
                     {
                         _refresher.Refreshing = false;
                         _adapter.NotifyDataSetChanged();
-                    });
-                });
+
+                    }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }
         }
 
-	}
+        public override void OnDetach()
+        {
+            base.OnDetach();
+            _uiCancellation.Cancel();
+        }
+
+        readonly TaskScheduler _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        private CancellationTokenSource _uiCancellation;
+    }
 }
 

@@ -52,7 +52,7 @@ namespace BotaNaRoda.WebApi.Identity
                 // new user, so add them here
                 var nameClaim = context.ExternalIdentity.Claims.First(x => x.Type == Constants.ClaimTypes.Name);
                 var emailClaim = context.ExternalIdentity.Claims.First(x => x.Type.Contains(Constants.ClaimTypes.Email));
-                var avatarClaim = context.ExternalIdentity.Claims.First(x => x.Type == "avatar");
+                var pictureClaim = context.ExternalIdentity.Claims.First(x => x.Type == Constants.ClaimTypes.Picture);
 
                 user = new User
                 {
@@ -60,7 +60,7 @@ namespace BotaNaRoda.WebApi.Identity
                     ProviderId = context.ExternalIdentity.ProviderId,
                     Username = emailClaim.Value,
                     Name = nameClaim.Value,
-                    Avatar = avatarClaim.Value
+                    Avatar = pictureClaim.Value
                 };
                 await _itemsContext.Users.InsertOneAsync(user);
             }
@@ -77,7 +77,9 @@ namespace BotaNaRoda.WebApi.Identity
                 //TODO setup claims
                 context.IssuedClaims = new List<Claim>
                 {
+                    new Claim(Constants.ClaimTypes.Name, user.Name),
                     new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
+                    new Claim(Constants.ClaimTypes.Picture, user.Avatar),
                 };
             }
         }
