@@ -12,22 +12,32 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:id="@+id/itemsDetailImage" />
+                android:id="@+id/itemsDetailImage"
+                android:background="@color/grey" />
             <TextView
                 android:text="Autor..."
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailAuthor"
                 android:layout_below="@id/itemsDetailImage"
                 android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
+                android:layout_alignParentLeft="true" />
+            <TextView
+                android:text="Distance..."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/itemsDetailDistance"
+                android:layout_below="@id/itemsDetailImage"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true" />
             <TextView
                 android:text="Descrição..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDescription"
-                android:layout_below="@id/itemsDetailImage"
-                android:layout_marginTop="30dp"
+                android:layout_below="@id/itemsDetailAuthor"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="25dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
             <TextView
@@ -36,8 +46,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailLocation"
                 android:layout_below="@id/itemsDetailDescription"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="3dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
             <fragment

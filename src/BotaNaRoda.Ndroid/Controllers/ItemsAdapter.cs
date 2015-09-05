@@ -59,7 +59,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 {
                     viewHolder.ItemId = item.Id;
                     viewHolder.Name.Text = item.Name;
-                    viewHolder.Distance.Text = string.Format("{0:0,0.00}m", item.DistanceTo(UserLocation));
+                    viewHolder.Distance.Text = item.DistanceTo(UserLocation);
                     viewHolder.Image.Post(() =>
                     {
                         Picasso.With(_context)

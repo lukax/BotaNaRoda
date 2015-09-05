@@ -13,6 +13,7 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
+using BotaNaRoda.Ndroid.Util;
 using Xamarin.Auth;
 using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
@@ -49,6 +50,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
+                DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
             };
 
             _holder.ReserveButton.Click += ReserveItem;
@@ -144,6 +146,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _holder.ItemAuthorView.Text = _item.User.Name;
             _holder.ItemDescriptionView.Text = _item.Description;
             _holder.ItemLocationView.Text = _item.Locality;
+            _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
 
             Picasso.With(this)
                .Load(_item.Images.First().Url)
@@ -160,6 +163,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal TextView ItemDescriptionView;
             internal TextView ItemLocationView;
             internal Button ReserveButton;
+            internal TextView DistanceView;
         }
     }
 }
