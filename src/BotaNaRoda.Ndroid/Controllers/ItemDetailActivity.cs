@@ -8,19 +8,22 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using Xamarin.Auth;
 using Square.Picasso;
+using AlertDialog = Android.App.AlertDialog;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-    [Activity(Label = "ItemDetailActivity",
+    [Activity(Label = "Bota na Roda",
+        Theme = "@style/ItemDetailTheme",
         ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
         ParentActivity = typeof(MainActivity))]
-    public class ItemDetailActivity : Activity, IOnMapReadyCallback
+    public class ItemDetailActivity : AppCompatActivity, IOnMapReadyCallback
     {
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         private ItemDetailViewModel _item;
@@ -34,7 +37,8 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
             _userRepository = new UserRepository(this);
             _itemService = new ItemRestService(this, new UserRepository(this));
 
@@ -42,7 +46,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             {
                 ItemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage),
                 ItemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor),
-                ItemTitleView = FindViewById<TextView>(Resource.Id.itemsDetailTitle),
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
@@ -79,7 +82,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void ReserveItem(object sender, EventArgs e)
         {
-            _holder.ReserveButton.Text = "Reserved";
+            _holder.ReserveButton.Text = "Reservado";
             _holder.ReserveButton.Enabled = false;
         }
 
@@ -137,14 +140,15 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == currentUser.Username);
             }
 
-            _holder.ItemAuthorView.Text = _item.User.Username;
-            _holder.ItemTitleView.Text = _item.Name;
+            Title = _item.Name;
+            _holder.ItemAuthorView.Text = _item.User.Name;
             _holder.ItemDescriptionView.Text = _item.Description;
-            _holder.ItemLocationView.Text = _item.Address;
+            _holder.ItemLocationView.Text = _item.Locality;
 
             Picasso.With(this)
                .Load(_item.Images.First().Url)
-               .Fit()
+               .Resize(_holder.ItemImageView.Width, _holder.ItemImageView.Height)
+               .CenterCrop()
                .Tag(this)
                .Into(_holder.ItemImageView);
         }
@@ -154,7 +158,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal ImageView ItemImageView;
             internal TextView ItemAuthorView;
             internal TextView ItemDescriptionView;
-            internal TextView ItemTitleView;
             internal TextView ItemLocationView;
             internal Button ReserveButton;
         }

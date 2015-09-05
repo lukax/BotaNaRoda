@@ -72,7 +72,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public override void OnResume ()
 		{
 			base.OnResume ();
-			_locMgr.RequestLocationUpdates (_locMgr.GetBestProvider(new Criteria(), true), 20000, 100, this);
+			_locMgr.RequestLocationUpdates (_locMgr.GetBestProvider(new Criteria(), false), 20000, 100, this);
 		}
 
 		public override void OnPause ()
@@ -121,7 +121,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
-
                 _refresher.Refreshing = true;
                 _uiCancellation = new CancellationTokenSource();
                 _itemsLoader.LoadMoreItemsAsync()
@@ -131,6 +130,10 @@ namespace BotaNaRoda.Ndroid.Controllers
                         _adapter.NotifyDataSetChanged();
 
                     }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
+            }
+            else
+            {
+                _refresher.Refreshing = _itemsLoader.IsBusy;
             }
         }
 

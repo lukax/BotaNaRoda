@@ -12,7 +12,7 @@
         <ImageView
             android:src="@android:drawable/ic_menu_gallery"
             android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:id="@+id/itemsImageView" />
         <TextView
             android:text="asdfasdfasdf"

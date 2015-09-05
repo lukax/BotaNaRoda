@@ -42,7 +42,7 @@ namespace BotaNaRoda.WebApi.Identity
                         new Secret("secret".Sha256())
                     },
 
-                    Flow = Flows.Implicit,
+                    Flow = Flows.Hybrid,
 
                     ClientUri = "http://www.thinktecture.com",
                     RequireConsent = true,

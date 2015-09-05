@@ -22,7 +22,7 @@ using Fragment = Android.Support.V4.App.Fragment;
 
 namespace BotaNaRoda.Ndroid
 {
-	[Activity (Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MyTheme")]
+	[Activity (Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme")]
     public class MainActivity : AppCompatActivity, AdapterView.IOnItemClickListener
 	{
         private DrawerLayout _mDrawerLayout;

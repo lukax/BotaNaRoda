@@ -1,17 +1,30 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-    </style>
-
-	<style name="MyTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<item name="colorPrimary">#2196F3</item>
-		<item name="drawerArrowStyle">@style/MyDrawerArrowStyle</item>
+	<style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accent</item>
+		<item name="drawerArrowStyle">@style/MainDrawerArrowStyle</item>
 	</style>
-	<style name="MyDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-		<item name="color">#F5F5F5</item>
+	<style name="MainDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+		<item name="color">@color/white</item>
 		<item name="spinBars">true</item>
 	</style>
+
+  <style name="ItemDetailTheme" parent="MainTheme">
+    <item name="android:windowActionBarOverlay">true</item>
+    <item name="android:actionBarStyle">@style/ItemDetailActionBar</item>
+    <!-- Support library compatibility -->
+    <item name="windowActionBarOverlay">true</item>
+    <item name="actionBarStyle">@style/ItemDetailActionBar</item>
+  </style>
+  
+  <!-- ActionBar styles -->
+  <style name="ItemDetailActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+    <item name="android:background">@color/action_bar_transparent</item>
+    <!-- Support library compatibility -->
+    <item name="background">@color/action_bar_transparent</item>
+  </style>
+
+
 </resources>
