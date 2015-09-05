@@ -60,19 +60,20 @@ namespace BotaNaRoda.Ndroid.Controllers
                     viewHolder.ItemId = item.Id;
                     viewHolder.Name.Text = item.Name;
                     viewHolder.Distance.Text = string.Format("{0:0,0.00}m", item.DistanceTo(UserLocation));
-                    Picasso.With(_context)
+                    viewHolder.Image.Post(() =>
+                    {
+                        Picasso.With(_context)
                             .Load(item.ThumbImage.Url)
-                            .Placeholder(Resource.Drawable.placeholder)
-                            .Error(Resource.Drawable.error)
-							.Fit()
-							.CenterCrop()
+                            .Resize(viewHolder.Image.Width, 0)
                             .Tag(_context)
                             .Into(viewHolder.Image);
+                    });
+
                 }
             }
         }
         
-        private class ItemViewHolder : RecyclerView.ViewHolder, View.IOnClickListener
+        private class ItemViewHolder : RecyclerView.ViewHolder, View.IOnClickListener, ITransformation
         {
             internal new string ItemId;
             internal readonly ImageView Image;
@@ -93,6 +94,30 @@ namespace BotaNaRoda.Ndroid.Controllers
                 itemDetailIntent.PutExtra("itemId", ItemId);
                 v.Context.StartActivity(itemDetailIntent);
             }
+
+            public Bitmap Transform(Bitmap image)
+            {
+                //int maxWidth = 200;
+                //int maxHeight = 500;
+
+                //var ratioX = (double)maxWidth / image.Width;
+                //var ratioY = (double)maxHeight / image.Height;
+                //var ratio = Math.Min(ratioX, ratioY);
+
+                //var newWidth = (int)(image.Width * ratio);
+                //var newHeight = (int)(image.Height * ratio);
+
+                //var newImage = new Bitmap(newWidth, newHeight);
+
+                //using (var graphics = Graphics.FromImage(newImage))
+                //    graphics.DrawImage(image, 0, 0, newWidth, newHeight);
+
+                //return newImage;
+
+                throw new NotImplementedException();
+            }
+
+            public string Key { get; }
         }
     }
 }

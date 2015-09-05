@@ -4,11 +4,11 @@ using Android.Views;
 
 namespace BotaNaRoda.Ndroid
 {
-    public class ChatFragment : Fragment
+    public class ConversationsFragment : Fragment
     {
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            var view = inflater.Inflate(Resource.Layout.Chat, container, false);
+            var view = inflater.Inflate(Resource.Layout.Conversations, container, false);
 
             return view;
         }

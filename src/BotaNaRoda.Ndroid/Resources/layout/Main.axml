@@ -17,7 +17,7 @@
         android:background="#E3F2FD">
         <ImageView
             android:id="@+id/avatar"
-            android:src="@android:drawable/ic_menu_gallery"
+            android:src="@drawable/contact_picture_placeholder"
             android:layout_width="100dp"
             android:layout_height="100dp" />
         <TextView

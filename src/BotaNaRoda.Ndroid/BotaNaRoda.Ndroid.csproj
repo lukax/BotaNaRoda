@@ -97,7 +97,7 @@
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Controllers\ChatFragment.cs" />
+    <Compile Include="Controllers\ConversationsFragment.cs" />
     <Compile Include="Controllers\InfiniteScrollListener.cs" />
     <Compile Include="Data\IItemService.cs" />
     <Compile Include="Data\ItemRestService.cs" />
@@ -142,8 +142,6 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_add_white_24dp.png" />
     <AndroidResource Include="Resources\values\Colors.xml" />
     <AndroidResource Include="Resources\values\Styles.xml" />
-    <AndroidResource Include="Resources\drawable\error.jpg" />
-    <AndroidResource Include="Resources\drawable\placeholder.jpg" />
     <None Include="Properties\AndroidManifest.xml">
       <SubType>Designer</SubType>
     </None>
@@ -213,5 +211,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup />
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\contact_picture_placeholder.png" />
+  </ItemGroup>
 </Project>

@@ -52,7 +52,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    var sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical);
             _itemsRecyclerView.SetLayoutManager(sglm);
 
-			_adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
+            _adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
             var scrollListener = new InfiniteScrollListener(_adapter, sglm, UpdateDataAdapter);
