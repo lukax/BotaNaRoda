@@ -7,7 +7,7 @@
     p1:minHeight="25px">
     <ImageView
         p1:id="@+id/conversationProfileImage"
-        p1:src="@android:drawable/ic_menu_gallery"
+        p1:src="@drawable/contact_picture_placeholder"
         p1:layout_width="80dp"
         p1:layout_height="80dp" />
     <TextView
@@ -15,6 +15,7 @@
         p1:text="Lucas E."
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
+        p1:layout_marginTop="20dp"
         p1:layout_toRightOf="@id/conversationProfileImage" />
     <TextView
         p1:id="@+id/conversationItemName"

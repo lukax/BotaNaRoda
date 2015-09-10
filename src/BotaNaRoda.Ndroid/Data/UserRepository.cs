@@ -29,46 +29,40 @@ namespace BotaNaRoda.Ndroid.Data
             _context = context;
         }
 
-		public bool IsLoggedIn {
-			get { return AccountStore.Create (_context)
-                    .FindAccountsForService (ServiceId)
-                    .Any (x => !string.IsNullOrWhiteSpace(x.Username)); }
-		}
-
-        public UserInfo Get()
+        public bool IsLoggedIn
         {
-            var user = new UserInfo();
+            get
+            {
+                return AccountStore.Create(_context)
+                      .FindAccountsForService(ServiceId)
+                      .Any(x => !string.IsNullOrWhiteSpace(x.Username));
+            }
+        }
+
+        public AuthInfo Get()
+        {
+            AuthInfo user = new AuthInfo();
             var acc = AccountStore.Create(_context).FindAccountsForService(ServiceId).FirstOrDefault();
             if (acc != null)
             {
-                string accessToken;
-                string lat;
-                string lon;
-                acc.Properties.TryGetValue("access_token", out accessToken);
-                acc.Properties.TryGetValue("lat", out lat);
-                acc.Properties.TryGetValue("lon", out lon);
-
-                user.Username = acc.Username ?? string.Empty;
-                user.AccessToken = accessToken ?? string.Empty;
-                user.Latitude = Convert.ToDouble(lat, CultureInfo.InvariantCulture);
-                user.Longitude = Convert.ToDouble(lon, CultureInfo.InvariantCulture);
+                string authInfo;
+                if (acc.Properties.TryGetValue("authInfo", out authInfo))
+                {
+                    user = JsonConvert.DeserializeObject<AuthInfo>(authInfo);
+                }
             }
             return user;
         }
 
-        public void Save(UserInfo userInfo)
+        public void Save(AuthInfo authInfo)
         {
-            Account acc = new Account();
-            acc.Username = userInfo.Username ?? string.Empty;
-            acc.Properties["access_token"] = userInfo.AccessToken ?? string.Empty;
-            acc.Properties["lat"] = userInfo.Latitude.ToString(CultureInfo.InvariantCulture);
-            acc.Properties["lon"] = userInfo.Longitude.ToString(CultureInfo.InvariantCulture);
-            Save(acc);
-        }
-
-        public void Save(Account account)
-        {
-            AccountStore.Create(_context).Save(account, ServiceId);
+            Account acc = new Account(
+                authInfo.Username,
+                new Dictionary<string, string>
+                {
+                    {"authInfo", JsonConvert.SerializeObject(authInfo)}
+                });
+            AccountStore.Create(_context).Save(acc, ServiceId);
         }
     }
 }

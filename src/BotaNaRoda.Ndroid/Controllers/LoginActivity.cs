@@ -9,7 +9,7 @@ using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "LoginActivity",
+	[Activity (Label = "Login",
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
         ParentActivity = typeof(MainActivity))]
 	public class LoginActivity : Activity
@@ -35,7 +35,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void Login()
         {
-            var auth = new CustomOAuth2Authenticator();
+            var auth = new CustomOAuth2Authenticator(_userRepository);
             auth.Error += (sender, args) =>
             {
             
@@ -46,9 +46,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                 {
                     return;
                 }
-
-                //Stores account
-                _userRepository.Save(ee.Account);
             };
 
             var intent = auth.GetUI(this);

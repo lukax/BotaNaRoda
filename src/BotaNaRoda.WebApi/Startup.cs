@@ -116,15 +116,14 @@ namespace BotaNaRoda.WebApi
                 {
                     options.Authority = appSettings.Options.IdSvrAuthority;
                     options.Audience = "https://botanaroda.com.br/resources";
-                    options.MetadataAddress = appSettings.Options.IdSvrAuthority + "/.well-known/openid-configuration";
                     options.AutomaticAuthentication = true;
                 });
 
-                app.UseSignalR();
-
-                api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.ApiScope });
+                api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.BotaNaRodaApiScope });
 
                 api.UseMvc();
+
+                app.UseSignalR();
             });
         }
 

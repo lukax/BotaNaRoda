@@ -21,8 +21,7 @@ using AlertDialog = Android.App.AlertDialog;
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "Bota na Roda",
-        Theme = "@style/ItemDetailTheme",
-        ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
+        Theme = "@style/ItemDetailTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
         ParentActivity = typeof(MainActivity))]
     public class ItemDetailActivity : AppCompatActivity, IOnMapReadyCallback
     {
@@ -136,10 +135,9 @@ namespace BotaNaRoda.Ndroid.Controllers
         private void UpdateUi()
         {
             FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
-            var currentUser = _userRepository.Get();
-            if (currentUser != null && _menu != null)
+            if (_userRepository.IsLoggedIn && _menu != null)
             {
-                _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == currentUser.Username);
+                _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _userRepository.Get().Username);
             }
 
             Title = _item.Name;

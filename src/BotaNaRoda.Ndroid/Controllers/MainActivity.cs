@@ -22,7 +22,9 @@ using Fragment = Android.Support.V4.App.Fragment;
 
 namespace BotaNaRoda.Ndroid
 {
-	[Activity (Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/MainTheme")]
+	[Activity(
+        Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon",
+        Theme = "@style/MainTheme")]
     public class MainActivity : AppCompatActivity, AdapterView.IOnItemClickListener
 	{
         private DrawerLayout _mDrawerLayout;
@@ -30,9 +32,6 @@ namespace BotaNaRoda.Ndroid
         private Dictionary<string, Type> _mLeftDataSet;
         private ArrayAdapter<string> _mLeftAdapter;
 		private MyActionBarDrawerToggle _mDrawerToggle;
-	    private TextView _userLocalityTextView;
-	    private TextView _userNameTextView;
-	    private ImageView _avatarImageView;
 	    private Fragment _currentFragment;
 
 	    protected override void OnCreate (Bundle bundle)
@@ -58,16 +57,12 @@ namespace BotaNaRoda.Ndroid
 				this,								//Host Activity
 				_mDrawerLayout,						//DrawerLayout
 				Resource.String.ApplicationName,	//Opened Message
-				Resource.String.ApplicationName		//Closed Message
+				Resource.String.ApplicationName,		//Closed Message
+                new UserRepository(this)
 			);
 
 			_mDrawerLayout.SetDrawerListener(_mDrawerToggle);
 			_mDrawerToggle.SyncState();
-
-            //Profile
-            _avatarImageView = FindViewById<ImageView>(Resource.Id.avatar);
-            _userNameTextView = FindViewById<TextView>(Resource.Id.userName);
-            _userLocalityTextView = FindViewById<TextView>(Resource.Id.userLocality);
 
             //Container
             LoadFragment(_mLeftDataSet.First().Value);
@@ -76,7 +71,6 @@ namespace BotaNaRoda.Ndroid
 	    protected override void OnStart()
 	    {
 	        base.OnStart();
-            GetUserInfo();
 	    }
 
 	    public override bool OnOptionsItemSelected (IMenuItem item)
@@ -111,34 +105,7 @@ namespace BotaNaRoda.Ndroid
 			_mDrawerToggle.OnConfigurationChanged(newConfig);
 		}
 
-	    private void GetUserInfo()
-	    {
-	        ItemRestService restService = new ItemRestService(this, new UserRepository(this));
-            BackgroundWorker worker = new BackgroundWorker();
-	        worker.DoWork += (sender, args) =>
-	        {
-                UserViewModel profile = restService.GetUserProfileAsync().Result;
-	            args.Result = profile;
-	        };
-	        worker.RunWorkerCompleted += (sender, args) =>
-	        {
-	            var profile = args.Result as UserViewModel;
-	            if (profile != null)
-	            {
-                    RunOnUiThread(() =>
-                    {
-                        _userNameTextView.Text = profile.Username;
-                        _userLocalityTextView.Text = profile.Locality;
-                        Picasso.With(this)
-                           .Load(profile.Avatar)
-                           .Fit()
-                           .Tag(this)
-                           .Into(_avatarImageView);
-                    });
-                }
-	        };
-            worker.RunWorkerAsync();
-	    }
+
 
         private void LoadFragment(Type value)
         {

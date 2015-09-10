@@ -8,15 +8,17 @@ namespace BotaNaRoda.WebApi.Identity
 {
     public class Scopes
     {
-        public const string ApiScope = "https://api.botanaroda.com.br";
+        public const string BotaNaRodaApiScope = "https://api.botanaroda.com.br";
 
         public static IEnumerable<Scope> Get()
         {
             return new[]
             {
                 StandardScopes.OpenId,
-                StandardScopes.ProfileAlwaysInclude,
-                StandardScopes.EmailAlwaysInclude,
+                StandardScopes.Profile,
+                StandardScopes.Email,
+                StandardScopes.Address,
+                StandardScopes.OfflineAccess,
 
                 ////////////////////////
                 // resource scopes
@@ -24,7 +26,7 @@ namespace BotaNaRoda.WebApi.Identity
 
                 new Scope
                 {
-                    Name = ApiScope,
+                    Name = BotaNaRodaApiScope,
                     DisplayName = "Bota na Roda API",
                     Type = ScopeType.Resource,
                 }

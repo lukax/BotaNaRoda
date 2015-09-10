@@ -59,6 +59,7 @@ namespace BotaNaRoda.WebApi.Identity
                     Provider = context.ExternalIdentity.Provider,
                     ProviderId = context.ExternalIdentity.ProviderId,
                     Username = emailClaim.Value,
+                    Email = emailClaim.Value,
                     Name = nameClaim.Value,
                     Avatar = pictureClaim.Value
                 };
@@ -79,7 +80,9 @@ namespace BotaNaRoda.WebApi.Identity
                 {
                     new Claim(Constants.ClaimTypes.Name, user.Name),
                     new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
-                    new Claim(Constants.ClaimTypes.Picture, user.Avatar),
+                    new Claim(Constants.ClaimTypes.Email, user.Email),
+                    new Claim(Constants.ClaimTypes.Picture, user.Avatar ?? ""),
+                    new Claim(Constants.ClaimTypes.Address, user.Address ?? ""),
                 };
             }
         }

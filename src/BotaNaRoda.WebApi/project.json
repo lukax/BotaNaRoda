@@ -12,7 +12,7 @@
     "Microsoft.Framework.Configuration.Json": "1.0.0-beta6",
     "Microsoft.AspNet.DataProtection": "1.0.0-beta6",
     "Microsoft.AspNet.Identity": "3.0.0-beta6",
-    "IdentityServer3": "2.0.0-rc3",
+    "IdentityServer3": "2.0.0",
     "Microsoft.AspNet.Authentication": "1.0.0-beta6",
     "Microsoft.AspNet.Authentication.OAuthBearer": "1.0.0-beta6",
     "MongoDB.Driver": "2.0.1",

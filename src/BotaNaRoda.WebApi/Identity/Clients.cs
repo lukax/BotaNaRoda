@@ -18,16 +18,21 @@ namespace BotaNaRoda.WebApi.Identity
                 {
                     ClientName = "Bota na Roda",
                     ClientId = "android.botanaroda.com.br",
-                    Flow = Flows.Implicit,
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("150D23DAE26C4629BC58A7104B1AECFB".Sha256()) //Dummy secret as requirement of the hybrid flow
+                    },
+                    Flow = Flows.AuthorizationCode, //Allows the retrieval of both: code, id_token and token
                     ClientUri = "https://botanaroda.com.br",
                     RequireConsent = false,
-                    AllowAccessToAllScopes = true,
+                    AllowAccessToAllScopes = true, //<------------TODO review this
                     RedirectUris = new List<string>
                     {
                         "https://botanaroda.azurewebsites.net/core",
                     },
                     IdentityTokenLifetime = 360,
-                    AccessTokenLifetime = 3600
+                    AccessTokenLifetime = 3600,
+                    AccessTokenType = AccessTokenType.Reference
                 },
 
 #if DEBUG
@@ -42,7 +47,7 @@ namespace BotaNaRoda.WebApi.Identity
                         new Secret("secret".Sha256())
                     },
 
-                    Flow = Flows.Hybrid,
+                    Flow = Flows.AuthorizationCode,
 
                     ClientUri = "http://www.thinktecture.com",
                     RequireConsent = true,
@@ -92,7 +97,8 @@ namespace BotaNaRoda.WebApi.Identity
                     },
 
                     IdentityTokenLifetime = 360,
-                    AccessTokenLifetime = 3600
+                    AccessTokenLifetime = 3600,
+                    AccessTokenType = AccessTokenType.Reference
                 },
 #endif
             };

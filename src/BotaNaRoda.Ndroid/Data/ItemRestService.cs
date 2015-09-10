@@ -10,8 +10,10 @@ using Android.Content;
 using Android.Graphics;
 using Android.Locations;
 using Android.Media;
+using Android.Util;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
+using IdentityModel.Client;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 using Path = System.IO.Path;
@@ -56,7 +58,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
         {
-            SetupAuthorizationHeader();
+            await SetupAuthorizationHeader();
 
 			var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit));
             if (response.IsSuccessStatusCode)
@@ -71,7 +73,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<ItemDetailViewModel> GetItem(string id)
         {
-            SetupAuthorizationHeader();
+            await SetupAuthorizationHeader();
 
             var response = await _httpClient.GetAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
             if (response.IsSuccessStatusCode)
@@ -86,7 +88,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<string> SaveItem(ItemCreateBindingModel item)
         {
-            SetupAuthorizationHeader();
+            await SetupAuthorizationHeader();
 
             if (item.Images == null || item.Images.Length > 3)
             {
@@ -96,7 +98,7 @@ namespace BotaNaRoda.Ndroid.Data
             var imgs = await UploadImages(item.Images.Select(x => x.Url).ToArray());
             if (imgs == null)
             {
-                throw new ArgumentException("Não foi possível carregar imagens", "item");    
+                throw new ArgumentException("N乤o foi possivel carregar imagens", "item");    
             }
 
             item.ThumbImage = imgs.Last();
@@ -116,22 +118,22 @@ namespace BotaNaRoda.Ndroid.Data
 
         public async Task<bool> DeleteItem(string id)
         {
-            SetupAuthorizationHeader();
+            await SetupAuthorizationHeader();
 
             var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
             LoginUserIfUnauthorizedResponse(response);
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<UserViewModel> GetUserProfileAsync(string userId = "me")
+        public async Task<UserDetailViewModel> GetUserProfileAsync(string userId = "me")
         {
-            SetupAuthorizationHeader();
+            await SetupAuthorizationHeader();
 
             var response = await _httpClient.GetAsync(Path.Combine(BotaNaRodaUsersEndpoint, userId));
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<UserViewModel>(json);
+                return JsonConvert.DeserializeObject<UserDetailViewModel>(json);
             }
 
             return null;
@@ -163,12 +165,30 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-        private void SetupAuthorizationHeader()
+        private async Task SetupAuthorizationHeader()
         {
-            var userInfo = _userRepository.Get();
-            if (userInfo != null)
+            if (_userRepository.IsLoggedIn)
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", userInfo.AccessToken);
+                var authInfo = _userRepository.Get();
+                if (authInfo.IsExpired())
+                {
+                    var client = new TokenClient(
+                        Constants.IdSvrTokenEndpoint,
+                        Constants.ClientId,
+                        Constants.ClientSecret);
+
+                    var response = await client.RequestRefreshTokenAsync(authInfo.RefreshToken, Constants.ClientRedirectUrl);
+                    if (response.IsError)
+                    {
+                        Log.Error("ItemRestService", "Could not refresh token. " + response.Error);
+                        return;
+                    }
+
+                    authInfo.Update(response);
+                    _userRepository.Save(authInfo);
+                }
+
+                _httpClient.SetBearerToken(authInfo.AccessToken);
             }
         }
 

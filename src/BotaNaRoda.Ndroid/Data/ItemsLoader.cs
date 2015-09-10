@@ -37,7 +37,8 @@ namespace BotaNaRoda.Ndroid.Data
             Items.AddRange(itemListViewModels);
 
             CurrentPageValue = Items.Count;
-            CanLoadMoreItems = ItemsPerPage == itemListViewModels.Length;
+            CanLoadMoreItems = (itemListViewModels.Length != 0 &&
+                                ItemsPerPage == itemListViewModels.Length);
 
             IsBusy = false;
         }

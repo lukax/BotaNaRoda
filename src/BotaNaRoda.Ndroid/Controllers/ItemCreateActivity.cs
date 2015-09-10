@@ -9,6 +9,7 @@ using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
 using Android.Provider;
+using Android.Support.V7.App;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
@@ -16,12 +17,13 @@ using Java.IO;
 using Xamarin.Auth;
 using Uri = Android.Net.Uri;
 using Square.Picasso;
+using AlertDialog = Android.App.AlertDialog;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "ItemCreateActivity",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), ParentActivity = typeof(ItemsFragment))]	
-	public class ItemCreateActivity : Activity, ILocationListener
+	[Activity (Label = "ItemCreateActivity", ParentActivity = typeof(MainActivity),
+        Theme = "@style/MainTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]	
+	public class ItemCreateActivity : AppCompatActivity, ILocationListener
 	{
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         private const int CapturePhoto1 = 0;
@@ -40,7 +42,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.ItemCreate);
-            ActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
 			_locMgr = GetSystemService(LocationService) as LocationManager;
             _itemService = new ItemRestService(this, new UserRepository(this));
