@@ -2,6 +2,7 @@
   "AppSettings": {
     "AppName": "BotaNaRoda Api",
     "IdSvrAuthority": "https://localhost:44333/core",
+    "IdSvrAudience": "https://botanaroda.com.br/resources",
     "BotaNaRodaConnectionString": "mongodb://localhost",
     "BotaNaRodaDatabaseName": "botanaroda",
     "StorageConnectionString": "",

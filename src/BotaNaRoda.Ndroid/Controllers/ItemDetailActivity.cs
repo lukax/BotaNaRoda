@@ -45,7 +45,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             _holder = new ViewHolder
             {
                 ItemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage),
-                ItemAuthorView = FindViewById<TextView>(Resource.Id.itemsDetailAuthor),
+                ItemAuthorNameView = FindViewById<TextView>(Resource.Id.itemsDetailAuthorName),
+                ItemAuthorImageView = FindViewById<ImageView>(Resource.Id.itemsDetailAuthorName),
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
@@ -141,11 +142,16 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
 
             Title = _item.Name;
-            _holder.ItemAuthorView.Text = _item.User.Name;
+            _holder.ItemAuthorNameView.Text = _item.User.Name;
             _holder.ItemDescriptionView.Text = _item.Description;
             _holder.ItemLocationView.Text = _item.Locality;
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
-
+            Picasso.With(this)
+                .Load(_item.User.Avatar)
+                .Resize(_holder.ItemAuthorImageView.Width, _holder.ItemAuthorImageView.Height)
+                .CenterCrop()
+                .Tag(this)
+                .Into(_holder.ItemAuthorImageView);
             Picasso.With(this)
                .Load(_item.Images.First().Url)
                .Resize(_holder.ItemImageView.Width, _holder.ItemImageView.Height)
@@ -157,11 +163,12 @@ namespace BotaNaRoda.Ndroid.Controllers
         private class ViewHolder
         {
             internal ImageView ItemImageView;
-            internal TextView ItemAuthorView;
+            internal TextView ItemAuthorNameView;
             internal TextView ItemDescriptionView;
             internal TextView ItemLocationView;
             internal Button ReserveButton;
             internal TextView DistanceView;
+            internal ImageView ItemAuthorImageView;
         }
     }
 }

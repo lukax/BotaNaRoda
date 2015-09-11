@@ -17,7 +17,6 @@
     <SSLPort>44333</SSLPort>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BotaNaRoda.Domain\BotaNaRoda.Domain.csproj" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

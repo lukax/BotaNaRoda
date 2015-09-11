@@ -3,26 +3,24 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "Microsoft.AspNet.Mvc": "6.0.0-beta6",
-    "Microsoft.AspNet.Server.IIS": "1.0.0-beta6",
-    "Microsoft.AspNet.Server.WebListener": "1.0.0-beta6",
-    "Microsoft.AspNet.StaticFiles": "1.0.0-beta6",
+    "Microsoft.AspNet.Mvc": "6.0.0-beta7",
+    "Microsoft.AspNet.Server.IIS": "1.0.0-beta7",
+    "Microsoft.AspNet.Server.WebListener": "1.0.0-beta7",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-beta7",
+    "Microsoft.AspNet.Owin": "1.0.0-beta7",
     "Microsoft.Owin": "3.0.1",
-    "Microsoft.AspNet.Owin": "1.0.0-beta6",
-    "Microsoft.Framework.Configuration.Json": "1.0.0-beta6",
-    "Microsoft.AspNet.DataProtection": "1.0.0-beta6",
-    "Microsoft.AspNet.Identity": "3.0.0-beta6",
-    "IdentityServer3": "2.0.0",
-    "Microsoft.AspNet.Authentication": "1.0.0-beta6",
-    "Microsoft.AspNet.Authentication.OAuthBearer": "1.0.0-beta6",
-    "MongoDB.Driver": "2.0.1",
     "Microsoft.Owin.Security.Facebook": "3.0.1",
-    "xunit": "2.0.0",
-    "WindowsAzure.Storage": "5.0.0",
-    "Microsoft.Framework.Logging": "1.0.0-beta6",
+    "Microsoft.Framework.Configuration.Json": "1.0.0-beta7",
+    "Microsoft.AspNet.DataProtection": "1.0.0-beta7",
+    "Microsoft.AspNet.Identity": "3.0.0-beta7",
+    "IdentityServer3": "2.0.1",
+    "Microsoft.AspNet.Authentication.OAuthBearer": "1.0.0-beta7",
+    "MongoDB.Driver": "2.0.1",
+    "WindowsAzure.Storage": "5.0.2",
+    "Microsoft.Framework.Logging": "1.0.0-beta7",
     "Serilog.Sinks.Loggly": "2.0.7",
-    "Serilog.Framework.Logging": "1.0.0-beta6-10048",
-    "Microsoft.AspNet.SignalR.Server": "3.0.0-beta6"
+    "Serilog.Framework.Logging": "1.0.0-beta7-10052",
+    "Microsoft.AspNet.SignalR.Server": "3.0.0-beta7"
   },
 
   "commands": {
@@ -31,8 +29,7 @@
 
   "frameworks": {
     "dnx451": {
-      "dependencies": {
-      },
+      "dependencies": {},
       "frameworkAssemblies": {
         "System.Drawing": "4.0.0.0"
       }

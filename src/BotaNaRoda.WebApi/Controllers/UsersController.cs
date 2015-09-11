@@ -34,7 +34,7 @@ namespace BotaNaRoda.WebApi.Controllers
         {
             if (id == "me")
             {
-                if (!User.IsSignedIn())
+                if (!User.Identity.IsAuthenticated)
                 {
                     return HttpUnauthorized();
                 }

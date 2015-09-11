@@ -31,17 +31,16 @@ namespace BotaNaRoda.WebApi.Identity
                         "https://botanaroda.azurewebsites.net/core",
                     },
                     IdentityTokenLifetime = 360,
-                    AccessTokenLifetime = 3600,
-                    AccessTokenType = AccessTokenType.Reference
+                    AccessTokenLifetime = 3600
                 },
 
 #if DEBUG
                 new Client
                 {
-                    ClientName = "Implicit Client Demo",
+                    ClientName = "Hybrid Client Demo",
                     Enabled = true,
 
-                    ClientId = "implicitclient",
+                    ClientId = "hybridclient",
                     ClientSecrets = new List<Secret>
                     {
                         new Secret("secret".Sha256())
@@ -98,7 +97,6 @@ namespace BotaNaRoda.WebApi.Identity
 
                     IdentityTokenLifetime = 360,
                     AccessTokenLifetime = 3600,
-                    AccessTokenType = AccessTokenType.Reference
                 },
 #endif
             };

@@ -67,7 +67,6 @@ namespace BotaNaRoda.Ndroid.Data
                 return JsonConvert.DeserializeObject<IEnumerable<ItemListViewModel>>(json);
             }
 
-            LoginUserIfUnauthorizedResponse(response);
             return new List<ItemListViewModel>();
         }
 
@@ -82,7 +81,6 @@ namespace BotaNaRoda.Ndroid.Data
                 return JsonConvert.DeserializeObject<ItemDetailViewModel>(json);
             }
 
-            LoginUserIfUnauthorizedResponse(response);
             return null;
         }
 
@@ -112,7 +110,6 @@ namespace BotaNaRoda.Ndroid.Data
                 return await response.Content.ReadAsStringAsync();
             }
 
-            LoginUserIfUnauthorizedResponse(response);
             return null;
         }
 
@@ -121,7 +118,6 @@ namespace BotaNaRoda.Ndroid.Data
             await SetupAuthorizationHeader();
 
             var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaItemsEndpoint, id));
-            LoginUserIfUnauthorizedResponse(response);
             return response.IsSuccessStatusCode;
         }
 
@@ -172,14 +168,21 @@ namespace BotaNaRoda.Ndroid.Data
                 var authInfo = _userRepository.Get();
                 if (authInfo.IsExpired())
                 {
-                    var client = new TokenClient(
-                        Constants.IdSvrTokenEndpoint,
-                        Constants.ClientId,
-                        Constants.ClientSecret);
+                    var httpResponseMessage = await _httpClient.PostAsync(Constants.IdSvrTokenEndpoint,
+                        new FormUrlEncodedContent(new Dictionary<string, string>
+                        {
+                            { "client_id", Constants.ClientId },
+                            { "client_secret", Constants.ClientSecret },
+                            { "grant_type", "refresh_token" },
+                            { "refresh_token", authInfo.RefreshToken }
+                        }));
+                    var raw = await httpResponseMessage.Content.ReadAsStringAsync();
 
-                    var response = await client.RequestRefreshTokenAsync(authInfo.RefreshToken, Constants.ClientRedirectUrl);
+                    var response = new TokenResponse(raw);
                     if (response.IsError)
                     {
+                        _context.StartActivity(typeof(LoginActivity));
+
                         Log.Error("ItemRestService", "Could not refresh token. " + response.Error);
                         return;
                     }
@@ -189,14 +192,6 @@ namespace BotaNaRoda.Ndroid.Data
                 }
 
                 _httpClient.SetBearerToken(authInfo.AccessToken);
-            }
-        }
-
-        private void LoginUserIfUnauthorizedResponse(HttpResponseMessage response)
-        {
-            if (!response.IsSuccessStatusCode && _httpClient.DefaultRequestHeaders.Authorization != null)
-            {
-                _context.StartActivity(typeof(LoginActivity));
             }
         }
 

@@ -131,11 +131,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-				var progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
-			    Task.Delay(2000).ContinueWith(t =>
-			    {
-                    progressDialog.Cancel();
-			    }, UiScheduler);
+				//var progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
+			 //   Task.Delay(2000).ContinueWith(t =>
+			 //   {
+    //                progressDialog.Cancel();
+			 //   }, UiScheduler);
 
                 return;
 			}
@@ -162,18 +162,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    };
 
 
-            ProgressDialog.Show(this, "", "Carregando...");
+            //ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();
 	        worker.DoWork += (o, args) =>
 	        {
 				_itemService.SaveItem(item).Wait();
 	        };
-	        worker.RunWorkerCompleted += (o, args) => 
-				Task.FromResult(0).ContinueWith(t => 
-					{ 
-						Finish();
-					}, UiScheduler);
+	        worker.RunWorkerCompleted += (o, args) =>
+	        {
+	            RunOnUiThread(() =>
+	            {
+	                Finish();
+	            });
+	        };
             worker.RunWorkerAsync();
 		}
 
@@ -182,7 +184,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    {
             File imageFile = new File(_itemService.GetTempImageFilename(capturePhotoCode));
             var imageUri = Uri.FromFile(imageFile);
-            _captureCodeImageUrlDictionary.Add(capturePhotoCode, imageUri);
+            _captureCodeImageUrlDictionary[capturePhotoCode] = imageUri;
 
             Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
             cameraIntent.PutExtra(MediaStore.ExtraOutput, imageUri);

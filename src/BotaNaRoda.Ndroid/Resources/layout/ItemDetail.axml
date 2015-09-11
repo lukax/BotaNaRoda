@@ -14,14 +14,20 @@
                 android:layout_height="400dp"
                 android:id="@+id/itemsDetailImage"
                 android:background="@color/grey" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/itemsDetailAuthorImage"
+                android:layout_below="@id/itemsDetailImage"
+                android:background="@color/grey" />
             <TextView
                 android:text="Autor..."
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/itemsDetailAuthor"
+                android:id="@+id/itemsDetailAuthorName"
                 android:layout_below="@id/itemsDetailImage"
-                android:layout_marginLeft="15dp"
-                android:layout_alignParentLeft="true" />
+                android:layout_toRightOf="@id/itemsDetailAuthorImage"
+                android:layout_marginLeft="15dp" />
             <TextView
                 android:text="Distance..."
                 android:layout_width="wrap_content"
@@ -35,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDescription"
-                android:layout_below="@id/itemsDetailAuthor"
+                android:layout_below="@id/itemsDetailAuthorName"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="25dp"
                 android:layout_marginLeft="15dp"

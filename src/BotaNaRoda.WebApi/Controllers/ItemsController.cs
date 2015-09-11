@@ -111,7 +111,7 @@ namespace BotaNaRoda.WebApi.Controllers
         [Route("images")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> PostImage(IList<IFormFile> files)
+        public IActionResult PostImage(IList<IFormFile> files)
         {
             if (!ModelState.IsValid || !files.Any() || files.Count > 3)
             {
@@ -126,7 +126,7 @@ namespace BotaNaRoda.WebApi.Controllers
             // Create the container if it doesn't already exist.
             try
             {
-                await container.CreateIfNotExistsAsync();
+                container.CreateIfNotExists();
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace BotaNaRoda.WebApi.Controllers
                 {
                     using (var fs = file.OpenReadStream())
                     {
-                        await blockBlob.UploadFromStreamAsync(fs);
+                        blockBlob.UploadFromStream(fs);
                     }
                 }
                 catch (Exception ex)
@@ -187,7 +187,7 @@ namespace BotaNaRoda.WebApi.Controllers
             CloudBlockBlob thumbBlockBlob = container.GetBlockBlobReference(thumbImageInfo.Name);
             using (thumbMs)
             {
-                await thumbBlockBlob.UploadFromStreamAsync(thumbMs);
+                thumbBlockBlob.UploadFromStream(thumbMs);
             }
 
             thumbImageInfo.Url = thumbBlockBlob.Uri.ToString();

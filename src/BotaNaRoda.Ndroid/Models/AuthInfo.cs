@@ -23,25 +23,24 @@ namespace BotaNaRoda.Ndroid.Data
         public string IdentityToken { get; set; }
         public string RefreshToken { get; set; }
         public long ExpiresIn { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         public AuthInfo()
         {
-            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         //public void Update(AuthorizeResponse response)
         //{
-        //    CreatedAt = DateTime.UtcNow;
+        //    UpdatedAt = DateTime.UtcNow;
         //    ExpiresIn = response.ExpiresIn;
         //    IdentityToken = response.IdentityToken;
         //    AccessToken = response.AccessToken;
-        //    Code = response.Code;
         //}
 
         public void Update(TokenResponse response)
         {
-            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
             ExpiresIn = response.ExpiresIn;
             IdentityToken = response.IdentityToken;
             AccessToken = response.AccessToken;
@@ -50,7 +49,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public bool IsExpired()
         {
-            return CreatedAt.AddSeconds(ExpiresIn) <= DateTime.UtcNow;
+            return UpdatedAt.AddSeconds(ExpiresIn) <= DateTime.UtcNow;
         }
 
         private T GetPropFromTokenSafely<T>(string prop, string token)

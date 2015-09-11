@@ -42,7 +42,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
 			_refresher.Refresh += delegate
 			{
-				UpdateDataAdapter();
+			    UpdateDataAdapter(false);
 			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
@@ -55,7 +55,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
-            var scrollListener = new InfiniteScrollListener(_adapter, sglm, UpdateDataAdapter);
+            var scrollListener = new InfiniteScrollListener(_adapter, sglm, () => UpdateDataAdapter(true));
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
 
             _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
@@ -63,17 +63,13 @@ namespace BotaNaRoda.Ndroid.Controllers
             return view;
 		}
 
-		public override void OnStart ()
-		{
-			base.OnStart ();
-            UpdateDataAdapter();
-        }
-
 		public override void OnResume ()
 		{
 			base.OnResume ();
 			_locMgr.RequestLocationUpdates (_locMgr.GetBestProvider(new Criteria(), false), 20000, 100, this);
-		}
+
+            UpdateDataAdapter(false);
+        }
 
 		public override void OnPause ()
 		{
@@ -116,9 +112,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		}
 
-        private void UpdateDataAdapter()
+        private void UpdateDataAdapter(bool fromScroll)
         {
-            if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
+            if ((fromScroll && _itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy) 
+                || !fromScroll)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
                 _refresher.Refreshing = true;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -16,7 +17,6 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.OptionsModel;
-using Microsoft.Framework.Runtime;
 using Microsoft.Owin.Security.Facebook;
 using Newtonsoft.Json.Linq;
 using Owin;
@@ -24,6 +24,7 @@ using Serilog;
 using IdentityServer3;
 using Loggly;
 using Loggly.Config;
+using Microsoft.Dnx.Runtime;
 using Microsoft.Framework.Logging;
 using Constants = IdentityServer3.Core.Constants;
 
@@ -49,7 +50,7 @@ namespace BotaNaRoda.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             // maps the AppSettings configuration key to an instance of the configuration class
-            services.Configure<AppSettings>(Configuration.GetConfigurationSection("AppSettings"));
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             services.AddTransient<ItemsContext>();
 
@@ -70,7 +71,6 @@ namespace BotaNaRoda.WebApi
             ConfigureLogging(app, appSettings, loggerFactory);
 
             app.UseStaticFiles();
-
 
             app.Map("/core", core =>
             {
@@ -115,7 +115,7 @@ namespace BotaNaRoda.WebApi
                 api.UseOAuthBearerAuthentication(options =>
                 {
                     options.Authority = appSettings.Options.IdSvrAuthority;
-                    options.Audience = "https://botanaroda.com.br/resources";
+                    options.Audience = appSettings.Options.IdSvrAudience;
                     options.AutomaticAuthentication = true;
                 });
 
