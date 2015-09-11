@@ -39,8 +39,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             SetContentView(Resource.Layout.ItemDetail);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            _userRepository = new UserRepository(this);
-            _itemService = new ItemRestService(this, new UserRepository(this));
+            _userRepository = new UserRepository();
+            _itemService = new ItemRestService(this, new UserRepository());
 
             _holder = new ViewHolder
             {

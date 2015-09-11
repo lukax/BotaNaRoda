@@ -45,7 +45,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
 			_locMgr = GetSystemService(LocationService) as LocationManager;
-            _itemService = new ItemRestService(this, new UserRepository(this));
+            _itemService = new ItemRestService(this, new UserRepository());
 
             _holder = new ViewHolder
             {
@@ -95,7 +95,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                            .Load(imgUrl)
                            .Fit()
 						   .CenterCrop()
-                           .Tag(this)
+                           .MemoryPolicy(MemoryPolicy.NoCache)
                            .Into(holder);
 				}
                 else

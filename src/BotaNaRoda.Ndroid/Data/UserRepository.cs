@@ -24,9 +24,9 @@ namespace BotaNaRoda.Ndroid.Data
         private readonly Context _context;
         private const string ServiceId = "BotaNaRoda";
 
-        public UserRepository(Context context)
+        public UserRepository()
         {
-            _context = context;
+            _context = Application.Context;
         }
 
         public bool IsLoggedIn

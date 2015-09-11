@@ -58,7 +58,7 @@ namespace BotaNaRoda.Ndroid
 				_mDrawerLayout,						//DrawerLayout
 				Resource.String.ApplicationName,	//Opened Message
 				Resource.String.ApplicationName,		//Closed Message
-                new UserRepository(this)
+                new UserRepository()
 			);
 
 			_mDrawerLayout.SetDrawerListener(_mDrawerToggle);

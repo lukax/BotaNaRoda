@@ -23,7 +23,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			//SetContentView (Resource.Layout.Login);
             //ActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            _userRepository = new UserRepository(this);
+            _userRepository = new UserRepository();
             Login();
 		}
 
