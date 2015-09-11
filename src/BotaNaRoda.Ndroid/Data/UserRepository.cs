@@ -57,12 +57,25 @@ namespace BotaNaRoda.Ndroid.Data
         public void Save(AuthInfo authInfo)
         {
             Account acc = new Account(
-                authInfo.Username,
+                authInfo.Username ?? string.Empty,
                 new Dictionary<string, string>
                 {
                     {"authInfo", JsonConvert.SerializeObject(authInfo)}
                 });
+
+            DeleteExistingAccounts();
             AccountStore.Create(_context).Save(acc, ServiceId);
+        }
+
+        private void DeleteExistingAccounts()
+        {
+            foreach (var acc in AccountStore.Create(_context).FindAccountsForService(ServiceId))
+            {
+                if (acc != null)
+                {
+                    AccountStore.Create(_context).Delete(acc, ServiceId);
+                }
+            }
         }
     }
 }

@@ -168,6 +168,7 @@ namespace BotaNaRoda.Ndroid.Data
                 var authInfo = _userRepository.Get();
                 if (authInfo.IsExpired())
                 {
+                    //bug doing this manually because of crazy issue with IdentityModel
                     var httpResponseMessage = await _httpClient.PostAsync(Constants.IdSvrTokenEndpoint,
                         new FormUrlEncodedContent(new Dictionary<string, string>
                         {

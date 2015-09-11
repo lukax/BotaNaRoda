@@ -46,7 +46,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             {
                 ItemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage),
                 ItemAuthorNameView = FindViewById<TextView>(Resource.Id.itemsDetailAuthorName),
-                ItemAuthorImageView = FindViewById<ImageView>(Resource.Id.itemsDetailAuthorName),
+                ItemAuthorImageView = FindViewById<ImageView>(Resource.Id.itemsDetailAuthorImage),
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),

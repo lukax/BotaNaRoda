@@ -49,19 +49,26 @@ namespace BotaNaRoda.Ndroid.Data
 
         public bool IsExpired()
         {
-            return UpdatedAt.AddSeconds(ExpiresIn) <= DateTime.UtcNow;
+            if (ExpiresIn > 0)
+            {
+                return UpdatedAt.AddSeconds(ExpiresIn) <= DateTime.UtcNow;
+            }
+            return false;
         }
 
         private T GetPropFromTokenSafely<T>(string prop, string token)
         {
-            try
+            if (token != null)
             {
-                var tk = ParseToken(token);
-                return tk[prop].Value<T>();
-            }
-            catch (Exception ex)
-            {
-                Log.Warn("AuthInfo", "Could not get prop from token: " + ex.Message);
+                try
+                {
+                    var tk = ParseToken(token);
+                    return tk[prop].Value<T>();
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn("AuthInfo", "Could not get prop from token: " + ex.Message);
+                }
             }
             return default(T);
         }

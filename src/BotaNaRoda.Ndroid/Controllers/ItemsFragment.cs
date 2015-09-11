@@ -118,7 +118,10 @@ namespace BotaNaRoda.Ndroid.Controllers
                 || !fromScroll)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
-                _refresher.Refreshing = true;
+                if (fromScroll)
+                {
+                    _refresher.Refreshing = true;
+                }
                 _uiCancellation = new CancellationTokenSource();
                 _itemsLoader.LoadMoreItemsAsync()
                     .ContinueWith(task =>
