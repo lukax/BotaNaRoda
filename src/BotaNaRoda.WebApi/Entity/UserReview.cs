@@ -1,4 +1,5 @@
 using System;
+using BotaNaRoda.WebApi.Util;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -16,7 +17,7 @@ namespace BotaNaRoda.WebApi.Entity
 
         public UserReview()
         {
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = DateProvider.Get;
         }
     }
 }

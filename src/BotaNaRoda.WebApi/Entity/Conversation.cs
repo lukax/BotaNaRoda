@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using BotaNaRoda.WebApi.Util;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -23,19 +24,22 @@ namespace BotaNaRoda.WebApi.Entity
         [BsonRepresentation(BsonType.ObjectId)]
         public string ToUserId { get; set; }
 
-        public ICollection<ConversationMessage> Messages { get; set; }
+        public List<ConversationMessage> Messages { get; set; }
+
+        [BsonIgnoreIfNull]
+        public ConversationHubInfo HubInfo { get; set; }
 
         public Conversation()
         {
             Id = ObjectId.GenerateNewId().ToString();
-            CreatedAt = DateTime.UtcNow;
-            Messages = new HashSet<ConversationMessage>();
+            CreatedAt = DateProvider.Get;
+            Messages = new List<ConversationMessage>();
         }
     }
 
-    public class ConversationMessage
+    public class ConversationHubInfo
     {
-        public string Message { get; set; }
-        public DateTime Sent { get; set; }
+        public string FromUserConnectionId { get; set; }
+        public string ToUserConnectionId { get; set; }
     }
 }

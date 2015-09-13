@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
+using BotaNaRoda.WebApi.Util;
 using IdentityServer3.Core.Extensions;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
@@ -45,7 +46,7 @@ namespace BotaNaRoda.WebApi.Controllers
             }
 
             //Update item status
-            item.UpdatedAt = DateTime.UtcNow;
+            item.UpdatedAt = DateProvider.Get;
             item.Status = ItemStatus.Pending;
             item.ReservedBy = User.GetSubjectId();
 
@@ -84,7 +85,7 @@ namespace BotaNaRoda.WebApi.Controllers
                 return HttpBadRequest("Item was not reserved");
             }
 
-            item.UpdatedAt = DateTime.UtcNow;
+            item.UpdatedAt = DateProvider.Get;
             item.Status = ItemStatus.Available;
             item.ReservedBy = null;
 

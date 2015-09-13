@@ -60,7 +60,7 @@ namespace BotaNaRoda.WebApi.Controllers
                 //{ "status", 0 }
             //}
             var filter = Builders<Item>.Filter
-                .Eq(x => x.Status, ItemStatus.Available);
+                .Not(Builders<Item>.Filter.Eq(x => x.Status, ItemStatus.Unavailable));
 
             var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
             return items.Select(x => new ItemListViewModel(x));

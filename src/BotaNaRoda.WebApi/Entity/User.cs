@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BotaNaRoda.WebApi.Models;
+using BotaNaRoda.WebApi.Util;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
@@ -37,7 +38,7 @@ namespace BotaNaRoda.WebApi.Entity
         public User()
         {
             Id = ObjectId.GenerateNewId().ToString();
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = DateProvider.Get;
             Reviews = new HashSet<UserReview>();
         }
 
