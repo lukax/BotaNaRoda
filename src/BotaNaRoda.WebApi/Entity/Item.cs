@@ -34,17 +34,22 @@ namespace BotaNaRoda.WebApi.Entity
         public string CountryCode { get; set; }
         public string PostalCode { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ReservedBy { get; set; }
+
+        public ICollection<string> Subscribers { get; set; }
+
         public Item()
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
             Images = new HashSet<ImageInfo>();
+            Subscribers = new HashSet<string>();
         }
 
         public Item(ItemCreateBindingModel model, string userId) 
+            :this()
         {
-            Id = ObjectId.GenerateNewId().ToString();
-            CreatedAt = DateTime.UtcNow;
             Name = model.Name;
             UserId = userId;
             Description = model.Description;

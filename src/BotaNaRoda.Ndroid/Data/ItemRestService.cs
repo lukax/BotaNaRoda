@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Locations;
@@ -33,9 +34,9 @@ namespace BotaNaRoda.Ndroid.Data
         public bool CanLoadMoreItems { get; set; }
         public bool IsBusy { get; set; }
 
-        public ItemRestService(Context context, UserRepository userRepository)
+        public ItemRestService(UserRepository userRepository)
         {
-            _context = context;
+            _context = Application.Context;
             _userRepository = userRepository;
 
             _storagePath = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.Path, "BotaNaRoda");

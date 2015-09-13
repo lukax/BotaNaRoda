@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BotaNaRoda.WebApi.Entity
 {
-    public class UserRating
+    public class UserReview
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string FromUserId { get; set; }
@@ -14,7 +14,7 @@ namespace BotaNaRoda.WebApi.Entity
         public string Message { get; set; }
         public int Score { get; set; }
 
-        public UserRating()
+        public UserReview()
         {
             CreatedAt = DateTime.UtcNow;
         }

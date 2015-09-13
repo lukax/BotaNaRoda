@@ -19,4 +19,10 @@ namespace BotaNaRoda.WebApi.Models
         public string Name { get; set; }
         public string Locality { get; set; }
     }
+
+    public class UserReviewBindingModel
+    {
+        public string Message { get; set; }
+        public int Score { get; set; }
+    }
 }

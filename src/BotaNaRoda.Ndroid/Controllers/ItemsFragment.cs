@@ -36,11 +36,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 			_userRepository = new UserRepository();
-			_itemService = new ItemRestService(Activity, _userRepository);
+			_itemService = new ItemRestService(_userRepository);
             _itemsLoader = new ItemsLoader(_itemService, 20);
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            _refresher.Activated = false;
+            _refresher.Enabled = false;
 			_refresher.Refresh += delegate
 			{
 			    UpdateDataAdapter(false);

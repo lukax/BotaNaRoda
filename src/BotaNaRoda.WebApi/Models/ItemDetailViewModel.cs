@@ -20,6 +20,7 @@ namespace BotaNaRoda.WebApi.Models
             Latitude = item.Loc.Latitude;
             Longitude = item.Loc.Longitude;
             Address = item.Address;
+            ReservedByMe = item.ReservedBy == userViewModel.Id;
         }
 
         public string Id { get; set; }
@@ -40,5 +41,7 @@ namespace BotaNaRoda.WebApi.Models
         public double Longitude { get; set; }
         public string Address { get; set; }
         public string Locality { get; set; }
+
+        public bool ReservedByMe { get; set; }
     }
 }

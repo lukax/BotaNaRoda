@@ -46,8 +46,8 @@ namespace BotaNaRoda.WebApi.Controllers
         {
             const double earthRadiusInKm = 6371.009;
 
-            var items = await _itemsContext.Items.Find(new BsonDocument
-            {
+            //new BsonDocument
+            //{
                 //{ "loc", new BsonDocument
                 //    {
                 //        { "$geoWithin", new BsonDocument
@@ -58,7 +58,11 @@ namespace BotaNaRoda.WebApi.Controllers
                 //    }
                 //},
                 //{ "status", 0 }
-            }).Skip(skip).Limit(limit).ToListAsync();
+            //}
+            var filter = Builders<Item>.Filter
+                .Eq(x => x.Status, ItemStatus.Available);
+
+            var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
             return items.Select(x => new ItemListViewModel(x));
         }
 

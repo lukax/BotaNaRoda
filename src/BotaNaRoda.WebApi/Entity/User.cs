@@ -29,7 +29,7 @@ namespace BotaNaRoda.WebApi.Entity
         public string PostalCode { get; set; }
 
         public int Credits { get; set; }
-        public ICollection<UserRating> Ratings { get; set; }
+        public ICollection<UserReview> Reviews { get; set; }
 
         public string Provider { get; set; }
         public string ProviderId { get; set; }
@@ -38,13 +38,12 @@ namespace BotaNaRoda.WebApi.Entity
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateTime.UtcNow;
-            Ratings = new HashSet<UserRating>();
+            Reviews = new HashSet<UserReview>();
         }
 
         public User(RegisterUserBindingModel model)
+            :this()
         {
-            Id = ObjectId.GenerateNewId().ToString();
-            CreatedAt = DateTime.UtcNow;
             Username = model.Username;
             Avatar = model.Avatar;
             Loc = GeoJson.Geographic(model.Longitude, model.Latitude);
