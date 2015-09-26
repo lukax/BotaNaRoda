@@ -43,7 +43,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _refresher.Enabled = false;
 			_refresher.Refresh += delegate
 			{
-			    UpdateDataAdapter(false);
+			    Activity.RunOnUiThread(() => UpdateDataAdapter(false));
 			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;

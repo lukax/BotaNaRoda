@@ -27,7 +27,6 @@ namespace BotaNaRoda.WebApi.Data
 
         public IMongoCollection<Conversation> Conversations => _db.GetCollection<Conversation>("conversations");
 
-
         private async void CreateIndexes()
         {
             await Items.Indexes.CreateOneAsync(Builders<Item>.IndexKeys.Geo2DSphere(x => x.Loc));

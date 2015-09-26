@@ -35,6 +35,8 @@ namespace BotaNaRoda.WebApi.Entity
         public string Provider { get; set; }
         public string ProviderId { get; set; }
 
+        public string PushDeviceRegistrationId { get; set; }
+
         public User()
         {
             Id = ObjectId.GenerateNewId().ToString();

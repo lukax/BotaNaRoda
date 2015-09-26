@@ -10,7 +10,8 @@ using Xamarin.Auth;
 namespace BotaNaRoda.Ndroid.Controllers
 {
 	[Activity (Label = "Login",
-		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
+		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
+        LaunchMode = Android.Content.PM.LaunchMode.SingleTask,
         ParentActivity = typeof(MainActivity))]
 	public class LoginActivity : Activity
 	{

@@ -30,14 +30,17 @@ namespace BotaNaRoda.WebApi.Controllers
     public class ItemsController : Controller
     {
         private readonly ItemsContext _itemsContext;
+        private readonly NotificationService _notificationService;
         private readonly IOptions<AppSettings> _appSettings;
         private readonly ILogger<ItemsController> _logger;
 
-        public ItemsController(ItemsContext itemsContext, IOptions<AppSettings> appSettings, ILogger<ItemsController> logger)
+        public ItemsController(ILogger<ItemsController> logger, IOptions<AppSettings> appSettings,
+            ItemsContext itemsContext, NotificationService notificationService)
         {
-            _itemsContext = itemsContext;
-            _appSettings = appSettings;
             _logger = logger;
+            _appSettings = appSettings;
+            _itemsContext = itemsContext;
+            _notificationService = notificationService;
         }
 
         // GET: api/items
@@ -73,8 +76,7 @@ namespace BotaNaRoda.WebApi.Controllers
             var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (item == null)
             {
-                _logger.LogError("Unable to find item with id: " + id);
-                return HttpNotFound();
+                return HttpNotFound("Unable to find item with id: " + id);
             }
 
             var user = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
@@ -102,8 +104,17 @@ namespace BotaNaRoda.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
+            var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (item == null)
+            {
+                return HttpNotFound("Unable to find item with id: " + id);
+            }
+
+            _notificationService.OnItemDelete(item);
+
             var userId = User.GetSubjectId();
             var result = await _itemsContext.Items.DeleteOneAsync(x => x.Id == id && x.UserId == userId);
+            
             //TODO acknowledge result
             //if (result.DeletedCount > 0)
             //{

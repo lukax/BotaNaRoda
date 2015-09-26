@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="BotaNaRoda.Ndroid" android:versionCode="1" android:versionName="1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="br.com.botanaroda.ndroid" android:versionCode="1" android:versionName="1.0">
 	<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="22" />
-	<application android:label="BotaNaRoda.Ndroid" android:icon="@drawable/Icon">
+	<application android:label="@string/ApplicationName" android:icon="@drawable/Icon">
 		<!-- Put your Google Maps V2 API Key here. -->
 		<meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCL6h3cXWTNL0Y7izKUiWnqFSdQpT-jIyI" />
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 	</application>
+  
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -21,5 +22,10 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<!-- Permission to receive remote notifications from Google Play Services -->
 	<!-- Notice here that we have the package name of our application as a prefix on the permissions. -->
-	<uses-permission android:name="BotaNaRoda.Ndroid.permission.MAPS_RECEIVE" />
+  <uses-permission android:name="br.com.botanaroda.ndroid.permission.MAPS_RECEIVE" />
+  <permission android:name="br.com.botanaroda.ndroid.permission.MAPS_RECEIVE" android:protectionLevel="signature" />
+  <!--GCM-->
+  <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <permission android:name="br.com.botanaroda.ndroid.permission.C2D_MESSAGE" android:protectionLevel="signature" />
 </manifest>

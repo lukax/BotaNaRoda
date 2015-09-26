@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -24,6 +26,7 @@ namespace BotaNaRoda.Ndroid
 {
 	[Activity(
         Label = "Bota na Roda", MainLauncher = true, Icon = "@drawable/icon",
+        LaunchMode = Android.Content.PM.LaunchMode.SingleTask,
         Theme = "@style/MainTheme")]
     public class MainActivity : AppCompatActivity, AdapterView.IOnItemClickListener
 	{
@@ -39,7 +42,7 @@ namespace BotaNaRoda.Ndroid
 			base.OnCreate (bundle);
 			SetContentView (Resource.Layout.Main);
 
-			_mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
+            _mDrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
 			_mLeftDrawer = FindViewById<ListView>(Resource.Id.left_drawer);
 			SupportActionBar.SetDisplayHomeAsUpEnabled (true);
 			SupportActionBar.SetHomeButtonEnabled(true);
@@ -66,7 +69,10 @@ namespace BotaNaRoda.Ndroid
 
             //Container
             LoadFragment(_mLeftDataSet.First().Value);
-		}
+
+            //Check for gplay
+            IsPlayServicesAvailable();
+        }
 
 	    protected override void OnStart()
 	    {
@@ -104,9 +110,7 @@ namespace BotaNaRoda.Ndroid
 			base.OnConfigurationChanged (newConfig);
 			_mDrawerToggle.OnConfigurationChanged(newConfig);
 		}
-
-
-
+        
         private void LoadFragment(Type value)
         {
             var tx = SupportFragmentManager.BeginTransaction();
@@ -128,6 +132,25 @@ namespace BotaNaRoda.Ndroid
             _mDrawerLayout.CloseDrawers();
             LoadFragment(_mLeftDataSet.ElementAt(position).Value);
 	    }
-	}
+
+        private bool IsPlayServicesAvailable()
+        {
+            int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
+            if (resultCode != ConnectionResult.Success)
+            {
+                if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
+                {
+                    GoogleApiAvailability.Instance.ShowErrorNotification(this, resultCode);
+                }
+                else
+                {
+                    Toast.MakeText(this, "Sorry, this device is not supported", ToastLength.Long);
+                    Finish();
+                }
+                return false;
+            }
+            return true;
+        }
+    }
 }
 

@@ -52,16 +52,13 @@ namespace BotaNaRoda.WebApi
             // maps the AppSettings configuration key to an instance of the configuration class
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
-            services.AddTransient<ItemsContext>();
+            //------ CONTAINER STUFF
+            services.AddSingleton<ItemsContext>();
+            services.AddSingleton<NotificationService>();
+            //-------
 
             services.AddMvc();
-
             services.AddSignalR();
-            
-            // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
-            // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
-            // services.AddWebApiConventions();
-
             services.AddDataProtection();
         }
 
@@ -122,7 +119,6 @@ namespace BotaNaRoda.WebApi
                 api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.BotaNaRodaApiScope });
 
                 api.UseMvc();
-
                 app.UseSignalR();
             });
         }

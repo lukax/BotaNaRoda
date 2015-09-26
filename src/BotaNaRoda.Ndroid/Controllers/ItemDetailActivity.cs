@@ -84,8 +84,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void ReserveItem(object sender, EventArgs e)
         {
-            _holder.ReserveButton.Text = "Reservado";
-            _holder.ReserveButton.Enabled = false;
+            RunOnUiThread(() =>
+            {
+                _holder.ReserveButton.Text = "Reservado";
+                _holder.ReserveButton.Enabled = false;
+            });
         }
 
         void DeleteItem()

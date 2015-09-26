@@ -161,7 +161,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		        Longitude = _currentLocation.Longitude
 		    };
 
-
             //ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();

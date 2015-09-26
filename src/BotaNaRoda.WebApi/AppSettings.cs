@@ -9,5 +9,6 @@
         public string BotaNaRodaConnectionString { get; set; }
         public string StorageConnectionString { get; set; }
         public string LogglyCustomerToken { get; set; }
+        public string AndroidApiKey { get; set; }
     }
 }

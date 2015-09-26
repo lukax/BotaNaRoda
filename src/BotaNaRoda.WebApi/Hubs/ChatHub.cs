@@ -23,10 +23,12 @@ namespace BotaNaRoda.WebApi.Hubs
     public class ChatHub : Hub<IChatHubClient>
     {
         private readonly ItemsContext _context;
+        private readonly NotificationService _notificationService;
 
-        public ChatHub(ItemsContext context)
+        public ChatHub(ItemsContext context, NotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<dynamic> Connect(string conversationId)
@@ -99,6 +101,8 @@ namespace BotaNaRoda.WebApi.Hubs
                     {
                         Message = sendMessageModel.Message
                     });
+
+                    _notificationService.OnConversationMessageSent(conversation);
                 }
             }
         }

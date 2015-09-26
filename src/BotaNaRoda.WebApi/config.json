@@ -6,6 +6,7 @@
     "BotaNaRodaConnectionString": "mongodb://localhost",
     "BotaNaRodaDatabaseName": "botanaroda",
     "StorageConnectionString": "",
-    "LogglyCustomerToken":  ""
+    "LogglyCustomerToken":  "",
+    "AndroidApiKey":  "AIzaSyCL6h3cXWTNL0Y7izKUiWnqFSdQpT-jIyI"
   }
 }

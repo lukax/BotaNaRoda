@@ -18,13 +18,16 @@ namespace BotaNaRoda.WebApi.Controllers
     [Authorize]
     public class ReservationsController : Controller
     {
-        private readonly ItemsContext _itemsContext;
         private readonly ILogger<ReservationsController> _logger;
+        private readonly ItemsContext _itemsContext;
+        private readonly NotificationService _notificationService;
 
-        public ReservationsController(ItemsContext itemsContext, ILogger<ReservationsController> logger)
+        public ReservationsController(ILogger<ReservationsController> logger, 
+            ItemsContext itemsContext, NotificationService notificationService)
         {
-            _itemsContext = itemsContext;
             _logger = logger;
+            _itemsContext = itemsContext;
+            _notificationService = notificationService;
         }
 
         [HttpPost("{itemId}")]
@@ -68,6 +71,8 @@ namespace BotaNaRoda.WebApi.Controllers
 
             await _itemsContext.Conversations.InsertOneAsync(itemConversation);
 
+            _notificationService.OnItemReservation(item);
+
             return new JsonResult(itemConversation.Id);
         }
 
@@ -94,6 +99,8 @@ namespace BotaNaRoda.WebApi.Controllers
                 Builders<Item>.Update
                     .Set(x => x.UpdatedAt, item.UpdatedAt)
                     .Set(x => x.ReservedBy, item.ReservedBy));
+
+            _notificationService.OnItemReservationCancelled(item);
 
             return new HttpOkResult();
         }
@@ -168,6 +175,8 @@ namespace BotaNaRoda.WebApi.Controllers
                     Builders<User>.Filter.Eq(x => x.Id, item.UserId),
                     Builders<User>.Update
                         .AddToSet(x => x.Reviews, review));
+
+                _notificationService.OnItemReceived(item);
 
                 return new HttpOkResult();
             }
