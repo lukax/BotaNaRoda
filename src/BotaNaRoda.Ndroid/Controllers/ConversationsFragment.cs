@@ -17,6 +17,8 @@ namespace BotaNaRoda.Ndroid
         private ItemRestService _itemService;
         private ListView _itemsListView;
         private ConversationListAdapter _adapter;
+        private IList<ConversationListViewModel> _conversations;
+        private BackgroundWorker _refreshWorker;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -30,34 +32,42 @@ namespace BotaNaRoda.Ndroid
             _itemsListView.Adapter = _adapter;
             _itemsListView.ItemClick += _itemsListView_ItemClick;
 
-            LoadMessages();
+            Refresh();
 
             return view;
         }
 
-        private void LoadMessages()
+        private void Refresh()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
+            _refreshWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
+            _refreshWorker.DoWork += (sender, args) =>
             {
-                args.Result = _itemService.GetAllConversations().Result;
+                _conversations = _itemService.GetAllConversations().Result;
             };
-            worker.RunWorkerCompleted += (sender, args) =>
+            _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
-                Activity.RunOnUiThread(() =>
-                {
-                    _adapter.Conversations = ((IList<ConversationListViewModel>) args.Result);
-                    _adapter.NotifyDataSetChanged();
-                });    
+                Activity.RunOnUiThread(UpdateUi);    
             };
-            worker.RunWorkerAsync();
+            _refreshWorker.RunWorkerAsync();
+        }
+
+        private void UpdateUi()
+        {
+            _adapter.Conversations = _conversations;
+            _adapter.NotifyDataSetChanged();
         }
 
         private void _itemsListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            Intent itemDetailIntent = new Intent(Activity, typeof(ConversationDetailActivity));
+            Intent itemDetailIntent = new Intent(Activity, typeof(ChatActivity));
             itemDetailIntent.PutExtra("conversationIdId", e.Id);
             Activity.StartActivity(itemDetailIntent);
+        }
+
+        public override void OnDestroy()
+        {
+            _refreshWorker.CancelAsync();
+            base.OnDetach();
         }
     }
 }

@@ -19,6 +19,7 @@ using Android.Support.V4.Widget;
 using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Data;
+using BotaNaRoda.Ndroid.Gcm;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
 using Fragment = Android.Support.V4.App.Fragment;

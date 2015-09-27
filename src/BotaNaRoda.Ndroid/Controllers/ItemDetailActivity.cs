@@ -32,6 +32,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemRestService _itemService;
         private UserRepository _userRepository;
         private ViewHolder _holder;
+        private BackgroundWorker _refreshWorker;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -111,16 +112,16 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void Refresh()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
+            _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
+            _refreshWorker.DoWork += (sender, args) =>
             {
                 _item = _itemService.GetItem(Intent.GetStringExtra("itemId")).Result;
             };
-            worker.RunWorkerCompleted += (sender, args) =>
+            _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
                 RunOnUiThread(UpdateUi);
             };
-            worker.RunWorkerAsync();
+            _refreshWorker.RunWorkerAsync();
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -161,6 +162,12 @@ namespace BotaNaRoda.Ndroid.Controllers
                .CenterCrop()
                .Tag(this)
                .Into(_holder.ItemImageView);
+        }
+
+        protected override void OnDestroy()
+        {
+            _refreshWorker?.CancelAsync();
+            base.OnDestroy();
         }
 
         private class ViewHolder

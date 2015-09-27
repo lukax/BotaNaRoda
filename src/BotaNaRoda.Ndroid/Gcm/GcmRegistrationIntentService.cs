@@ -1,32 +1,25 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.Gms.Gcm;
 using Android.Gms.Gcm.Iid;
-using Android.OS;
-using Android.Runtime;
 using Android.Util;
-using Android.Views;
-using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
-using ModernHttpClient;
 
-namespace BotaNaRoda.Ndroid.Auth
+namespace BotaNaRoda.Ndroid.Gcm
 {
     [Service(Exported = false)]
     public class GcmRegistrationIntentService : IntentService
     {
         static readonly object Locker = new object();
         private readonly ItemRestService _itemsService;
+        private bool _tokenSent = false;
+        private UserRepository _userRepository;
 
         public GcmRegistrationIntentService() : base("RegistrationIntentService")
         {
-            _itemsService = new ItemRestService(new UserRepository());
+            _userRepository = new UserRepository();
+            _itemsService = new ItemRestService(_userRepository);
         }
 
         protected override void OnHandleIntent(Intent intent)
@@ -36,9 +29,8 @@ namespace BotaNaRoda.Ndroid.Auth
                 Log.Info("RegistrationIntentService", "Calling InstanceID.GetToken");
                 lock (Locker)
                 {
-                    var instanceID = InstanceID.GetInstance(this);
-                    var token = instanceID.GetToken(
-                        "YOUR_SERVER_ID", GoogleCloudMessaging.InstanceIdScope, null);
+                    var instanceId = InstanceID.GetInstance(this);
+                    var token = instanceId.GetToken(GetString(Resource.String.gcm_defaultSenderId), GoogleCloudMessaging.InstanceIdScope, null);
 
                     Log.Info("RegistrationIntentService", "GCM Registration Token: " + token);
                     SendRegistrationToAppServer(token);
@@ -54,8 +46,10 @@ namespace BotaNaRoda.Ndroid.Auth
 
         void SendRegistrationToAppServer(string token)
         {
-            //TODO store info that has already been sent
-            _itemsService.PostDeviceRegistrationId(token).Wait();
+            if (!_tokenSent && _userRepository.IsLoggedIn)
+            {
+                _tokenSent = _itemsService.PostDeviceRegistrationId(token).Result;
+            }
         }
 
         void Subscribe(string token)

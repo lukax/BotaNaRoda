@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Entity;
 using Microsoft.Framework.OptionsModel;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using PushSharp;
 using PushSharp.Android;
 
@@ -21,34 +22,83 @@ namespace BotaNaRoda.WebApi.Data
             _itemsContext = itemsContext;
         }
 
-        public void OnItemReservation(Item item)
+        public async void OnItemReservation(Item item)
         {
-            string registrationId = "";
-            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(registrationId)
+            var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
                 .WithJson(new
                 {
-                    
+                    itemReserved = new {
+                        itemId = item.Id,
+                        itemName = item.Name
+                    }
                 }.ToJson()));
         }
 
-        public void OnItemReservationCancelled(Item item)
+        public async void OnItemReservationCancelled(Item item)
         {
+            var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
+                .WithJson(new
+                {
+                    itemCancelled = new
+                    {
+                        itemId = item.Id,
+                        itemName = item.Name
+                    }
+                }.ToJson()));
         }
 
-        public void OnItemReceived(Item item)
+        public async void OnItemReceived(Item item)
         {
+            var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
+                .WithJson(new
+                {
+                    itemReceived = new
+                    {
+                        itemId = item.Id,
+                        itemName = item.Name
+                    }
+                }.ToJson()));
         }
 
-        public void OnItemDelete(Item item)
+        public async void OnItemDelete(Item item)
         {
+            var subscribers = await _itemsContext.Users.Find(x => item.Subscribers.Contains(x.Id)).ToListAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(subscribers.Select(x=> x.PushDeviceRegistrationId))
+                .WithJson(new
+                {
+                    itemDeleted = new
+                    {
+                        itemId = item.Id,
+                        itemName = item.Name
+                    }
+                }.ToJson()));
         }
 
-        public void OnConversationMessageSent(Conversation conversation)
+        public async void OnConversationMessageSent(Conversation conversation, string receivingEndUserId)
         {
+            var item = await _itemsContext.Items.Find(x => x.Id == conversation.ItemId).FirstAsync();
+            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == receivingEndUserId).FirstAsync();
+            
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(receivingEndUser.PushDeviceRegistrationId)
+                .WithJson(new
+                {
+                    conversation = new
+                    {
+                        id = conversation.Id,
+                        itemName = item.Name,
+                    }
+                }.ToJson()));
         }
 
         private PushBroker _androidPushBroker;
-        private PushBroker AndroidPushBroker
+        public PushBroker AndroidPushBroker
         {
             get
             {

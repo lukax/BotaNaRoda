@@ -24,7 +24,7 @@ namespace BotaNaRoda.WebApi.Entity
         [BsonRepresentation(BsonType.ObjectId)]
         public string ToUserId { get; set; }
 
-        public List<ConversationMessage> Messages { get; set; }
+        public List<ConversationChatMessage> Messages { get; set; }
 
         [BsonIgnoreIfNull]
         public ConversationHubInfo HubInfo { get; set; }
@@ -33,7 +33,7 @@ namespace BotaNaRoda.WebApi.Entity
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateProvider.Get;
-            Messages = new List<ConversationMessage>();
+            Messages = new List<ConversationChatMessage>();
         }
     }
 

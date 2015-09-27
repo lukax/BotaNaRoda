@@ -88,22 +88,19 @@ namespace BotaNaRoda.WebApi.Hubs
                 //add msg to conversation
                 await _context.Conversations.UpdateOneAsync(
                     Builders<Conversation>.Filter.Eq(x => x.Id, sendMessageModel.ConversationId),
-                    Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationMessage {Message = sendMessageModel.Message}));
+                    Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage {Message = sendMessageModel.Message}));
 
-                string clientConnectionId = conversation.HubInfo.ToUserConnectionId;
-                if (conversation.ToUserId == userId)
-                {
-                    clientConnectionId = conversation.HubInfo.FromUserConnectionId;
-                }
-                if (clientConnectionId != null)
-                {
-                    Clients.Client(clientConnectionId).OnMessageReceived(new
+
+                Clients.Clients(new [] { conversation.HubInfo.ToUserConnectionId, conversation.HubInfo.FromUserConnectionId})
+                    .OnMessageReceived(new
                     {
                         Message = sendMessageModel.Message
                     });
 
-                    _notificationService.OnConversationMessageSent(conversation);
-                }
+                var receivingEndUserId = userId == conversation.FromUserId
+                    ? conversation.ToUserId
+                    : conversation.FromUserId;
+                _notificationService.OnConversationMessageSent(conversation, receivingEndUserId);
             }
         }
 

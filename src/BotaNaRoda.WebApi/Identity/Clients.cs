@@ -31,7 +31,7 @@ namespace BotaNaRoda.WebApi.Identity
                         "https://botanaroda.azurewebsites.net/core",
                     },
                     IdentityTokenLifetime = 360,
-                    AccessTokenLifetime = 3600
+                    AccessTokenLifetime = 36000
                 },
 
 #if DEBUG

@@ -106,9 +106,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
-    <Compile Include="Auth\GcmRegistrationIntentService.cs" />
+    <Compile Include="Gcm\GcmRegistrationIntentService.cs" />
+    <Compile Include="Gcm\MyGcmListenerService.cs" />
+    <Compile Include="Gcm\MyInstanceIDListenerService.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Controllers\ConversationDetailActivity.cs" />
+    <Compile Include="Controllers\ChatActivity.cs" />
+    <Compile Include="Controllers\ChatMessageAdapter.cs" />
     <Compile Include="Models\ConversationListViewModel.cs" />
     <Compile Include="Controllers\ConversationListAdapter.cs" />
     <Compile Include="Controllers\ConversationsFragment.cs" />
@@ -164,6 +167,9 @@
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_action_help.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_action_refresh.png" />
+    <AndroidResource Include="Resources\layout\ChatMessage.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />

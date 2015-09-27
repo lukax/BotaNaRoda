@@ -15,7 +15,7 @@ namespace BotaNaRoda.WebApi.Models
         public string ItemThumbImage { get; set; }
     }
 
-    public class ConversationDetailViewModel
+    public class ConversationDetailViewModel 
     {
         public string Id { get; set; }
         public DateTime LastUpdated { get; set; }
@@ -23,8 +23,8 @@ namespace BotaNaRoda.WebApi.Models
         public string ToUserAvatar { get; set; }
         public string ItemName { get; set; }
         public string ItemThumbImage { get; set; }
-        public double ItemLatitude { get; set; }
-        public double ItemLongitude { get; set; }
-        public List<ConversationMessage> Messages { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public List<ConversationChatMessage> Messages { get; set; }
     }
 }

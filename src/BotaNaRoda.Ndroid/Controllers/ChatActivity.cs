@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Resources;
 using Android.App;
@@ -15,18 +17,23 @@ namespace BotaNaRoda.Ndroid
     [Activity(Label = "Bota na Roda",
         Theme = "@style/ItemDetailTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
         ParentActivity = typeof (MainActivity))]
-    public class ConversationDetailActivity : AppCompatActivity
+    public class ChatActivity : AppCompatActivity
     {
         private UserRepository _userRepository;
         private ItemRestService _itemService;
         private ConversationDetailViewModel _conversation;
         private ViewHolder _holder;
+        private ChatMessageAdapter _adapter;
+        private BackgroundWorker _refreshWorker;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.ConversationListItem);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            _userRepository = new UserRepository();
+            _itemService = new ItemRestService(new UserRepository());
 
             _holder = new ViewHolder
             {
@@ -40,35 +47,53 @@ namespace BotaNaRoda.Ndroid
                 ChatSendButton = FindViewById<ImageButton>(Resource.Id.chatSendButton)
             };
 
-            _userRepository = new UserRepository();
-            _itemService = new ItemRestService(new UserRepository());
+            _adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>());
+            _holder.MessageList.Adapter = _adapter;
+            _holder.ChatSendButton.Click += ChatSendButtonOnClick;
+
+            Refresh();
+        }
+
+        private void ChatSendButtonOnClick(object sender, EventArgs eventArgs)
+        {
+            var msg = _holder.ChatMessageText.Text;
+            //...
+            _holder.ChatMessageText.Text = "";
         }
 
         private void Refresh()
         {
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (sender, args) =>
+            _refreshWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
+            _refreshWorker.DoWork += (sender, args) =>
             {
                 _conversation = _itemService.GetConversation(Intent.GetStringExtra("conversationId")).Result;
             };
-            worker.RunWorkerCompleted += (sender, args) =>
+            _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
                 RunOnUiThread(UpdateUi);
             };
-            worker.RunWorkerAsync();
+            _refreshWorker.RunWorkerAsync();
         }
-
 
         private void UpdateUi()
         {
+            var authInfo = _userRepository.Get();
+
             _holder.ItemName.Text = _conversation.ItemName;
-            _holder.ItemDistance.Text = _conversation.
+            _holder.ItemDistance.Text = _conversation.DistanceTo(authInfo);
             _holder.UserName.Text = _conversation.ToUserName;
 
             Picasso.With(this).Load(_conversation.ItemThumbImage).Fit().Tag(this).Into(_holder.ItemImage);
-            Picasso.With(this).Load(_conversation.ToUserAvatar).Fit().Tag(this).Into(_holder.AuthorImage);
+            Picasso.With(this).Load(_conversation.ToUserAvatar).Fit().Tag(this).Into(_holder.UserImage);
 
+            _adapter.ChatMessages = _conversation.Messages;
+            _adapter.NotifyDataSetChanged();
+        }
 
+        protected override void OnDestroy()
+        {
+            _refreshWorker?.CancelAsync();
+            base.OnDestroy();
         }
 
         private class ViewHolder
@@ -79,7 +104,6 @@ namespace BotaNaRoda.Ndroid
             internal ImageView UserImage;
             internal TextView UserName;
             internal ListView MessageList;
-            internal ImageView AuthorImage;
             internal EditText ChatMessageText;
             internal ImageButton ChatSendButton;
         }
