@@ -28,6 +28,9 @@ namespace BotaNaRoda.Ndroid.Data
         private readonly UserRepository _userRepository;
         private const string BotaNaRodaItemsEndpoint = Constants.BotaNaRodaEndpoint + "/items";
         private const string BotaNaRodaUsersEndpoint = Constants.BotaNaRodaEndpoint + "/users";
+        private const string BotaNaRodaConversationsEndpoint = Constants.BotaNaRodaEndpoint + "/conversations";
+        private const string BotaNaRodaAccountEndpoint = Constants.BotaNaRodaEndpoint + "/account";
+
         private readonly HttpClient _httpClient;
         private readonly string _storagePath;
 
@@ -51,13 +54,13 @@ namespace BotaNaRoda.Ndroid.Data
         {
         }
 
-        public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
+        public async Task<IList<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
         {
             var userInfo = _userRepository.Get();
             return await GetAllItems(userInfo.Latitude, userInfo.Longitude, radius, skip, limit);
         }
 
-        public async Task<IEnumerable<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
+        public async Task<IList<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
         {
             await SetupAuthorizationHeader();
 
@@ -65,7 +68,7 @@ namespace BotaNaRoda.Ndroid.Data
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<IEnumerable<ItemListViewModel>>(json);
+                return JsonConvert.DeserializeObject<IList<ItemListViewModel>>(json);
             }
 
             return new List<ItemListViewModel>();
@@ -159,6 +162,54 @@ namespace BotaNaRoda.Ndroid.Data
 				}
 
             }
+            return null;
+        }
+
+        public async Task<bool> PostDeviceRegistrationId(string registrationId)
+        {
+            await SetupAuthorizationHeader();
+
+            var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "DeviceRegistrationId"),
+                new StringContent(JsonConvert.SerializeObject(registrationId), System.Text.Encoding.UTF8,
+                    "application/json"));
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> PostUserLocalization(UserLocalizationBindingModel localization)
+        {
+            await SetupAuthorizationHeader();
+
+            var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "Localization"),
+                new StringContent(JsonConvert.SerializeObject(localization), System.Text.Encoding.UTF8,
+                    "application/json"));
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<IList<ConversationListViewModel>> GetAllConversations()
+        {
+            await SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(BotaNaRodaConversationsEndpoint);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IList<ConversationListViewModel>>(json);
+            }
+
+            return new List<ConversationListViewModel>();
+        }
+
+        public async Task<ConversationDetailViewModel> GetConversation(string id)
+        {
+            await SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(Path.Combine(BotaNaRodaConversationsEndpoint, id));
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ConversationDetailViewModel>(json);
+            }
+
             return null;
         }
 

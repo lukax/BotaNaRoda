@@ -106,8 +106,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
+    <Compile Include="Auth\GcmRegistrationIntentService.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Models\ConversationViewModel.cs" />
+    <Compile Include="Controllers\ConversationDetailActivity.cs" />
+    <Compile Include="Models\ConversationListViewModel.cs" />
     <Compile Include="Controllers\ConversationListAdapter.cs" />
     <Compile Include="Controllers\ConversationsFragment.cs" />
     <Compile Include="Controllers\InfiniteScrollListener.cs" />
@@ -117,7 +119,7 @@
     <Compile Include="Auth\AuthInfo.cs" />
     <Compile Include="Data\UserRepository.cs" />
     <Compile Include="Models\CategoryType.cs" />
-    <Compile Include="Models\ILocation.cs" />
+    <Compile Include="Models\ILatLon.cs" />
     <Compile Include="Models\ImageInfo.cs" />
     <Compile Include="Models\ItemCreateBindingModel.cs" />
     <Compile Include="Models\ItemDetailViewModel.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Models\ItemStatus.cs" />
     <Compile Include="Models\RegisterUserBindingModel.cs" />
     <Compile Include="Models\UserDetailViewModel.cs" />
+    <Compile Include="Models\UserLocalizationBindingModel.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\ItemsAdapter.cs" />

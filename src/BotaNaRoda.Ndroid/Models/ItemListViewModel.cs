@@ -2,7 +2,7 @@
 
 namespace BotaNaRoda.Ndroid.Models
 {
-    public class ItemListViewModel : ILocation
+    public class ItemListViewModel : ILatLon
     {
         public string Id { get; set; }
         public DateTime CreatedAt { get; set; }

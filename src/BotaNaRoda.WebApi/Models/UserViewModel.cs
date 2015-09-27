@@ -1,4 +1,5 @@
 ﻿using BotaNaRoda.WebApi.Entity;
+using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace BotaNaRoda.WebApi.Models
 {
@@ -18,11 +19,5 @@ namespace BotaNaRoda.WebApi.Models
         public string Avatar { get; set; }
         public string Name { get; set; }
         public string Locality { get; set; }
-    }
-
-    public class UserReviewBindingModel
-    {
-        public string Message { get; set; }
-        public int Score { get; set; }
     }
 }

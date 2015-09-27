@@ -20,13 +20,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 	{
 	    private readonly Context _context;
 	    private readonly IList<ItemListViewModel> _items;
-	    public ILocation UserLocation { get; set; }
+	    public ILatLon UserLatLon { get; set; }
 
-		public ItemsAdapter (Context context, IList<ItemListViewModel> items, ILocation userLocation)
+		public ItemsAdapter (Context context, IList<ItemListViewModel> items, ILatLon userLatLon)
 		{
 		    _context = context;
 		    _items = items;
-		    UserLocation = userLocation;
+		    UserLatLon = userLatLon;
 		}
 
 	    public override int ItemCount
@@ -59,7 +59,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 {
                     viewHolder.ItemId = item.Id;
                     viewHolder.Name.Text = item.Name;
-                    viewHolder.Distance.Text = item.DistanceTo(UserLocation);
+                    viewHolder.Distance.Text = item.DistanceTo(UserLatLon);
                     viewHolder.Image.Post(() =>
                     {
                         Picasso.With(_context)

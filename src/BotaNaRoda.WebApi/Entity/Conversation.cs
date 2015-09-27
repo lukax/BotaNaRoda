@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BotaNaRoda.WebApi.Entity
 {
-    public class Conversation
+    public class Conversation : IUpdatable
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }

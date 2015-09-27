@@ -16,6 +16,7 @@ using Android.Widget;
 using Android.Support.V7.App;
 using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Support.V4.Widget;
+using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
@@ -71,7 +72,11 @@ namespace BotaNaRoda.Ndroid
             LoadFragment(_mLeftDataSet.First().Value);
 
             //Check for gplay
-            IsPlayServicesAvailable();
+	        if (IsPlayServicesAvailable())
+	        {
+	            var intent = new Intent(this, typeof (GcmRegistrationIntentService));
+	            StartService(intent);
+	        }
         }
 
 	    protected override void OnStart()

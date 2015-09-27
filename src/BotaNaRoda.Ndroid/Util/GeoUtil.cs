@@ -16,7 +16,7 @@ namespace BotaNaRoda.Ndroid.Util
 {
     public static class GeoUtil
     {
-        public static string DistanceTo(this ILocation loc1, ILocation loc2)
+        public static string DistanceTo(this ILatLon loc1, ILatLon loc2)
         {
             return string.Format("{0:0,0.00}m", DistanceTo(loc1.Latitude, loc1.Longitude, loc2.Latitude, loc2.Longitude));
         }

@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace BotaNaRoda.Ndroid.Data
 {
-    public class AuthInfo : ILocation
+    public class AuthInfo : ILatLon
     {
         public string Id { get { return GetPropFromTokenSafely<string>("sub", IdentityToken); } }
         public string Username { get { return GetPropFromTokenSafely<string>("preferred_username", IdentityToken); } }

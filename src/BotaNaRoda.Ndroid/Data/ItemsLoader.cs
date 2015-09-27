@@ -27,7 +27,7 @@ namespace BotaNaRoda.Ndroid.Data
             CurrentPageValue = 0;
         }
 
-        public async Task LoadMoreItemsAsync()
+        public async Task<int> LoadMoreItemsAsync()
         {
             IsBusy = true;
 
@@ -41,6 +41,8 @@ namespace BotaNaRoda.Ndroid.Data
                                 ItemsPerPage == itemListViewModels.Length);
 
             IsBusy = false;
+
+            return itemListViewModels.Length;
         }
 
     }

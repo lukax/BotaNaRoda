@@ -3,19 +3,20 @@ using System.Linq;
 using Android.App;
 using Android.Views;
 using Android.Widget;
+using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid
 {
-    public class ConversationListAdapter : BaseAdapter<ConversationViewModel>
+    public class ConversationListAdapter : BaseAdapter<ConversationListViewModel>
     {
         private readonly Activity _context;
-        private readonly IList<ConversationViewModel> _conversations;
+        public IList<ConversationListViewModel> Conversations { get; set; }
 
-        public ConversationListAdapter(Activity context, IList<ConversationViewModel> conversations)
+        public ConversationListAdapter(Activity context, IList<ConversationListViewModel> conversations)
         {
             _context = context;
-            _conversations = conversations;
+            Conversations = conversations;
         }
 
         public override long GetItemId(int position)
@@ -29,13 +30,13 @@ namespace BotaNaRoda.Ndroid
 
             var conversation = this[position];
 
-            view.FindViewById<TextView>(Resource.Id.conversationUserName).Text = conversation.ToUser.Name;
-            view.FindViewById<TextView>(Resource.Id.conversationItemName).Text = conversation.Item.Name;
-            view.FindViewById<TextView>(Resource.Id.conversationLastMessageTime).Text = conversation.UpdatedAt.ToString("dd/MM hh:mm");
+            view.FindViewById<TextView>(Resource.Id.conversationUserName).Text = conversation.ToUserName;
+            view.FindViewById<TextView>(Resource.Id.conversationItemName).Text = conversation.ItemName;
+            view.FindViewById<TextView>(Resource.Id.conversationLastMessageTime).Text = conversation.LastUpdated.ToString("dd/MM hh:mm");
 
             var imageView = view.FindViewById<ImageView>(Resource.Id.conversationProfileImage);
             Picasso.With(_context)
-                .Load(conversation.ToUser.Avatar)
+                .Load(conversation.ItemThumbImage)
                 .Fit()
                 .Tag(_context)
                 .Into(imageView);
@@ -45,12 +46,12 @@ namespace BotaNaRoda.Ndroid
 
         public override int Count
         {
-            get { return _conversations.Count; }
+            get { return Conversations.Count; }
         }
         
-        public override ConversationViewModel this[int index]
+        public override ConversationListViewModel this[int index]
         {
-            get { return _conversations[index]; }
+            get { return Conversations[index]; }
         }
         
     }

@@ -1,6 +1,6 @@
 namespace BotaNaRoda.Ndroid.Models
 {
-    public interface ILocation
+    public interface ILatLon
     {
         double Latitude { get; set; }
         double Longitude { get; set; }

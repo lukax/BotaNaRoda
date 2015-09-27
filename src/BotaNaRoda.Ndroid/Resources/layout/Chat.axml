@@ -43,7 +43,7 @@
         p1:layout_height="match_parent"
         p1:layout_below="@id/chatUserImage"
         p1:layout_marginBottom="50dp" />
-    <TextView
+    <EditText
         p1:id="@+id/chatMessageText"
         p1:text="Digitar mensagem..."
         p1:layout_width="match_parent"

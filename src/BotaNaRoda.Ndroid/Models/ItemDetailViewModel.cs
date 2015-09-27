@@ -2,7 +2,7 @@
 
 namespace BotaNaRoda.Ndroid.Models
 {
-    public class ItemDetailViewModel : ILocation
+    public class ItemDetailViewModel : ILatLon
     {
         public string Id { get; set; }
         public UserDetailViewModel User { get; set; }

@@ -39,7 +39,6 @@ namespace BotaNaRoda.WebApi.Data
         {
         }
 
-
         public void OnItemDelete(Item item)
         {
         }

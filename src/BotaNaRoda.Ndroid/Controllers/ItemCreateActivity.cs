@@ -32,7 +32,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private LocationManager _locMgr;
         private Location _currentLocation;
 	    private bool _imageTaken;
-	    private IList<Address> _addresses;
+	    private Address _address;
 	    private ArrayAdapter _categoriesAdapter;
 	    private ItemRestService _itemService;
 	    private ViewHolder _holder;
@@ -113,7 +113,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			_currentLocation = location;
             Geocoder geocdr = new Geocoder(this);
-            _addresses = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1);
+            _address = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1).First();
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -146,17 +146,16 @@ namespace BotaNaRoda.Ndroid.Controllers
                 return;
             }
 
-	        var addr = _addresses.First();
 		    var item = new ItemCreateBindingModel
 		    {
                 Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
 		        Name = _holder.ItemTitleView.Text,
 		        Description = _holder.ItemDescriptionView.Text,
 		        Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
-		        Address = addr.Thoroughfare,
-                PostalCode = addr.PostalCode,
-                CountryCode = addr.CountryCode,
-                Locality = addr.Locality,
+		        Address = _address.Thoroughfare,
+                PostalCode = _address.PostalCode,
+                CountryCode = _address.CountryCode,
+                Locality = _address.Locality,
 		        Latitude = _currentLocation.Latitude,
 		        Longitude = _currentLocation.Longitude
 		    };

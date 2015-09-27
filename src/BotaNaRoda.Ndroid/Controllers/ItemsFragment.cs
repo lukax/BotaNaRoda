@@ -15,9 +15,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Android.Support.V7.Widget;
 using Android.Util;
+using BotaNaRoda.Ndroid.Models;
 using BotaNaRoda.Ndroid.Util;
 using Xamarin.Auth;
 using com.refractored.fab;
+using Javax.Xml.Xpath;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -85,8 +87,21 @@ namespace BotaNaRoda.Ndroid.Controllers
             usr.Longitude = location.Longitude;
             _userRepository.Save(usr);
 
-            _adapter.UserLocation = usr;
+            _adapter.UserLatLon = usr;
 			_adapter.NotifyDataSetChanged ();
+
+            Geocoder geocdr = new Geocoder(Activity);
+            var addr = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1).First();
+
+		    _itemService.PostUserLocalization(new UserLocalizationBindingModel
+		    {
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Address = addr.Thoroughfare,
+                PostalCode = addr.PostalCode,
+                CountryCode = addr.CountryCode,
+                Locality = addr.Locality
+            }).Wait();
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -119,17 +134,15 @@ namespace BotaNaRoda.Ndroid.Controllers
                 || !fromScroll)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
-                if (fromScroll)
-                {
-                    _refresher.Refreshing = true;
-                }
                 _uiCancellation = new CancellationTokenSource();
                 _itemsLoader.LoadMoreItemsAsync()
                     .ContinueWith(task =>
                     {
-                        _refresher.Refreshing = false;
-                        _adapter.NotifyDataSetChanged();
-
+                        var newItemsCount = task.Result;
+                        if (newItemsCount > 0)
+                        {
+                            _adapter.NotifyItemRangeInserted(_adapter.ItemCount - newItemsCount, newItemsCount);
+                        }
                     }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }
             else

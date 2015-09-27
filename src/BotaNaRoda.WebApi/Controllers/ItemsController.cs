@@ -104,6 +104,8 @@ namespace BotaNaRoda.WebApi.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
+            return HttpBadRequest();
+            //TODO remove every association with item
             var item = await _itemsContext.Items.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (item == null)
             {
