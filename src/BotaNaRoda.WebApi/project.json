@@ -21,7 +21,8 @@
     "Serilog.Sinks.Loggly": "2.0.7",
     "Serilog.Framework.Logging": "1.0.0-beta7-10052",
     "Microsoft.AspNet.SignalR.Server": "3.0.0-beta7",
-    "PushSharp": "2.2.1.0"
+    "PushSharp": "2.2.1.0",
+    "AutoMapper": "3.2.0",
   },
 
   "commands": {
@@ -30,7 +31,8 @@
 
   "frameworks": {
     "dnx451": {
-      "dependencies": { },
+      "dependencies": {
+      },
       "frameworkAssemblies": {
         "System.Drawing": "4.0.0.0"
       }

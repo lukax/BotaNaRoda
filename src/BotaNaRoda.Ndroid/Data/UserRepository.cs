@@ -13,7 +13,6 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using ModernHttpClient;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 

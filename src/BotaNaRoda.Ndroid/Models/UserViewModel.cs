@@ -1,6 +1,6 @@
 ﻿namespace BotaNaRoda.Ndroid.Models
 {
-    public class UserDetailViewModel
+    public class UserViewModel
     {
         public string Id { get; set; }
         public string Username { get; set; }

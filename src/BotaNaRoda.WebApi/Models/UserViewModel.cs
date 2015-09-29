@@ -1,5 +1,4 @@
 ﻿using BotaNaRoda.WebApi.Entity;
-using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace BotaNaRoda.WebApi.Models
 {

@@ -1,13 +1,12 @@
 ﻿
 using System.Security.Claims;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.SignalR;
 using System.Threading.Tasks;
 using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
+using BotaNaRoda.WebApi.Util;
 using IdentityServer3.Core.Extensions;
 using Microsoft.AspNet.Identity;
 using MongoDB.Driver;
@@ -33,42 +32,46 @@ namespace BotaNaRoda.WebApi.Hubs
 
         public async Task<dynamic> Connect(string conversationId)
         {
-            var userId = Context.User.GetSubjectId();
+            var currentUserId = Context.User.GetSubjectId();
 
             var conversation = await _context.Conversations
-                .Find(x => x.Id == conversationId && (x.FromUserId == userId || x.ToUserId == userId))
+                .Find(x => x.Id == conversationId && (x.FromUserId == currentUserId || x.ToUserId == currentUserId))
                 .FirstOrDefaultAsync();
             if (conversation == null)
             {
                 throw new HubException("Conversation not found");
             }
 
+            var item = await _context.Items.Find(x => x.Id == conversation.ItemId).FirstOrDefaultAsync();
             var fromUsr = await _context.Users.Find(x => x.Id == conversation.FromUserId).FirstOrDefaultAsync();
             var toUsr = await _context.Users.Find(x => x.Id == conversation.ToUserId).FirstOrDefaultAsync();
-            var item = await _context.Items.Find(x => x.Id == conversation.ItemId).FirstOrDefaultAsync();
 
             //update conversation hub info
             conversation.HubInfo = conversation.HubInfo ?? new ConversationHubInfo();
-            if (conversation.FromUserId == userId)
+
+            var viewModel = new ConversationChatConnectionViewModel
+            {
+                UpdatedAt = conversation.UpdatedAt,
+                Messages = conversation.Messages.ToList(),
+                Item = new ItemListViewModel(item)
+            };
+
+            if (conversation.FromUserId == currentUserId)
             {
                 conversation.HubInfo.FromUserConnectionId = Context.ConnectionId;
+                viewModel.ToUser = new UserViewModel(toUsr);
             }
             else
             {
                 conversation.HubInfo.ToUserConnectionId = Context.ConnectionId;
+                viewModel.ToUser = new UserViewModel(fromUsr);
             }
+
             await _context.Conversations.UpdateOneAsync(
                 Builders<Conversation>.Filter.Eq(x => x.Id, conversation.Id),
                 Builders<Conversation>.Update.Set(x => x.HubInfo, conversation.HubInfo));
 
-            return new
-            {
-                UpdatedAt = conversation.UpdatedAt,
-                From = new UserViewModel(fromUsr),
-                To = new UserViewModel(toUsr),
-                Messages = conversation.Messages.ToList(),
-                Item = new ItemListViewModel(item)
-            };
+            return viewModel;
         }
 
         public async Task SendMessage(SendConversationMessageBindingModel sendMessageModel)
@@ -90,11 +93,11 @@ namespace BotaNaRoda.WebApi.Hubs
                     Builders<Conversation>.Filter.Eq(x => x.Id, sendMessageModel.ConversationId),
                     Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage {Message = sendMessageModel.Message}));
 
-
                 Clients.Clients(new [] { conversation.HubInfo.ToUserConnectionId, conversation.HubInfo.FromUserConnectionId})
                     .OnMessageReceived(new
                     {
-                        Message = sendMessageModel.Message
+                        Message = sendMessageModel.Message,
+                        SentAt = DateProvider.Get
                     });
 
                 var receivingEndUserId = userId == conversation.FromUserId

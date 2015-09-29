@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Resources;
 using Android.App;
 using Android.Content.PM;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using BotaNaRoda.Ndroid.Util;
+using Microsoft.AspNet.SignalR.Client;
+using Newtonsoft.Json;
 using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid
@@ -20,11 +25,13 @@ namespace BotaNaRoda.Ndroid
     public class ChatActivity : AppCompatActivity
     {
         private UserRepository _userRepository;
-        private ItemRestService _itemService;
-        private ConversationDetailViewModel _conversation;
         private ViewHolder _holder;
         private ChatMessageAdapter _adapter;
         private BackgroundWorker _refreshWorker;
+        private IHubProxy _chatHubProxy;
+        private ConversationChatConnectionViewModel _connectionViewModel;
+        private string _conversationId;
+        private ProgressDialog _loadingDialog;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,8 +40,8 @@ namespace BotaNaRoda.Ndroid
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
             _userRepository = new UserRepository();
-            _itemService = new ItemRestService(new UserRepository());
 
+            _conversationId = Intent.GetStringExtra("conversationId");
             _holder = new ViewHolder
             {
                 ItemImage = FindViewById<ImageView>(Resource.Id.chatItemImage),
@@ -51,6 +58,7 @@ namespace BotaNaRoda.Ndroid
             _holder.MessageList.Adapter = _adapter;
             _holder.ChatSendButton.Click += ChatSendButtonOnClick;
 
+            _loadingDialog = ProgressDialog.Show(this, "Carregando...", "");
             Refresh();
         }
 
@@ -59,6 +67,13 @@ namespace BotaNaRoda.Ndroid
             var msg = _holder.ChatMessageText.Text;
             //...
             _holder.ChatMessageText.Text = "";
+
+            // Invoke the 'UpdateNick' method on the server
+            _chatHubProxy.Invoke("SendMessage", new
+            {
+                conversationId = _conversationId,
+                message = msg
+            });
         }
 
         private void Refresh()
@@ -66,7 +81,26 @@ namespace BotaNaRoda.Ndroid
             _refreshWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
             _refreshWorker.DoWork += (sender, args) =>
             {
-                _conversation = _itemService.GetConversation(Intent.GetStringExtra("conversationId")).Result;
+                var authInfo = _userRepository.Get();
+                // Connect to the server
+                var hubConnection = new HubConnection(Constants.BotaNaRodaEndpoint);
+                hubConnection.Headers["Authorization"] = new AuthenticationHeaderValue("Bearer", authInfo.AccessToken).ToString();
+
+                // Create a proxy to the 'ChatHub' SignalR Hub
+                _chatHubProxy = hubConnection.CreateHubProxy("ChatHub");
+
+                // Wire up a handler for the 'UpdateChatMessage' for the server
+                // to be called on our client
+                _chatHubProxy.On<ConversationChatMessage>("OnMessageReceived", message =>
+                {
+                    _adapter.ChatMessages.Add(message);
+                    _adapter.NotifyDataSetChanged();
+                });
+
+                // Start the connection
+                hubConnection.Start();
+                _connectionViewModel = _chatHubProxy.Invoke<ConversationChatConnectionViewModel>("Connect", _conversationId).Result;
+                //---
             };
             _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
@@ -79,15 +113,17 @@ namespace BotaNaRoda.Ndroid
         {
             var authInfo = _userRepository.Get();
 
-            _holder.ItemName.Text = _conversation.ItemName;
-            _holder.ItemDistance.Text = _conversation.DistanceTo(authInfo);
-            _holder.UserName.Text = _conversation.ToUserName;
+            _holder.ItemName.Text = _connectionViewModel.Item.Name;
+            _holder.ItemDistance.Text = _connectionViewModel.Item.DistanceTo(authInfo);
+            _holder.UserName.Text = _connectionViewModel.ToUser.Name;
 
-            Picasso.With(this).Load(_conversation.ItemThumbImage).Fit().Tag(this).Into(_holder.ItemImage);
-            Picasso.With(this).Load(_conversation.ToUserAvatar).Fit().Tag(this).Into(_holder.UserImage);
+            Picasso.With(this).Load(_connectionViewModel.Item.ThumbImage.Url).Fit().Tag(this).Into(_holder.ItemImage);
+            Picasso.With(this).Load(_connectionViewModel.ToUser.Avatar).Fit().Tag(this).Into(_holder.UserImage);
 
-            _adapter.ChatMessages = _conversation.Messages;
+            _adapter.ChatMessages = _connectionViewModel.Messages;
             _adapter.NotifyDataSetChanged();
+
+            _loadingDialog.Hide();
         }
 
         protected override void OnDestroy()

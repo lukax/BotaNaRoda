@@ -11,6 +11,7 @@ using PushSharp.Android;
 
 namespace BotaNaRoda.WebApi.Data
 {
+
     public class NotificationService : IDisposable
     {
         private readonly IOptions<AppSettings> _appSettings;
@@ -27,12 +28,11 @@ namespace BotaNaRoda.WebApi.Data
             var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
             AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
-                .WithJson(new
+                .WithJson(new ItemNotification
                 {
-                    itemReserved = new {
-                        itemId = item.Id,
-                        itemName = item.Name
-                    }
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = "O produto foi reservado!"
                 }.ToJson()));
         }
 
@@ -41,13 +41,11 @@ namespace BotaNaRoda.WebApi.Data
             var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
             AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
-                .WithJson(new
+                .WithJson(new ItemNotification
                 {
-                    itemCancelled = new
-                    {
-                        itemId = item.Id,
-                        itemName = item.Name
-                    }
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = "A reserva para o produto foi cancelada"
                 }.ToJson()));
         }
 
@@ -56,13 +54,11 @@ namespace BotaNaRoda.WebApi.Data
             var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
             AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(usr.PushDeviceRegistrationId)
-                .WithJson(new
+                .WithJson(new ItemNotification
                 {
-                    itemReceived = new
-                    {
-                        itemId = item.Id,
-                        itemName = item.Name
-                    }
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = "Doação concluída!"
                 }.ToJson()));
         }
 
@@ -71,13 +67,11 @@ namespace BotaNaRoda.WebApi.Data
             var subscribers = await _itemsContext.Users.Find(x => item.Subscribers.Contains(x.Id)).ToListAsync();
 
             AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(subscribers.Select(x=> x.PushDeviceRegistrationId))
-                .WithJson(new
+                .WithJson(new ItemNotification
                 {
-                    itemDeleted = new
-                    {
-                        itemId = item.Id,
-                        itemName = item.Name
-                    }
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = "O produto foi removido"
                 }.ToJson()));
         }
 
@@ -87,13 +81,12 @@ namespace BotaNaRoda.WebApi.Data
             var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == receivingEndUserId).FirstAsync();
             
             AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(receivingEndUser.PushDeviceRegistrationId)
-                .WithJson(new
+                .WithJson(new ChatMessageNotification
                 {
-                    conversation = new
-                    {
-                        id = conversation.Id,
-                        itemName = item.Name,
-                    }
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    ConversationId = conversation.Id,
+                    Description = "Mensagem recebida",
                 }.ToJson()));
         }
 

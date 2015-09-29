@@ -18,7 +18,6 @@ using IdentityModel.Client;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 using Path = System.IO.Path;
-using ModernHttpClient;
 
 namespace BotaNaRoda.Ndroid.Data
 {
@@ -47,7 +46,7 @@ namespace BotaNaRoda.Ndroid.Data
                 Directory.CreateDirectory(_storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
-			_httpClient = new HttpClient(new NativeMessageHandler());
+			_httpClient = new HttpClient(/*new NativeMessageHandler()*/);
         }
 
         public void RefreshCache()
@@ -125,7 +124,7 @@ namespace BotaNaRoda.Ndroid.Data
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<UserDetailViewModel> GetUserProfileAsync(string userId = "me")
+        public async Task<UserViewModel> GetUserProfileAsync(string userId = "me")
         {
             await SetupAuthorizationHeader();
 
@@ -133,7 +132,7 @@ namespace BotaNaRoda.Ndroid.Data
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<UserDetailViewModel>(json);
+                return JsonConvert.DeserializeObject<UserViewModel>(json);
             }
 
             return null;
@@ -234,8 +233,7 @@ namespace BotaNaRoda.Ndroid.Data
                     var response = new TokenResponse(raw);
                     if (response.IsError)
                     {
-                        _context.StartActivity(typeof(LoginActivity));
-
+                        _context.StartActivity(typeof (LoginActivity));
                         Log.Error("ItemRestService", "Could not refresh token. " + response.Error);
                         return;
                     }
