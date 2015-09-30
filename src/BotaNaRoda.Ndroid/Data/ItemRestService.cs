@@ -231,15 +231,13 @@ namespace BotaNaRoda.Ndroid.Data
                     var raw = await httpResponseMessage.Content.ReadAsStringAsync();
 
                     var response = new TokenResponse(raw);
-                    if (response.IsError)
-                    {
-                        _context.StartActivity(typeof (LoginActivity));
-                        Log.Error("ItemRestService", "Could not refresh token. " + response.Error);
-                        return;
-                    }
-
-                    authInfo.Update(response);
-                    _userRepository.Save(authInfo);
+					if (response.IsError) {
+						_context.StartActivity (typeof(LoginActivity));
+						Log.Error ("ItemRestService", "Could not refresh token. " + response.Error);
+					} else {
+						authInfo.Update(response);
+						_userRepository.Save(authInfo);
+					}
                 }
 
                 _httpClient.SetBearerToken(authInfo.AccessToken);

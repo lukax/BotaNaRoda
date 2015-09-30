@@ -98,6 +98,70 @@ namespace BotaNaRoda.WebApi.Identity
                     IdentityTokenLifetime = 360,
                     AccessTokenLifetime = 3600,
                 },
+
+                new Client
+                {
+                    ClientName = "Implicit Client Demo",
+                    Enabled = true,
+
+                    ClientId = "implicitclient",
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("secret".Sha256())
+                    },
+
+                    Flow = Flows.Implicit,
+
+                    ClientUri = "http://www.thinktecture.com",
+                    RequireConsent = true,
+                    AllowRememberConsent = true,
+                    AllowAccessToAllScopes = true,
+                    RedirectUris = new List<string>
+                    {
+                        // "simple JS client"
+                        "http://localhost:37045/index.html",
+                        "https://localhost:44331/Home/Callback",
+
+                        // OAuthJS client
+                        "http://localhost:23453/callback.html",
+                        "http://localhost:23453/frame.html",
+                        "http://localhost:23453/modal.html",
+
+                        "https://localhost:44333/core",
+                        "http://localhost:42000/core",
+                        "http://192.168.1.106:42001/core",
+                        "http://botanarodaapi.azurewebsites.net/core",
+
+                        // WPF client
+                        "oob://localhost/wpfclient",
+
+                        // WinRT client
+                        "ms-app://s-1-15-2-1677770454-1667073387-2045065244-1646983296-4049597744-3433330513-3528227871/",
+
+                        // JavaScript client
+                        "http://localhost:21575/index.html",
+                        "http://localhost:21575/silent_renew.html",
+
+                        // MVC form post sample
+                        "http://localhost:11716/account/signInCallback",
+
+                        // OWIN middleware client
+                        "http://localhost:2671/",
+                    },
+
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:23453/index.html",
+                        "http://localhost:21575/index.html"
+                    },
+
+                    AllowedCorsOrigins = new List<string>{
+                        "http://localhost:21575"
+                    },
+
+                    IdentityTokenLifetime = 360,
+                    AccessTokenLifetime = 3600,
+                },
 #endif
             };
         }

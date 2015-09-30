@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BotaNaRoda.WebApi.Entity
 {
+    [BsonIgnoreExtraElements]
     public class UserReview
     {
         [BsonRepresentation(BsonType.ObjectId)]

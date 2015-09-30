@@ -17,8 +17,5 @@
     <SSLPort>44333</SSLPort>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
-  <ItemGroup>
-    <ProjectReference Include="..\BotaNaRoda.Client\BotaNaRoda.Client.csproj" />
-  </ItemGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

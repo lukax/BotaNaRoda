@@ -8,6 +8,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace BotaNaRoda.WebApi.Entity
 {
+    [BsonIgnoreExtraElements]
     public class User : ILocalization, IUpdatable
     {
         [BsonRepresentation(BsonType.ObjectId)]
@@ -30,6 +31,8 @@ namespace BotaNaRoda.WebApi.Entity
         public string PostalCode { get; set; }
 
         public int Credits { get; set; }
+
+        [BsonIgnoreIfDefault]
         public ICollection<UserReview> Reviews { get; set; }
 
         public string Provider { get; set; }

@@ -23,7 +23,7 @@ namespace BotaNaRoda.Ndroid.Data
         public string IdentityToken { get; set; }
         public string RefreshToken { get; set; }
         public long ExpiresIn { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; protected set; }
 
         public AuthInfo()
         {

@@ -71,6 +71,18 @@ namespace BotaNaRoda.WebApi
 
             app.Map("/core", core =>
             {
+                var userService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings)));
+                
+                var idSvrMongoDbSettings = IdentityServer3.MongoDb.StoreSettings.DefaultSettings();
+                idSvrMongoDbSettings.ConnectionString = appSettings.Options.BotaNaRodaConnectionString;
+
+                var idSvrMongoDbFactory = new IdentityServer3.MongoDb.ServiceFactory(userService, idSvrMongoDbSettings)
+                {
+                    CorsPolicyService = new Registration<ICorsPolicyService>(new DefaultCorsPolicyService {AllowAll = true})
+                };
+                idSvrMongoDbFactory.UseInMemoryClients(Clients.Get());
+                idSvrMongoDbFactory.UseInMemoryScopes(Scopes.Get());
+
                 var idsrvOptions = new IdentityServerOptions
                 {
                     IssuerUri = "https://botanaroda.com.br",
@@ -78,14 +90,7 @@ namespace BotaNaRoda.WebApi
 
                     RequireSsl = false,
                     SigningCertificate = new X509Certificate2(env.ApplicationBasePath + "\\Identity\\idsrv3test.pfx", "idsrv3test"),
-                    Factory = new IdentityServerServiceFactory()
-                        {
-                            UserService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings))),
-                            CorsPolicyService = new Registration<ICorsPolicyService>(new DefaultCorsPolicyService { AllowAll = true })
-                        }
-                        .UseInMemoryClients(Clients.Get())
-                        .UseInMemoryScopes(Scopes.Get()),
-                    
+                    Factory = idSvrMongoDbFactory,
 
                     AuthenticationOptions = new AuthenticationOptions
                     {

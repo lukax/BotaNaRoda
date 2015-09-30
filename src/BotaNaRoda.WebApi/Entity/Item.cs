@@ -9,6 +9,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 
 namespace BotaNaRoda.WebApi.Entity
 {
+    [BsonIgnoreExtraElements]
     public class Item : ILocalization, IUpdatable
     {
         [BsonRepresentation(BsonType.ObjectId)]

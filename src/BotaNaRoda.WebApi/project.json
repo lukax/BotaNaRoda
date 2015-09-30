@@ -23,6 +23,7 @@
     "Microsoft.AspNet.SignalR.Server": "3.0.0-beta7",
     "PushSharp": "2.2.1.0",
     "AutoMapper": "3.2.0",
+    "IdentityServer3.MongoDb": "2.0.0"
   },
 
   "commands": {
