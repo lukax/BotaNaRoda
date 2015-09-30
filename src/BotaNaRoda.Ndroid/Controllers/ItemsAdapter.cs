@@ -117,7 +117,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 throw new NotImplementedException();
             }
 
-            public string Key { get; }
+			public string Key { get; set; }
         }
     }
 }

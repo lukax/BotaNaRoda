@@ -128,7 +128,9 @@ namespace BotaNaRoda.Ndroid
 
         protected override void OnDestroy()
         {
-            _refreshWorker?.CancelAsync();
+			if (_refreshWorker != null) {
+				_refreshWorker.CancelAsync ();
+			}
             base.OnDestroy();
         }
 

@@ -154,7 +154,9 @@ namespace BotaNaRoda.Ndroid.Controllers
         public override void OnDetach()
         {
             base.OnDetach();
-            _uiCancellation.Cancel();
+			if (_uiCancellation != null) {
+				_uiCancellation.Cancel();
+			}
         }
 
         readonly TaskScheduler _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
