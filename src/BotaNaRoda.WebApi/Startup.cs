@@ -75,6 +75,7 @@ namespace BotaNaRoda.WebApi
                 
                 var idSvrMongoDbSettings = IdentityServer3.MongoDb.StoreSettings.DefaultSettings();
                 idSvrMongoDbSettings.ConnectionString = appSettings.Options.BotaNaRodaConnectionString;
+                idSvrMongoDbSettings.Database = appSettings.Options.BotaNaRodaDatabaseName;
 
                 var idSvrMongoDbFactory = new IdentityServer3.MongoDb.ServiceFactory(userService, idSvrMongoDbSettings)
                 {
