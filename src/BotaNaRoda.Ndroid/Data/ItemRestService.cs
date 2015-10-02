@@ -35,6 +35,7 @@ namespace BotaNaRoda.Ndroid.Data
 
         public bool CanLoadMoreItems { get; set; }
         public bool IsBusy { get; set; }
+		private readonly object lockObj = new object ();
 
         public ItemRestService(UserRepository userRepository)
         {
@@ -219,7 +220,7 @@ namespace BotaNaRoda.Ndroid.Data
                 var authInfo = _userRepository.Get();
                 if (authInfo.IsExpired())
                 {
-                    //bug doing this manually because of crazy issue with IdentityModel
+                	//bug doing this manually because of crazy issue with IdentityModel
                     var httpResponseMessage = await _httpClient.PostAsync(Constants.IdSvrTokenEndpoint,
                         new FormUrlEncodedContent(new Dictionary<string, string>
                         {
@@ -237,7 +238,7 @@ namespace BotaNaRoda.Ndroid.Data
 					} else {
 						authInfo.Update(response);
 						_userRepository.Save(authInfo);
-					}
+					}					
                 }
 
                 _httpClient.SetBearerToken(authInfo.AccessToken);

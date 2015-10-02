@@ -15,19 +15,17 @@ namespace BotaNaRoda.Ndroid.Data
         public string Username { get { return GetPropFromTokenSafely<string>("preferred_username", IdentityToken); } }
         public string Name { get { return GetPropFromTokenSafely<string>("name", IdentityToken); } }
         public string Picture { get { return GetPropFromTokenSafely<string>("picture", IdentityToken); } }
-        public string Address { get { return GetPropFromTokenSafely<string>("address", IdentityToken); } }
+		public string Address { get { return GetPropFromTokenSafely<string>("address", IdentityToken); } }
+		public DateTime NotBefore { get { return GetPropFromTokenSafely<long> ("nbf", AccessToken).ToDateTimeFromEpoch(); } }
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string AccessToken { get; set; }
         public string IdentityToken { get; set; }
         public string RefreshToken { get; set; }
-        public long ExpiresIn { get; set; }
-        public DateTime UpdatedAt { get; protected set; }
 
         public AuthInfo()
         {
-            UpdatedAt = DateTime.UtcNow;
         }
 
         //public void Update(AuthorizeResponse response)
@@ -40,8 +38,6 @@ namespace BotaNaRoda.Ndroid.Data
 
         public void Update(TokenResponse response)
         {
-            UpdatedAt = DateTime.UtcNow;
-            ExpiresIn = response.ExpiresIn;
             IdentityToken = response.IdentityToken;
             AccessToken = response.AccessToken;
             RefreshToken = response.RefreshToken;
@@ -49,9 +45,9 @@ namespace BotaNaRoda.Ndroid.Data
 
         public bool IsExpired()
         {
-            if (ExpiresIn > 0)
+			if (AccessToken != null)
             {
-                return UpdatedAt.AddSeconds(ExpiresIn) <= DateTime.UtcNow;
+				return NotBefore < DateTime.UtcNow;
             }
             return false;
         }
