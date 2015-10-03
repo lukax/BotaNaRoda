@@ -83,13 +83,19 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
 
-        void ReserveItem(object sender, EventArgs e)
+        async void ReserveItem(object sender, EventArgs e)
         {
-            RunOnUiThread(() =>
-            {
-                _holder.ReserveButton.Text = "Reservado";
-                _holder.ReserveButton.Enabled = false;
-            });
+			var result = await _itemService.ReserveItem (_item.Id);
+		    RunOnUiThread(() =>
+	            {
+					if(result){
+						_holder.ReserveButton.Text = "Reservado";
+						_holder.ReserveButton.Enabled = false;
+					}
+					else{
+						Toast.MakeText(this, "Não foi possível reservar o produto.", ToastLength.Short);				
+					}
+	            });
         }
 
         void DeleteItem()

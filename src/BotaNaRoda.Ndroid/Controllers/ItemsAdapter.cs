@@ -73,7 +73,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
         
-        private class ItemViewHolder : RecyclerView.ViewHolder, View.IOnClickListener, ITransformation
+        private class ItemViewHolder : RecyclerView.ViewHolder, View.IOnClickListener
         {
             internal new string ItemId;
             internal readonly ImageView Image;
@@ -93,28 +93,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                 Intent itemDetailIntent = new Intent(v.Context, typeof(ItemDetailActivity));
                 itemDetailIntent.PutExtra("itemId", ItemId);
                 v.Context.StartActivity(itemDetailIntent);
-            }
-
-            public Bitmap Transform(Bitmap image)
-            {
-                //int maxWidth = 200;
-                //int maxHeight = 500;
-
-                //var ratioX = (double)maxWidth / image.Width;
-                //var ratioY = (double)maxHeight / image.Height;
-                //var ratio = Math.Min(ratioX, ratioY);
-
-                //var newWidth = (int)(image.Width * ratio);
-                //var newHeight = (int)(image.Height * ratio);
-
-                //var newImage = new Bitmap(newWidth, newHeight);
-
-                //using (var graphics = Graphics.FromImage(newImage))
-                //    graphics.DrawImage(image, 0, 0, newWidth, newHeight);
-
-                //return newImage;
-
-                throw new NotImplementedException();
             }
 
 			public string Key { get; set; }

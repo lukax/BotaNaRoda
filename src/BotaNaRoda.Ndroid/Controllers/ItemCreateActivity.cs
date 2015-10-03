@@ -21,7 +21,7 @@ using AlertDialog = Android.App.AlertDialog;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "ItemCreateActivity", ParentActivity = typeof(MainActivity),
+	[Activity (Label = "Doar Produto", ParentActivity = typeof(MainActivity),
         Theme = "@style/MainTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]	
 	public class ItemCreateActivity : AppCompatActivity, ILocationListener
 	{
@@ -98,12 +98,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                            .MemoryPolicy(MemoryPolicy.NoCache)
                            .Into(holder);
 				}
-                else
-				{
-					// let the user know the photo was cancelled
-					//Toast toast = Toast.MakeText (this, "Nenhuma foto capturada", ToastLength.Short);
-					//toast.Show ();
-				} 
 			} else {
 				base.OnActivityResult (requestCode, resultCode, data);
 			}
@@ -131,17 +125,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-				//var progressDialog = ProgressDialog.Show (this, "", "Obtendo localização");
-			 //   Task.Delay(2000).ContinueWith(t =>
-			 //   {
-    //                progressDialog.Cancel();
-			 //   }, UiScheduler);
+			 	var locationDialog = ProgressDialog.Show (this, "", "Obtendo localização...");
+				Task.Delay(2000).ContinueWith(t =>
+			    {
+					RunOnUiThread(() => { locationDialog.Dismiss(); });
+			    });
 
                 return;
 			}
             if (!_imageTaken)
             {
-                Toast toast = Toast.MakeText(this, "Não é possivel salvar item sem pelo menos uma foto!", ToastLength.Short);
+                Toast toast = Toast.MakeText(this, "Não é possivel publicar sem pelo menos uma foto!", ToastLength.Short);
                 toast.Show();
                 return;
             }
@@ -160,7 +154,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		        Longitude = _currentLocation.Longitude
 		    };
 
-            ProgressDialog.Show(this, "", "Publicando...");
+            var loadingDialog = ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();
 	        worker.DoWork += (o, args) =>
@@ -169,8 +163,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        };
 	        worker.RunWorkerCompleted += (o, args) =>
 	        {
-	            RunOnUiThread(() =>
-	            {
+				RunOnUiThread(() =>
+				{
+					loadingDialog.Dismiss();
 	                Finish();
 	            });
 	        };

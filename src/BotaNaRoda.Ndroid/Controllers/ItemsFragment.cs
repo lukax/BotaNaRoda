@@ -141,7 +141,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                         var newItemsCount = task.Result;
                         if (newItemsCount > 0)
                         {
-                            _adapter.NotifyItemRangeInserted(_adapter.ItemCount - newItemsCount, newItemsCount);
+							_adapter.NotifyDataSetChanged();
                         }
                     }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }

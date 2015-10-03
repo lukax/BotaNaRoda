@@ -38,6 +38,7 @@ namespace BotaNaRoda.Ndroid
         private ArrayAdapter<string> _mLeftAdapter;
 		private MyActionBarDrawerToggle _mDrawerToggle;
 	    private Fragment _currentFragment;
+		private readonly object _lockObj = new object();
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -119,18 +120,15 @@ namespace BotaNaRoda.Ndroid
         
         private void LoadFragment(Type value)
         {
-            var tx = SupportFragmentManager.BeginTransaction();
-            if (_currentFragment == null)
-            {
-                _currentFragment = (Fragment) Activator.CreateInstance(value);
-                tx.Add(Resource.Id.container, _currentFragment, value.Name);
-            }
-            else
-            {
-                _currentFragment = (Fragment) Activator.CreateInstance(value);
-                tx.Replace(Resource.Id.container, _currentFragment, value.Name);
-            }
-            tx.Commit();
+			lock (_lockObj) {
+	            var tx = SupportFragmentManager.BeginTransaction();
+				if (_currentFragment != null) {
+					tx.Remove (_currentFragment);
+				}
+	            _currentFragment = (Fragment) Activator.CreateInstance(value);
+	            tx.Add(Resource.Id.container, _currentFragment, value.Name);
+	            tx.Commit();
+			}
         }
 
         public void OnItemClick(AdapterView parent, View view, int position, long id)

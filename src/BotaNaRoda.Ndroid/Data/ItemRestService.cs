@@ -27,8 +27,9 @@ namespace BotaNaRoda.Ndroid.Data
         private readonly UserRepository _userRepository;
         private const string BotaNaRodaItemsEndpoint = Constants.BotaNaRodaEndpoint + "/items";
         private const string BotaNaRodaUsersEndpoint = Constants.BotaNaRodaEndpoint + "/users";
-        private const string BotaNaRodaConversationsEndpoint = Constants.BotaNaRodaEndpoint + "/conversations";
-        private const string BotaNaRodaAccountEndpoint = Constants.BotaNaRodaEndpoint + "/account";
+		private const string BotaNaRodaConversationsEndpoint = Constants.BotaNaRodaEndpoint + "/conversations";
+		private const string BotaNaRodaAccountEndpoint = Constants.BotaNaRodaEndpoint + "/account";
+		private const string BotaNaRodaReservationsEndpoint = Constants.BotaNaRodaEndpoint + "/reservations";
 
         private readonly HttpClient _httpClient;
         private readonly string _storagePath;
@@ -212,6 +213,23 @@ namespace BotaNaRoda.Ndroid.Data
 
             return null;
         }
+
+		public async Task<bool> ReserveItem(string itemId)
+		{
+			await SetupAuthorizationHeader();
+
+			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId),
+				new StringContent("", System.Text.Encoding.UTF8, "application/json"));
+			return response.IsSuccessStatusCode;
+		}
+
+		public async Task<bool> CancelReservationItem(string itemId)
+		{
+			await SetupAuthorizationHeader();
+
+			var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId));
+			return response.IsSuccessStatusCode;
+		}
 
         private async Task SetupAuthorizationHeader()
         {
