@@ -45,6 +45,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _refresher.Enabled = false;
 			_refresher.Refresh += delegate
 			{
+				_refresher.Refreshing = true;
 			    Activity.RunOnUiThread(() => UpdateDataAdapter(false));
 			};
 
@@ -61,7 +62,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             var scrollListener = new InfiniteScrollListener(_adapter, sglm, () => UpdateDataAdapter(true));
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
 
-            _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
+
 
             return view;
 		}
@@ -69,8 +70,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public override void OnResume ()
 		{
 			base.OnResume ();
-			_locMgr.RequestLocationUpdates (_locMgr.GetBestProvider(new Criteria(), false), 20000, 100, this);
+			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
+			_locMgr.RequestSingleUpdate (new Criteria {
+				Accuracy = Accuracy.Coarse,
+				PowerRequirement = Power.High
+			}, this, null);
 
+			_refresher.Refreshing = true;
             UpdateDataAdapter(false);
         }
 
@@ -127,12 +133,12 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _itemsLoader.LoadMoreItemsAsync()
                     .ContinueWith(task =>
                     {
-						_adapter.NotifyDataSetChanged();
-                    }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
-            }
-            else
-            {
-                _refresher.Refreshing = _itemsLoader.IsBusy;
+						Activity.RunOnUiThread(() => 
+						{
+							_refresher.Refreshing = false;
+							_adapter.NotifyDataSetChanged();
+						});
+					}, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }
         }
 

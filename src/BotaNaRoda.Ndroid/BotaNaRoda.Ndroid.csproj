@@ -149,6 +149,7 @@
     <Compile Include="Controllers\MyActionBarDrawerToggle.cs" />
     <Compile Include="Controllers\ItemsFragment.cs" />
     <Compile Include="Controllers\ItemDetailSubscribersAdapter.cs" />
+    <Compile Include="Util\ImageUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -179,6 +180,7 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\ItemDetailSubscribersListItem.axml" />
+    <AndroidResource Include="Resources\menu\TakePictureMenu.xml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />

@@ -20,16 +20,15 @@
             android:text="asdf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/chatMessageAuthor"
+            android:layout_marginLeft="10dp"
             android:layout_below="@id/chatMessageAuthor" />
         <TextView
             android:id="@+id/chatMessageTime"
             android:text="12:34pm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
-            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
             android:textSize="11sp"
-            android:layout_toRightOf="@id/chatMessageText" />
+            android:layout_alignParentRight="true" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

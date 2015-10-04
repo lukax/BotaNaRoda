@@ -18,6 +18,8 @@ using Xamarin.Auth;
 using Uri = Android.Net.Uri;
 using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
+using Android.Views;
+using Android.Database;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -26,9 +28,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemCreateActivity : AppCompatActivity, ILocationListener
 	{
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-        private const int CapturePhoto1 = 0;
-        private const int CapturePhoto2 = 1;
-        private const int CapturePhoto3 = 2;
+		private const int CapturePhoto1Id = 0;
+		private const int CapturePhoto2Id = 1;
+		private const int CapturePhoto3Id = 2;
         private LocationManager _locMgr;
         private Location _currentLocation;
 	    private bool _imageTaken;
@@ -61,9 +63,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        _categoriesAdapter = ArrayAdapter.CreateFromResource(this, Resource.Array.item_categories, Android.Resource.Layout.SimpleSpinnerItem);
             _categoriesAdapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _holder.ItemCategory.Adapter = _categoriesAdapter;
-            _holder.ItemImageView1.Click += (s, e) => TakePicture(CapturePhoto1);
-            _holder.ItemImageView2.Click += (s, e) => TakePicture(CapturePhoto2);
-            _holder.ItemImageView3.Click += (s, e) => TakePicture(CapturePhoto3);
+			_holder.ItemImageView1.Click += (s, e) => TakePicture(CapturePhoto1Id, _holder.ItemImageView1);
+			_holder.ItemImageView2.Click += (s, e) => TakePicture(CapturePhoto2Id, _holder.ItemImageView2);
+			_holder.ItemImageView3.Click += (s, e) => TakePicture(CapturePhoto3Id, _holder.ItemImageView3);
 			_holder.SaveBtn.Click += _saveButton_Click;
 		}
 
@@ -75,21 +77,29 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
 		{
-			if (requestCode == CapturePhoto1 || requestCode == CapturePhoto2 || requestCode == CapturePhoto3) {
+			if (requestCode == CapturePhoto1Id || 
+				requestCode == CapturePhoto2Id || 
+				requestCode == CapturePhoto3Id) {
 				if (resultCode == Result.Ok) {
 					// display saved image
 				    _imageTaken = true;
 
 				    ImageView holder = _holder.ItemImageView1;
-				    if (requestCode == CapturePhoto2)
+				    if (requestCode == CapturePhoto2Id)
 				    {
                         holder = _holder.ItemImageView2;
 				    }
-                    else if (requestCode == CapturePhoto3)
+                    else if (requestCode == CapturePhoto3Id)
                     {
                         holder = _holder.ItemImageView3;
                     }
-				    var imgUrl = _captureCodeImageUrlDictionary[requestCode];
+
+					if (data != null) {
+						//Picture selected instead of camera
+						var file = new File(GetPathToImage(data.Data));
+						_captureCodeImageUrlDictionary [requestCode] = Uri.FromFile (file);
+					} 
+					var imgUrl = _captureCodeImageUrlDictionary[requestCode];
 
                     Picasso.With(this)
                            .Load(imgUrl)
@@ -101,6 +111,22 @@ namespace BotaNaRoda.Ndroid.Controllers
 			} else {
 				base.OnActivityResult (requestCode, resultCode, data);
 			}
+		}
+
+		private string GetPathToImage(Uri uri)
+		{
+			string path = null;
+			// The projection contains the columns we want to return in our query.
+			string[] projection = new[] { Android.Provider.MediaStore.Images.Media.InterfaceConsts.Data };
+			using (ICursor cursor = ManagedQuery(uri, projection, null, null, null))
+			{
+				if (cursor != null && cursor.MoveToNext())
+				{
+					int columnIndex = cursor.GetColumnIndexOrThrow(Android.Provider.MediaStore.Images.Media.InterfaceConsts.Data);
+					path = cursor.GetString(columnIndex);
+				}
+			}
+			return path;
 		}
 
 		public void OnLocationChanged (Location location)
@@ -164,48 +190,65 @@ namespace BotaNaRoda.Ndroid.Controllers
 					Latitude = _currentLocation.Latitude,
 					Longitude = _currentLocation.Longitude
 				};
-				var newItemId = _itemService.SaveItem(item).Result;
-				if(newItemId == null){
-					Toast.MakeText(this, "Não foi possível publicar produto", ToastLength.Short);
-				}
+				args.Result = _itemService.SaveItem(item).Result;
 			};
 	        worker.RunWorkerCompleted += (o, args) =>
 	        {
+
 				RunOnUiThread(() =>
 				{
-					loadingDialog.Dismiss();
-	                Finish();
-	            });
+					if(args.Result != null) {
+						loadingDialog.Dismiss();
+						Finish();
+					}
+					else{
+						Toast.MakeText(this, "Não foi possível publicar produto", ToastLength.Short);
+					}
+				});
 	        };
             worker.RunWorkerAsync();
 		}
 
 
-	    void TakePicture(int capturePhotoCode)
+	    void TakePicture(int capturePhotoCode, View view)
 	    {
-            File imageFile = new File(_itemService.GetTempImageFilename(capturePhotoCode));
-            var imageUri = Uri.FromFile(imageFile);
-            _captureCodeImageUrlDictionary[capturePhotoCode] = imageUri;
+			PopupMenu menu = new PopupMenu (this, view);
+			menu.MenuInflater.Inflate (Resource.Menu.TakePictureMenu, menu.Menu);
+			menu.Show ();
 
-            Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
-            cameraIntent.PutExtra(MediaStore.ExtraOutput, imageUri);
-            //cameraIntent.PutExtra(MediaStore.ExtraSizeLimit, 1 * 1024);
+			menu.MenuItemClick += (object sender, PopupMenu.MenuItemClickEventArgs e) => {
+				if(e.Item.ItemId == Resource.Id.takePictureFromCamera){
+					File imageFile = new File(_itemService.GetTempImageFilename(capturePhotoCode));
+					var imageUri = Uri.FromFile(imageFile);
+					_captureCodeImageUrlDictionary[capturePhotoCode] = imageUri;
 
-            PackageManager packageManager = PackageManager;
-            IList<ResolveInfo> activities =
-                packageManager.QueryIntentActivities(cameraIntent, 0);
-            if (activities.Count == 0)
-            {
-                AlertDialog.Builder alertConfirm = new AlertDialog.Builder(this);
-                alertConfirm.SetCancelable(false);
-                alertConfirm.SetPositiveButton("OK", delegate { });
-                alertConfirm.SetMessage("No camera app available");
-                alertConfirm.Show();
-            }
-            else
-            {
-                StartActivityForResult(cameraIntent, capturePhotoCode);
-            }
+					Intent cameraIntent = new Intent(MediaStore.ActionImageCapture);
+					cameraIntent.PutExtra(MediaStore.ExtraOutput, imageUri);
+					//cameraIntent.PutExtra(MediaStore.ExtraSizeLimit, 1 * 1024);
+
+					PackageManager packageManager = PackageManager;
+					IList<ResolveInfo> activities =
+						packageManager.QueryIntentActivities(cameraIntent, 0);
+					if (activities.Count == 0)
+					{
+						AlertDialog.Builder alertConfirm = new AlertDialog.Builder(this);
+						alertConfirm.SetCancelable(false);
+						alertConfirm.SetPositiveButton("OK", delegate { });
+						alertConfirm.SetMessage("No camera app available");
+						alertConfirm.Show();
+					}
+					else
+					{
+						StartActivityForResult(cameraIntent, capturePhotoCode);
+					}
+				}
+				else if(e.Item.ItemId == Resource.Id.takePictureFromFile){
+					Intent = new Intent();
+					Intent.SetType("image/*");
+					Intent.SetAction(Intent.ActionPick);
+					StartActivityForResult(Intent.CreateChooser(Intent, "Selecionar Foto"), capturePhotoCode);
+				}
+			};
         }
 
 		void GetLocation ()

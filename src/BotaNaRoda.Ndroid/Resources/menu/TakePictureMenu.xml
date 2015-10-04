@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/takePictureFromCamera"
+          android:title="Tirar foto"
+          android:showAsAction="ifRoom"/>
+    <item android:id="@+id/takePictureFromFile"
+          android:title="Buscar foto" />
+</menu>
