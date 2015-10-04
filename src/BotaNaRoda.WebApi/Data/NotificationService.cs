@@ -23,7 +23,7 @@ namespace BotaNaRoda.WebApi.Data
             _itemsContext = itemsContext;
         }
 
-        public async void OnItemReservation(Item item)
+        public async void OnItemPromise(Item item)
         {
             var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
@@ -36,7 +36,7 @@ namespace BotaNaRoda.WebApi.Data
                 }.ToJson()));
         }
 
-        public async void OnItemReservationCancelled(Item item)
+        public async void OnItemPromiseDenied(Item item)
         {
             var usr = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
@@ -90,6 +90,32 @@ namespace BotaNaRoda.WebApi.Data
                 }.ToJson()));
         }
 
+        public async void OnItemSubscribe(Item item, string userId)
+        {
+            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(receivingEndUser.PushDeviceRegistrationId)
+                .WithJson(new ItemNotification
+                {
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = receivingEndUser.Name + " está de olho!"
+                }.ToJson()));
+        }
+
+        public async void OnItemUnsubscribe(Item item, string userId)
+        {
+            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+
+            AndroidPushBroker.QueueNotification(new GcmNotification().ForDeviceRegistrationId(receivingEndUser.PushDeviceRegistrationId)
+                .WithJson(new ItemNotification
+                {
+                    ItemId = item.Id,
+                    ItemName = item.Name,
+                    Description = receivingEndUser.Name + " desistiu"
+                }.ToJson()));
+        }
+
         private PushBroker _androidPushBroker;
         public PushBroker AndroidPushBroker
         {
@@ -110,5 +136,6 @@ namespace BotaNaRoda.WebApi.Data
             //Stop and wait for the queues to drains before it dispose 
             _androidPushBroker?.StopAllServices();
         }
+
     }
 }

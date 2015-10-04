@@ -36,7 +36,7 @@ namespace BotaNaRoda.Ndroid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.ConversationListItem);
+            SetContentView(Resource.Layout.Chat);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
             _userRepository = new UserRepository();
@@ -49,9 +49,9 @@ namespace BotaNaRoda.Ndroid
                 ItemDistance = FindViewById<TextView>(Resource.Id.chatItemDistance),
                 UserImage = FindViewById<ImageView>(Resource.Id.chatUserImage),
                 UserName = FindViewById<TextView>(Resource.Id.chatUserName),
-                MessageList = FindViewById<ListView>(Resource.Id.chatMessageList),
+				MessageList = FindViewById<ListView>(Resource.Id.chatMessageList),
                 ChatMessageText = FindViewById<EditText>(Resource.Id.chatMessageText),
-                ChatSendButton = FindViewById<ImageButton>(Resource.Id.chatSendButton)
+                ChatSendButton = FindViewById<ImageButton>(Resource.Id.chatSendButton),
             };
 
             _adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>());

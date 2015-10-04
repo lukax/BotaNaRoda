@@ -80,7 +80,23 @@ namespace BotaNaRoda.WebApi.Controllers
             }
 
             var user = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
-            return new ObjectResult(new ItemDetailViewModel(item, new UserViewModel(user)));
+
+            var viewModel = new ItemDetailViewModel(item, new UserViewModel(user));
+
+            if (User.Identity.IsAuthenticated)
+            {
+                viewModel.IsSubscribed = item.Subscribers.Contains(User.GetSubjectId());
+                if (User.GetSubjectId() == item.UserId)
+                {
+                    foreach (var subscriberId in item.Subscribers)
+                    {
+                        var subscriberDetail = await _itemsContext.Users.Find(x => x.Id == subscriberId).FirstOrDefaultAsync();
+                        viewModel.Subscribers.Add(new UserViewModel(subscriberDetail));
+                    }
+                }
+            }
+
+            return new ObjectResult(viewModel);
         }
 
         // POST api/items

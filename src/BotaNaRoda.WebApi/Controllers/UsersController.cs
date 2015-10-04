@@ -52,21 +52,21 @@ namespace BotaNaRoda.WebApi.Controllers
         }
 
         // POST api/users
-        [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterUserBindingModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Tried to register user with invalid model. " + ModelState.ToJson());
-                return HttpBadRequest(ModelState);
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> Register([FromBody] RegisterUserBindingModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        _logger.LogError("Tried to register user with invalid model. " + ModelState.ToJson());
+        //        return HttpBadRequest(ModelState);
+        //    }
 
-            var user = new User(model);
-            user.PasswordHash = new PasswordHasher<User>().HashPassword(user, model.Password);
+        //    var user = new User(model);
+        //    user.PasswordHash = new PasswordHasher<User>().HashPassword(user, model.Password);
 
-            await _itemsContext.Users.InsertOneAsync(user);
+        //    await _itemsContext.Users.InsertOneAsync(user);
 
-            return Created(Request.Path + "/" + user.Id, null);
-        }
+        //    return Created(Request.Path + "/" + user.Id, null);
+        //}
     }
 }

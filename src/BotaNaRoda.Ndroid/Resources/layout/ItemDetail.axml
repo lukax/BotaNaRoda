@@ -66,8 +66,14 @@
                 android:layout_width="fill_parent"
                 android:text="Reservar"
                 android:id="@+id/reserveButton"
+                android:visibility="gone"
                 android:layout_marginTop="15dp"
                 android:layout_below="@id/mapFragment" />
+            <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/subscribers"
+                android:layout_below="@id/reserveButton" />
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

@@ -17,6 +17,8 @@ using BotaNaRoda.Ndroid.Util;
 using Xamarin.Auth;
 using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
+using System.Collections.Generic;
+using Android.Content;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -52,9 +54,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
                 DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
+				SubscribersListView = FindViewById<ListView>(Resource.Id.subscribers)
             };
-
-            _holder.ReserveButton.Click += ReserveItem;
 
             Refresh();
         }
@@ -83,20 +84,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
 
-        async void ReserveItem(object sender, EventArgs e)
-        {
-			var result = await _itemService.ReserveItem (_item.Id);
-		    RunOnUiThread(() =>
-	            {
-					if(result){
-						_holder.ReserveButton.Text = "Reservado";
-						_holder.ReserveButton.Enabled = false;
-					}
-					else{
-						Toast.MakeText(this, "Não foi possível reservar o produto.", ToastLength.Short);				
-					}
-	            });
-        }
+
 
         void DeleteItem()
         {
@@ -146,10 +134,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         private void UpdateUi()
         {
             FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
-            if (_userRepository.IsLoggedIn && _menu != null)
-            {
-                _menu.FindItem(Resource.Id.actionDelete).SetVisible(_item.User.Username == _userRepository.Get().Username);
-            }
 
             Title = _item.Name;
             _holder.ItemAuthorNameView.Text = _item.User.Name;
@@ -168,7 +152,51 @@ namespace BotaNaRoda.Ndroid.Controllers
                .CenterCrop()
                .Tag(this)
                .Into(_holder.ItemImageView);
+
+			if (_userRepository.IsLoggedIn) {
+				if (_item.User.Username == _userRepository.Get ().Username) {
+					if (_menu != null) {
+						_menu.FindItem (Resource.Id.actionDelete).SetVisible (_item.User.Username == _userRepository.Get ().Username);
+					}
+				} 
+				if (!_item.IsSubscribed) {
+					_holder.ReserveButton.Visibility = ViewStates.Visible;
+					_holder.ReserveButton.Text = "Reservar";
+					_holder.ReserveButton.Click += Subscribe;
+				} else {
+					_holder.ReserveButton.Visibility = ViewStates.Visible;
+					_holder.ReserveButton.Text = "Reservado";
+				}
+			}
+			if (_item.Subscribers != null) {
+				_holder.SubscribersListView.Adapter = new ItemDetailSubscribersAdapter (this, _item.Subscribers);
+				_holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+			}
         }
+
+		async void Subscribe(object sender, EventArgs e)
+		{
+			var result = await _itemService.Subscribe (_item.Id);
+			RunOnUiThread(() =>
+				{
+					if(result){
+						_holder.ReserveButton.Text = "Reservado";
+						_holder.ReserveButton.Enabled = false;
+					}
+					else{
+						Toast.MakeText(this, "Não foi possível reservar o produto.", ToastLength.Short);				
+					}
+				});
+		}
+
+		async void _holder_SubscribersListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+		{
+			var conversationId = await _itemService.Promise (_item.Id, _item.Subscribers [e.Position].Id);
+
+			Intent chatIntent = new Intent(this, typeof(ChatActivity));
+			chatIntent.PutExtra("conversationId", conversationId);
+			StartActivity(chatIntent);
+		}
 
         protected override void OnDestroy()
         {
@@ -187,7 +215,9 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal Button ReserveButton;
             internal TextView DistanceView;
             internal ImageView ItemAuthorImageView;
+			internal ListView SubscribersListView;
         }
     }
+
 }
 

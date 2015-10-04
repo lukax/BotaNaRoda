@@ -5,7 +5,7 @@
     "IdSvrAudience": "https://botanaroda.com.br/resources",
     "BotaNaRodaConnectionString": "mongodb://localhost",
     "BotaNaRodaDatabaseName": "botanaroda",
-    "StorageConnectionString": "",
+    "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=atworkrio;AccountKey=+fFYyHH8LqdWE686Sl9XDUoRT/plmAhndoKzxz4Q3OJGNFlPzBLvhGWh/dnQU+CsgHYip9+qRMOGQRW7WYCRxg==",
     "LogglyCustomerToken":  "",
     "AndroidApiKey":  "AIzaSyDJGzxpr9nlQP9yDMFWQZOm7Bp__S_tzdU"
   }

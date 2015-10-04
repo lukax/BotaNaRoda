@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BotaNaRoda.Ndroid.Models
 {
@@ -17,5 +18,8 @@ namespace BotaNaRoda.Ndroid.Models
         public double Longitude { get; set; }
         public string Address { get; set; }
         public string Locality { get; set; }
+
+		public bool IsSubscribed { get; set; }
+		public IList<UserViewModel> Subscribers { get; set; }
     }
 }

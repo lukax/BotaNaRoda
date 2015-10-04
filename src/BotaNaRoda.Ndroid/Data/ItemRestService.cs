@@ -170,9 +170,8 @@ namespace BotaNaRoda.Ndroid.Data
         {
             await SetupAuthorizationHeader();
 
-            var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "DeviceRegistrationId"),
-                new StringContent(JsonConvert.SerializeObject(registrationId), System.Text.Encoding.UTF8,
-                    "application/json"));
+			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "DeviceRegistrationId", registrationId),
+                new StringContent("", System.Text.Encoding.UTF8, "application/json"));
             return response.IsSuccessStatusCode;
         }
 
@@ -214,20 +213,43 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-		public async Task<bool> ReserveItem(string itemId)
+		public async Task<bool> Subscribe(string itemId)
 		{
 			await SetupAuthorizationHeader();
 
-			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId),
+			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId, "Subscribe"),
 				new StringContent("", System.Text.Encoding.UTF8, "application/json"));
 			return response.IsSuccessStatusCode;
 		}
 
-		public async Task<bool> CancelReservationItem(string itemId)
+		public async Task<bool> Unsubscribe(string itemId)
 		{
 			await SetupAuthorizationHeader();
 
-			var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId));
+			var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId, "Subscribe"));
+			return response.IsSuccessStatusCode;
+		}
+
+		public async Task<string> Promise(string itemId, string userId)
+		{
+			await SetupAuthorizationHeader();
+
+			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId, "Promise", userId), 
+				new StringContent("", System.Text.Encoding.UTF8, "application/json"));
+			if (response.IsSuccessStatusCode)
+			{
+				var json = await response.Content.ReadAsStringAsync();
+				return JsonConvert.DeserializeObject<string>(json);
+			}
+
+			return null;
+		}
+
+		public async Task<bool> Unpromise(string itemId, string userId)
+		{
+			await SetupAuthorizationHeader();
+
+			var response = await _httpClient.DeleteAsync(Path.Combine(BotaNaRodaReservationsEndpoint, itemId, "Promise", userId));
 			return response.IsSuccessStatusCode;
 		}
 
@@ -251,6 +273,7 @@ namespace BotaNaRoda.Ndroid.Data
 
                     var response = new TokenResponse(raw);
 					if (response.IsError) {
+						_userRepository.DeleteExistingAccounts ();
 						_context.StartActivity (typeof(LoginActivity));
 						Log.Error ("ItemRestService", "Could not refresh token. " + response.Error);
 					} else {

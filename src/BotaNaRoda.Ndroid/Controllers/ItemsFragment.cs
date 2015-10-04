@@ -90,18 +90,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _adapter.UserLatLon = usr;
 			_adapter.NotifyDataSetChanged ();
 
-            Geocoder geocdr = new Geocoder(Activity);
-            var addr = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1).First();
-
-		    _itemService.PostUserLocalization(new UserLocalizationBindingModel
-		    {
-                Latitude = location.Latitude,
-                Longitude = location.Longitude,
-                Address = addr.Thoroughfare,
-                PostalCode = addr.PostalCode,
-                CountryCode = addr.CountryCode,
-                Locality = addr.Locality
-            }).Wait();
+			UpdateUserLocation (location);
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -150,6 +139,22 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _refresher.Refreshing = _itemsLoader.IsBusy;
             }
         }
+
+		private async void UpdateUserLocation(Location location){
+			Geocoder geocdr = new Geocoder(Activity);
+			var addr = (await geocdr.GetFromLocationAsync(location.Latitude, location.Longitude, 1)).FirstOrDefault();
+			if (addr != null) {
+				await _itemService.PostUserLocalization(new UserLocalizationBindingModel
+					{
+						Latitude = location.Latitude,
+						Longitude = location.Longitude,
+						Address = addr.Thoroughfare,
+						PostalCode = addr.PostalCode,
+						CountryCode = addr.CountryCode,
+						Locality = addr.Locality
+					});
+			}
+		}
 
         public override void OnDetach()
         {

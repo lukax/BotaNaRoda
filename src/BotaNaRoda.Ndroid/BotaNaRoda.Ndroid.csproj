@@ -148,6 +148,7 @@
     <Compile Include="Controllers\MainActivity.cs" />
     <Compile Include="Controllers\MyActionBarDrawerToggle.cs" />
     <Compile Include="Controllers\ItemsFragment.cs" />
+    <Compile Include="Controllers\ItemDetailSubscribersAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -177,6 +178,7 @@
     <AndroidResource Include="Resources\layout\ChatMessage.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\ItemDetailSubscribersListItem.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />

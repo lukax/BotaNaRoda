@@ -106,8 +106,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 		public void OnLocationChanged (Location location)
 		{
 			_currentLocation = location;
-            Geocoder geocdr = new Geocoder(this);
-            _address = geocdr.GetFromLocation(location.Latitude, location.Longitude, 1).First();
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -122,45 +120,55 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		}
 
-	    void _saveButton_Click (object sender, EventArgs e)
+	    async void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-			 	var locationDialog = ProgressDialog.Show (this, "", "Obtendo localização...");
-				Task.Delay(2000).ContinueWith(t =>
-			    {
-					RunOnUiThread(() => { locationDialog.Dismiss(); });
-			    });
+				Toast.MakeText (this, "Obtendo dados do GPS...", ToastLength.Short).Show();
+				return;
+			}
 
-                return;
+		 	var locationDialog = ProgressDialog.Show (this, "", "Obtendo localização...");
+			int attempts = 0;
+			while (_address == null && attempts < 100) {
+				Geocoder geocdr = new Geocoder(this);
+				_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
+				attempts++;
+			}
+			RunOnUiThread(() => { locationDialog.Dismiss(); });
+
+			if (_address == null) {
+				Toast.MakeText (this, "Não foi possível obter localização", ToastLength.Short).Show();
+				return;
 			}
             if (!_imageTaken)
             {
-                Toast toast = Toast.MakeText(this, "Não é possivel publicar sem pelo menos uma foto!", ToastLength.Short);
-                toast.Show();
+				Toast.MakeText(this, "Não é possivel publicar sem pelo menos uma foto!", ToastLength.Short).Show();
                 return;
             }
-
-		    var item = new ItemCreateBindingModel
-		    {
-                Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
-		        Name = _holder.ItemTitleView.Text,
-		        Description = _holder.ItemDescriptionView.Text,
-		        Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
-		        Address = _address.Thoroughfare,
-                PostalCode = _address.PostalCode,
-                CountryCode = _address.CountryCode,
-                Locality = _address.Locality,
-		        Latitude = _currentLocation.Latitude,
-		        Longitude = _currentLocation.Longitude
-		    };
 
             var loadingDialog = ProgressDialog.Show(this, "", "Carregando...");
 
             BackgroundWorker worker = new BackgroundWorker();
 	        worker.DoWork += (o, args) =>
 	        {
-				_itemService.SaveItem(item).Wait();
-	        };
+				var item = new ItemCreateBindingModel
+				{
+					Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
+					Name = _holder.ItemTitleView.Text,
+					Description = _holder.ItemDescriptionView.Text,
+					Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
+					Address = _address.Thoroughfare,
+					PostalCode = _address.PostalCode,
+					CountryCode = _address.CountryCode,
+					Locality = _address.Locality,
+					Latitude = _currentLocation.Latitude,
+					Longitude = _currentLocation.Longitude
+				};
+				var newItemId = _itemService.SaveItem(item).Result;
+				if(newItemId == null){
+					Toast.MakeText(this, "Não foi possível publicar produto", ToastLength.Short);
+				}
+			};
 	        worker.RunWorkerCompleted += (o, args) =>
 	        {
 				RunOnUiThread(() =>

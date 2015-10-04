@@ -67,7 +67,7 @@ namespace BotaNaRoda.Ndroid.Data
             AccountStore.Create(_context).Save(acc, ServiceId);
         }
 
-        private void DeleteExistingAccounts()
+        public void DeleteExistingAccounts()
         {
             foreach (var acc in AccountStore.Create(_context).FindAccountsForService(ServiceId))
             {
