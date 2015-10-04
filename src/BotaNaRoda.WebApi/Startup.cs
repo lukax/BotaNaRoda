@@ -88,14 +88,15 @@ namespace BotaNaRoda.WebApi
                 {
                     IssuerUri = "https://botanaroda.com.br",
                     SiteName = "Bota na Roda",
-
+                    EnableWelcomePage  = false,
                     RequireSsl = false,
                     SigningCertificate = new X509Certificate2(env.ApplicationBasePath + "\\Identity\\idsrv3test.pfx", "idsrv3test"),
                     Factory = idSvrMongoDbFactory,
-
+                    
                     AuthenticationOptions = new AuthenticationOptions
                     {
-                        IdentityProviders = ConfigureAdditionalIdentityProviders
+                        IdentityProviders = ConfigureAdditionalIdentityProviders,
+                        EnableLocalLogin = false
                     },
 
                     EventsOptions = new EventsOptions

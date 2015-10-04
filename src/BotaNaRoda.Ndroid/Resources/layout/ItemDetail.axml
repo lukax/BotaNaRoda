@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ScrollView
-        android:layout_marginBottom="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <RelativeLayout
@@ -62,12 +61,13 @@
                 android:layout_height="200dp"
                 class="com.google.android.gms.maps.MapFragment"
                 android:layout_below="@id/itemsDetailLocation" />
+            <Button
+                android:layout_height="50dp"
+                android:layout_width="fill_parent"
+                android:text="Reservar"
+                android:id="@+id/reserveButton"
+                android:layout_marginTop="15dp"
+                android:layout_below="@id/mapFragment" />
         </RelativeLayout>
     </ScrollView>
-    <Button
-        android:layout_height="50dp"
-        android:layout_width="fill_parent"
-        android:text="Reservar"
-        android:id="@+id/reserveButton"
-        android:layout_alignParentBottom="true" />
 </RelativeLayout>
