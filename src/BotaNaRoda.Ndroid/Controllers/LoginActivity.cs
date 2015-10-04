@@ -9,7 +9,7 @@ using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "Login",
+	[Activity (Label = "Fazer Login - Bota na Roda",
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
         LaunchMode = Android.Content.PM.LaunchMode.SingleTask,
         ParentActivity = typeof(MainActivity))]

@@ -6,34 +6,29 @@
     p1:minWidth="25px"
     p1:minHeight="25px">
     <ImageView
-        p1:id="@+id/conversationProfileImage"
+        p1:id="@+id/itemDetailSubscriberProfileImage"
         p1:src="@drawable/contact_picture_placeholder"
-        p1:layout_width="80dp"
-        p1:layout_height="80dp" />
+        p1:layout_width="40dp"
+        p1:layout_height="40dp" />
     <TextView
-        p1:id="@+id/conversationUserName"
+        p1:id="@+id/itemDetailSubscriberName"
         p1:text="Lucas E."
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_marginTop="20dp"
-        p1:layout_toRightOf="@id/conversationProfileImage" />
+        p1:layout_marginTop="5dp"
+        p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
+        p1:layout_marginLeft="5dp" />
     <TextView
-        p1:id="@+id/conversationItemName"
-        p1:text="Luva de Neve"
+        p1:id="@+id/itemDetailSubscriberLocality"
+        p1:text="(Ativo)"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_below="@id/conversationUserName"
-        p1:layout_toRightOf="@id/conversationProfileImage" />
-    <TextView
-        p1:id="@+id/conversationLastMessageTime"
-        p1:text="11 horas atrás"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:layout_below="@id/conversationItemName"
-        p1:layout_toRightOf="@id/conversationProfileImage" />
+        p1:layout_below="@id/itemDetailSubscriberName"
+        p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
+        p1:layout_marginLeft="5dp" />
     <ImageView
         p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
         p1:layout_alignParentRight="true"
         p1:layout_width="25dp"
-        p1:layout_height="80dp" />
+        p1:layout_height="40dp" />
 </RelativeLayout>

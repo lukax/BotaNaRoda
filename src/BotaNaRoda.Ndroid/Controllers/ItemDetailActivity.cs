@@ -54,7 +54,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
                 DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
-				SubscribersListView = FindViewById<ListView>(Resource.Id.subscribers)
+				SubscribersListView = FindViewById<ListView>(Resource.Id.subscribers),
+				Subscribers = FindViewById<LinearLayout>(Resource.Id.subscribers)
             };
 
             Refresh();
@@ -169,6 +170,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				}
 			}
 			if (_item.Subscribers != null) {
+				_holder.Subscribers.Visibility = ViewStates.Visible;
 				_holder.SubscribersListView.Adapter = new ItemDetailSubscribersAdapter (this, _item.Subscribers);
 				_holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
 			}
@@ -216,6 +218,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal TextView DistanceView;
             internal ImageView ItemAuthorImageView;
 			internal ListView SubscribersListView;
+			internal LinearLayout Subscribers;
         }
     }
 

@@ -63,17 +63,30 @@
                 android:layout_below="@id/itemsDetailLocation" />
             <Button
                 android:layout_height="50dp"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:text="Reservar"
                 android:id="@+id/reserveButton"
                 android:visibility="gone"
                 android:layout_marginTop="15dp"
                 android:layout_below="@id/mapFragment" />
-            <ListView
-                android:layout_width="fill_parent"
+            <LinearLayout
+                android:id="@+id/subscribersLayout"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/subscribers"
-                android:layout_below="@id/reserveButton" />
+                android:layout_below="@id/reserveButton"
+                android:visibility="gone"
+                android:layout_marginTop="50dp">
+                <TextView
+                    android:text="Interessados"
+                    android:textSize="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp" />
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/subscribers" />
+            </LinearLayout>
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

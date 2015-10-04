@@ -11,10 +11,17 @@
         android:layout_height="wrap_content"
         android:id="@+id/relativeLayout1">
         <TextView
-            android:id="@+id/chatMessageText"
+            android:id="@+id/chatMessageAuthor"
             android:text="asdf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/chatMessageText"
+            android:text="asdf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/chatMessageAuthor"
+            android:layout_below="@id/chatMessageAuthor" />
         <TextView
             android:id="@+id/chatMessageTime"
             android:text="12:34pm"

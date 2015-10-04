@@ -37,6 +37,7 @@ namespace BotaNaRoda.Ndroid.Models
     public class ConversationChatMessage
     {
         public string Message { get; set; }
-        public DateTime Sent { get; set; }
+        public DateTime SentAt { get; set; }
+		public string SentBy { get; set; }
     }
 }

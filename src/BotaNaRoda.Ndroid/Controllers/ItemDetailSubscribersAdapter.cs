@@ -40,15 +40,14 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public override View GetView(int position, View convertView, ViewGroup parent)
 		{
-			var view = convertView ?? _context.LayoutInflater.Inflate(Resource.Layout.ConversationListItem, null);
+			var view = convertView ?? _context.LayoutInflater.Inflate(Resource.Layout.ItemDetailSubscribersListItem, null);
 
 			var user = this[position];
 
-			view.FindViewById<TextView>(Resource.Id.conversationUserName).Text = user.Name;
-			view.FindViewById<TextView>(Resource.Id.conversationItemName).Text = user.Locality;
-			view.FindViewById<TextView>(Resource.Id.conversationLastMessageTime).Text = "";
+			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberName).Text = user.Name;
+			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberLocality).Text = user.Locality;
 
-			var imageView = view.FindViewById<ImageView>(Resource.Id.conversationProfileImage);
+			var imageView = view.FindViewById<ImageView>(Resource.Id.itemDetailSubscriberProfileImage);
 			Picasso.With(_context)
 				.Load(user.Avatar)
 				.Fit()

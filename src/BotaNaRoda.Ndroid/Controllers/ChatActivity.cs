@@ -21,7 +21,7 @@ using System.IO;
 namespace BotaNaRoda.Ndroid
 {
     [Activity(Label = "Bota na Roda",
-        Theme = "@style/ItemDetailTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
+		Theme = "@style/MainTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
         ParentActivity = typeof (MainActivity))]
     public class ChatActivity : AppCompatActivity
     {

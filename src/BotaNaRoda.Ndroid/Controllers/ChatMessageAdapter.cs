@@ -31,8 +31,8 @@ namespace BotaNaRoda.Ndroid
             var msg = this[position];
 
             view.FindViewById<TextView>(Resource.Id.chatMessageText).Text = msg.Message;
-            view.FindViewById<TextView>(Resource.Id.chatMessageTime).Text = msg.Sent.ToString("MM-dd HH:mm:ss");
-
+            view.FindViewById<TextView>(Resource.Id.chatMessageTime).Text = msg.SentAt.ToString("MM-dd HH:mm:ss");
+			view.FindViewById<TextView> (Resource.Id.chatMessageAuthor).Text = msg.SentBy;
             return view;
         }
 
