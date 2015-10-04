@@ -180,8 +180,7 @@ namespace BotaNaRoda.Ndroid.Data
             await SetupAuthorizationHeader();
 
             var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "Localization"),
-                new StringContent(JsonConvert.SerializeObject(localization), System.Text.Encoding.UTF8,
-                    "application/json"));
+				new StringContent(JsonConvert.SerializeObject(localization), System.Text.Encoding.UTF8, "application/json"));
             return response.IsSuccessStatusCode;
         }
 

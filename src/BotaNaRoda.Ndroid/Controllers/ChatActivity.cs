@@ -16,6 +16,7 @@ using BotaNaRoda.Ndroid.Util;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using Square.Picasso;
+using System.IO;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -83,8 +84,8 @@ namespace BotaNaRoda.Ndroid
             {
                 var authInfo = _userRepository.Get();
                 // Connect to the server
-                var hubConnection = new HubConnection(Constants.BotaNaRodaEndpoint);
-                hubConnection.Headers["Authorization"] = new AuthenticationHeaderValue("Bearer", authInfo.AccessToken).ToString();
+				var hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
+				hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
 
                 // Create a proxy to the 'ChatHub' SignalR Hub
                 _chatHubProxy = hubConnection.CreateHubProxy("ChatHub");
@@ -93,12 +94,11 @@ namespace BotaNaRoda.Ndroid
                 // to be called on our client
                 _chatHubProxy.On<ConversationChatMessage>("OnMessageReceived", message =>
                 {
-                    _adapter.ChatMessages.Add(message);
-                    _adapter.NotifyDataSetChanged();
+						RunOnUiThread(() => MessageReceived(message));
                 });
 
                 // Start the connection
-                hubConnection.Start();
+				hubConnection.Start().Wait();
                 _connectionViewModel = _chatHubProxy.Invoke<ConversationChatConnectionViewModel>("Connect", _conversationId).Result;
                 //---
             };
@@ -111,6 +111,12 @@ namespace BotaNaRoda.Ndroid
 
         private void UpdateUi()
         {
+			if (_connectionViewModel == null) {
+				Toast.MakeText (this, "Não foi possível carregar as mensagens", ToastLength.Short);
+				Finish ();
+				return;
+			}
+
             var authInfo = _userRepository.Get();
 
             _holder.ItemName.Text = _connectionViewModel.Item.Name;
@@ -125,6 +131,11 @@ namespace BotaNaRoda.Ndroid
 
             _loadingDialog.Hide();
         }
+
+		private void MessageReceived(ConversationChatMessage message){
+			_adapter.ChatMessages.Add(message);
+			_adapter.NotifyDataSetChanged();
+		}
 
         protected override void OnDestroy()
         {

@@ -120,15 +120,14 @@ namespace BotaNaRoda.Ndroid
         
         private void LoadFragment(Type value)
         {
-			lock (_lockObj) {
-	            var tx = SupportFragmentManager.BeginTransaction();
-				if (_currentFragment != null) {
-					tx.Remove (_currentFragment);
-				}
-	            _currentFragment = (Fragment) Activator.CreateInstance(value);
-	            tx.Add(Resource.Id.container, _currentFragment, value.Name);
-	            tx.Commit();
+			for (int i = 0; i < SupportFragmentManager.BackStackEntryCount; i++) {
+				SupportFragmentManager.PopBackStack ();
 			}
+
+            var tx = SupportFragmentManager.BeginTransaction();
+            _currentFragment = (Fragment) Activator.CreateInstance(value);
+			tx.Replace(Resource.Id.container, _currentFragment, value.Name);
+            tx.Commit();
         }
 
         public void OnItemClick(AdapterView parent, View view, int position, long id)

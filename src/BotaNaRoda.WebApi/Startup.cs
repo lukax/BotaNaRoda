@@ -111,22 +111,23 @@ namespace BotaNaRoda.WebApi
                 core.UseIdentityServer(idsrvOptions);
             });
 
-            app.Map("/api", api =>
+            app.Map("/api", theApi =>
             {
                 //Really? yet??
                 JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
 
-                api.UseOAuthBearerAuthentication(options =>
+                theApi.UseOAuthBearerAuthentication(options =>
                 {
                     options.Authority = appSettings.Options.IdSvrAuthority;
                     options.Audience = appSettings.Options.IdSvrAudience;
                     options.AutomaticAuthentication = true;
                 });
 
-                api.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.BotaNaRodaApiScope });
+                theApi.UseMiddleware<RequiredScopesMiddleware>(new List<string> { Scopes.BotaNaRodaApiScope });
 
-                api.UseMvc();
-                app.UseSignalR();
+                theApi.UseMvc();
+                theApi.UseSignalR();
+                theApi.UseStaticFiles();
             });
         }
 

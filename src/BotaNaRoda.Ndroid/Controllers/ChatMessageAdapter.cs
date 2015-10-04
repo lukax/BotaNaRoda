@@ -26,7 +26,7 @@ namespace BotaNaRoda.Ndroid
 
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
-            var view = convertView ?? _context.LayoutInflater.Inflate(Resource.Layout.ConversationListItem, null);
+			var view = convertView ?? _context.LayoutInflater.Inflate(Resource.Layout.ChatMessage, null);
 
             var msg = this[position];
 
