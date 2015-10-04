@@ -127,11 +127,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _itemsLoader.LoadMoreItemsAsync()
                     .ContinueWith(task =>
                     {
-                        var newItemsCount = task.Result;
-                        if (newItemsCount > 0)
-                        {
-							_adapter.NotifyDataSetChanged();
-                        }
+						_adapter.NotifyDataSetChanged();
                     }, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }
             else
