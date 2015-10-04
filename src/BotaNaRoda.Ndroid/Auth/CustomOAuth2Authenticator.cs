@@ -24,7 +24,7 @@ namespace BotaNaRoda.Ndroid.Auth
         private readonly UserRepository _userRepository;
         private readonly Uri _redirectUrl;
 
-        public CustomOAuth2Authenticator(UserRepository userRepository)
+		public CustomOAuth2Authenticator(UserRepository userRepository)
         {
             _userRepository = userRepository;
             Title = "Bota na Roda";
@@ -71,6 +71,8 @@ namespace BotaNaRoda.Ndroid.Auth
             //wtf???
             var parsedUrl = url.AbsoluteUri.Substring(0, url.AbsoluteUri.LastIndexOf("#"));
 
+			//ProgressDialog.Show ("Login", "Carregando...");
+
             var authorizeResponse = new AuthorizeResponse(parsedUrl);
             if (authorizeResponse.IsError)
             {
@@ -89,15 +91,13 @@ namespace BotaNaRoda.Ndroid.Auth
             {
                 Log.Error("CustomOAuth2Authenticator", "Could not request authorization code. " + tokenResponse.Error);
             }
-
-
+				
+            OnSucceeded(new Account());
+        	
 			var authInfo = _userRepository.Get();
 			authInfo.Update(tokenResponse);
-
-			OnSucceeded(new Account(authInfo.Username));
-
 			_userRepository.Save(authInfo);
-        }
+		}
 
 
     }

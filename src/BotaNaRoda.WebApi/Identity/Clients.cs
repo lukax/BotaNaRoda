@@ -29,11 +29,11 @@ namespace BotaNaRoda.WebApi.Identity
                     RedirectUris = new List<string>
                     {
                         "https://botanaroda.azurewebsites.net/core",
+                        "http://192.168.1.106:44200/core",
                     },
                     IdentityTokenLifetime = 360,
                     AccessTokenLifetime = 36000
                 },
-
 #if DEBUG
                 new Client
                 {

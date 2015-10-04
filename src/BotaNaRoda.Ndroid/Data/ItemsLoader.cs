@@ -13,7 +13,7 @@ namespace BotaNaRoda.Ndroid.Data
     {
         private readonly ItemRestService _itemRestService;
         public int ItemsPerPage { get; set; }
-        public List<ItemListViewModel> Items { get; set; }
+		public readonly List<ItemListViewModel> Items;
         public bool CanLoadMoreItems { get; set; }
         public int CurrentPageValue { get; set; }
         public bool IsBusy { get; set; }
@@ -34,7 +34,9 @@ namespace BotaNaRoda.Ndroid.Data
             var loaded = await _itemRestService.GetAllItems(10000, CurrentPageValue, ItemsPerPage);
             var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
-            Items.AddRange(itemListViewModels);
+			itemListViewModels = itemListViewModels.Where (x => !Items.Any (y => y.Id == x.Id)).ToArray();
+
+			Items.AddRange(itemListViewModels);
 
             CurrentPageValue = Items.Count;
             CanLoadMoreItems = (itemListViewModels.Length != 0 &&

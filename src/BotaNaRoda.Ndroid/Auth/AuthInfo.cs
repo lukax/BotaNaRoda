@@ -16,7 +16,8 @@ namespace BotaNaRoda.Ndroid.Data
         public string Name { get { return GetPropFromTokenSafely<string>("name", IdentityToken); } }
         public string Picture { get { return GetPropFromTokenSafely<string>("picture", IdentityToken); } }
 		public string Address { get { return GetPropFromTokenSafely<string>("address", IdentityToken); } }
-		public DateTime NotBefore { get { return GetPropFromTokenSafely<long> ("nbf", AccessToken).ToDateTimeFromEpoch(); } }
+		public DateTimeOffset NotBefore { get { return GetPropFromTokenSafely<long> ("nbf", AccessToken).ToDateTimeOffsetFromEpoch(); } }
+		public DateTimeOffset ExpiresIn { get { return GetPropFromTokenSafely<long> ("exp", AccessToken).ToDateTimeOffsetFromEpoch(); } }
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
@@ -47,7 +48,7 @@ namespace BotaNaRoda.Ndroid.Data
         {
 			if (AccessToken != null)
             {
-				return NotBefore < DateTime.UtcNow;
+				return DateTimeOffset.UtcNow >= ExpiresIn;
             }
             return false;
         }
