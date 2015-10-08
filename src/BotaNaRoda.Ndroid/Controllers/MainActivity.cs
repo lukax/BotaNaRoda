@@ -76,7 +76,7 @@ namespace BotaNaRoda.Ndroid
             //Check for gplay
 	        if (IsPlayServicesAvailable())
 	        {
-	            var intent = new Intent(this, typeof (GcmRegistrationIntentService));
+	            var intent = new Intent(this, typeof (RegistrationIntentService));
 	            StartService(intent);
 	        }
         }

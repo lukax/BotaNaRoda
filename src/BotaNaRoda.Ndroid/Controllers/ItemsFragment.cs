@@ -42,11 +42,11 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemsLoader = new ItemsLoader(_itemService, 20);
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            _refresher.Enabled = false;
+			_refresher.Enabled = false;
 			_refresher.Refresh += delegate
 			{
 				_refresher.Refreshing = true;
-			    Activity.RunOnUiThread(() => UpdateDataAdapter(false));
+			    UpdateDataAdapter(false);
 			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
@@ -133,11 +133,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                 _itemsLoader.LoadMoreItemsAsync()
                     .ContinueWith(task =>
                     {
-						Activity.RunOnUiThread(() => 
-						{
-							_refresher.Refreshing = false;
-							_adapter.NotifyDataSetChanged();
-						});
+						_refresher.Refreshing = false;
+						_adapter.NotifyDataSetChanged();
 					}, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
             }
         }

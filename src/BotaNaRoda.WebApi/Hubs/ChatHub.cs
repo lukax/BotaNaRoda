@@ -52,7 +52,12 @@ namespace BotaNaRoda.WebApi.Hubs
             var viewModel = new ConversationChatConnectionViewModel
             {
                 UpdatedAt = conversation.UpdatedAt,
-                Messages = conversation.Messages.ToList(),
+                Messages = conversation.Messages.Select(x => new ConversationChatMessageViewModel
+                {
+                    Message = x.Message,
+                    SentAt = x.SentAt,
+                    SentBy = x.SentBy
+                }).ToList(),
                 Item = new ItemListViewModel(item)
             };
 
@@ -98,16 +103,14 @@ namespace BotaNaRoda.WebApi.Hubs
                     }));
 
                 Clients.Clients(new [] { conversation.HubInfo.ToUserConnectionId, conversation.HubInfo.FromUserConnectionId})
-                    .OnMessageReceived(new
+                    .OnMessageReceived(new ConversationChatMessageViewModel
                     {
                         Message = sendMessageModel.Message,
-                        SentAt = DateProvider.Get
+                        SentAt = DateProvider.Get,
+                        SentBy = userId
                     });
 
-                var receivingEndUserId = userId == conversation.FromUserId
-                    ? conversation.ToUserId
-                    : conversation.FromUserId;
-                _notificationService.OnConversationMessageSent(conversation, receivingEndUserId);
+                _notificationService.OnConversationMessageSent(conversation, userId);
             }
         }
 

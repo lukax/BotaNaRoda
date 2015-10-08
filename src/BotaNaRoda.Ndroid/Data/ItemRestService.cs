@@ -170,8 +170,8 @@ namespace BotaNaRoda.Ndroid.Data
         {
             await SetupAuthorizationHeader();
 
-			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "DeviceRegistrationId", registrationId),
-                new StringContent("", System.Text.Encoding.UTF8, "application/json"));
+			var response = await _httpClient.PostAsync(Path.Combine(BotaNaRodaAccountEndpoint, "DeviceRegistrationId"),
+				new StringContent(JsonConvert.SerializeObject(registrationId), System.Text.Encoding.UTF8, "application/json"));
             return response.IsSuccessStatusCode;
         }
 

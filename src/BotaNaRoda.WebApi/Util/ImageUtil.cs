@@ -6,20 +6,55 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Driver.GeoJsonObjectModel.Serializers;
 
 namespace BotaNaRoda.WebApi.Util
 {
     public class ImageUtil
     {
-        public static Bitmap ResizeImageProportionally(Stream stream, int width)
+        public static Stream CompressImage(Stream stream, int quality)
         {
-            var original = Image.FromStream(stream);
-            double ratio = (original.Width*1.0)/original.Height;
-            int proportionalHeight = (int) (width/ratio);
+            if (quality < 0 || quality > 100)
+                throw new ArgumentOutOfRangeException(nameof(quality));
 
-            return ResizeImage(original, width, proportionalHeight);
+            using (stream)
+            {
+                var original = Image.FromStream(stream);
+
+                var ms = new MemoryStream();
+
+                // Encoder parameter for image quality 
+                EncoderParameter qualityParam = new EncoderParameter(Encoder.Quality, quality);
+                // Jpeg image codec 
+                ImageCodecInfo jpegCodec = ImageCodecInfo.GetImageEncoders().First(t => t.MimeType == "image/jpeg");
+
+                EncoderParameters encoderParams = new EncoderParameters(1);
+                encoderParams.Param[0] = qualityParam;
+
+                original.Save(ms, jpegCodec, encoderParams);
+
+                ms.Position = 0;
+                return ms;
+            }
         }
 
+        public static Stream CreateThumbnail(Stream stream, int width)
+        {
+            using (stream)
+            {
+                var ms = new MemoryStream();
+
+                var original = Image.FromStream(stream);
+                double ratio = (original.Width * 1.0) / original.Height;
+                int proportionalHeight = (int)(width / ratio);
+
+                var image = ResizeImage(original, width, proportionalHeight);
+                image.Save(ms, ImageFormat.Jpeg);
+
+                ms.Position = 0;
+                return ms;
+            }
+        }
 
         /// <summary>
         /// Resize the image to the specified width and height.

@@ -1,23 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BotaNaRoda.WebApi.Entity
 {
-
-    public class ChatMessageNotification
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public interface IDeviceNotification
     {
-        public string Description { get; set; }
-        public string ConversationId { get; set; }
-        public string ItemId { get; set; }
-        public string ItemName { get; set; }
+        string message { get; set; }
     }
 
-    public class ItemNotification
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class ChatMessageNotification : IDeviceNotification
     {
-        public string Description { get; set; }
-        public string ItemId { get; set; }
-        public string ItemName { get; set; }
+        public string message { get; set; }
+        public string conversationId { get; set; }
+        public string itemId { get; set; }
+        public string itemName { get; set; }
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class ItemNotification : IDeviceNotification
+    {
+        public string message { get; set; }
+        public string itemId { get; set; }
+        public string itemName { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
+using BotaNaRoda.Ndroid.Data;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -12,10 +13,12 @@ namespace BotaNaRoda.Ndroid
     {
         private readonly Activity _context;
         public IList<ConversationChatMessage> ChatMessages { get; set; }
+		private readonly AuthInfo _currentUser;
 
-        public ChatMessageAdapter(Activity context, IList<ConversationChatMessage> chatMessages)
+        public ChatMessageAdapter(Activity context, IList<ConversationChatMessage> chatMessages, AuthInfo currentUser)
         {
             _context = context;
+			_currentUser = currentUser;
             ChatMessages = chatMessages;
         }
 
@@ -32,7 +35,14 @@ namespace BotaNaRoda.Ndroid
 
             view.FindViewById<TextView>(Resource.Id.chatMessageText).Text = msg.Message;
             view.FindViewById<TextView>(Resource.Id.chatMessageTime).Text = msg.SentAt.ToString("MM-dd HH:mm:ss");
-			view.FindViewById<TextView> (Resource.Id.chatMessageAuthor).Text = msg.SentBy;
+
+			if (_currentUser.Id == msg.SentBy) {
+				view.SetBackgroundColor (Android.Graphics.Color.Green);	
+			} 
+			else {
+				view.SetBackgroundColor (Android.Graphics.Color.White);	
+			}
+
             return view;
         }
 

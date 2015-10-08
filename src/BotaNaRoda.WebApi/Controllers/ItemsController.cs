@@ -112,6 +112,8 @@ namespace BotaNaRoda.WebApi.Controllers
 
             var item = new Item(model, User.GetSubjectId());
             await _itemsContext.Items.InsertOneAsync(item);
+
+            _notificationService.OnItemPost(item, User.GetSubjectId());
             return new JsonResult(item.Id);
         }
 
@@ -174,7 +176,7 @@ namespace BotaNaRoda.WebApi.Controllers
             List<ImageInfo> imageInfoList = new List<ImageInfo>();
             foreach (var file in files)
             {
-                if (file.Length > 2000000 || file.ContentType != "image/jpeg")
+                if (file.Length > 10000000 || file.ContentType != "image/jpeg")
                 {
                     _logger.LogError("Tried to access items/images endpoint with image too large: " + file.Length);
                     return HttpBadRequest("Imagem inválida");
@@ -191,9 +193,9 @@ namespace BotaNaRoda.WebApi.Controllers
                 // Create or overwrite the "myblob" blob with contents from a local file.
                 try
                 {
-                    using (var fs = file.OpenReadStream())
+                    using (var imgStream = ImageUtil.CompressImage(file.OpenReadStream(), 90))
                     {
-                        blockBlob.UploadFromStream(fs);
+                        blockBlob.UploadFromStream(imgStream);
                     }
                 }
                 catch (Exception ex)
@@ -212,15 +214,10 @@ namespace BotaNaRoda.WebApi.Controllers
                 Name = imagePartUrl + "image_thumb.jpg"
             };
 
-            Bitmap thumbBitmap = ImageUtil.ResizeImageProportionally(files.First().OpenReadStream(), 200);
-            var thumbMs = new MemoryStream();
-            thumbBitmap.Save(thumbMs, ImageFormat.Jpeg);
-            thumbMs.Position = 0;
-
             CloudBlockBlob thumbBlockBlob = container.GetBlockBlobReference(thumbImageInfo.Name);
-            using (thumbMs)
+            using (var thumbnailStream = ImageUtil.CreateThumbnail(files.First().OpenReadStream(), 200))
             {
-                thumbBlockBlob.UploadFromStream(thumbMs);
+                thumbBlockBlob.UploadFromStream(thumbnailStream);
             }
 
             thumbImageInfo.Url = thumbBlockBlob.Uri.ToString();

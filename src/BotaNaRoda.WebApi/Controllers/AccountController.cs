@@ -52,8 +52,8 @@ namespace BotaNaRoda.WebApi.Controllers
             return new HttpOkResult();
         }
 
-        [HttpPost("DeviceRegistrationId/{registrationId}")]
-        public async Task<IActionResult> PostDeviceRegistrationId(string registrationId)
+        [HttpPost("DeviceRegistrationId")]
+        public async Task<IActionResult> PostDeviceRegistrationId([FromBody] string registrationId)
         {
             if (!ModelState.IsValid)
             {

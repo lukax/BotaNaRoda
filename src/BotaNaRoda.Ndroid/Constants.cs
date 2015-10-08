@@ -22,9 +22,13 @@ namespace BotaNaRoda.Ndroid
         public const string IdSvrAuthorizeEndpoint = "https://botanaroda.azurewebsites.net/core/connect/authorize";
 		public const string IdSvrTokenEndpoint = "https://botanaroda.azurewebsites.net/core/connect/token";
 		public const string BotaNaRodaEndpoint = "https://botanaroda.azurewebsites.net/api";
-
+//
 //		public const string IdSvrAuthorizeEndpoint = "http://192.168.1.106:44200/core/connect/authorize";
 //		public const string IdSvrTokenEndpoint = "http://192.168.1.106:44200/core/connect/token";
 //		public const string BotaNaRodaEndpoint = "http://192.168.1.106:44200/api";
+
+//		public const string IdSvrAuthorizeEndpoint = "http://lucas-pc:42000/core/connect/authorize";
+//		public const string IdSvrTokenEndpoint = "http://lucas-pc:42000/core/connect/token";
+//		public const string BotaNaRodaEndpoint = "http://lucas-pc:42000/api";
     }
 }

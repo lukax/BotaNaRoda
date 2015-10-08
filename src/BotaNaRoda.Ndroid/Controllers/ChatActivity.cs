@@ -55,7 +55,7 @@ namespace BotaNaRoda.Ndroid
                 ChatSendButton = FindViewById<ImageButton>(Resource.Id.chatSendButton),
             };
 
-            _adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>());
+			_adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>(), _userRepository.Get());
             _holder.MessageList.Adapter = _adapter;
             _holder.ChatSendButton.Click += ChatSendButtonOnClick;
 
