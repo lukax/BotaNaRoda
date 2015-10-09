@@ -33,6 +33,7 @@ namespace BotaNaRoda.Ndroid
         private ConversationChatConnectionViewModel _connectionViewModel;
         private string _conversationId;
         private ProgressDialog _loadingDialog;
+		private HubConnection _hubConnection;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -84,21 +85,21 @@ namespace BotaNaRoda.Ndroid
             {
                 var authInfo = _userRepository.Get();
                 // Connect to the server
-				var hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
-				hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
+				_hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
+				_hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
 
                 // Create a proxy to the 'ChatHub' SignalR Hub
-                _chatHubProxy = hubConnection.CreateHubProxy("ChatHub");
+				_chatHubProxy = _hubConnection.CreateHubProxy("ChatHub");
 
                 // Wire up a handler for the 'UpdateChatMessage' for the server
                 // to be called on our client
                 _chatHubProxy.On<ConversationChatMessage>("OnMessageReceived", message =>
                 {
-						RunOnUiThread(() => MessageReceived(message));
+					RunOnUiThread(() => MessageReceived(message));
                 });
 
                 // Start the connection
-				hubConnection.Start().Wait();
+				_hubConnection.Start().Wait();
                 _connectionViewModel = _chatHubProxy.Invoke<ConversationChatConnectionViewModel>("Connect", _conversationId).Result;
                 //---
             };
@@ -135,10 +136,14 @@ namespace BotaNaRoda.Ndroid
 		private void MessageReceived(ConversationChatMessage message){
 			_adapter.ChatMessages.Add(message);
 			_adapter.NotifyDataSetChanged();
+			//_holder.MessageList.SetSelection (_adapter.Count - 1); //scroll to last item
 		}
 
         protected override void OnDestroy()
         {
+			if (_hubConnection != null) {
+				_hubConnection.Dispose ();
+			}
 			if (_refreshWorker != null) {
 				_refreshWorker.CancelAsync ();
 			}

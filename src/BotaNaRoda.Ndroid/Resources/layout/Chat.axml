@@ -42,10 +42,14 @@
         p1:layout_width="wrap_content"
         p1:layout_height="match_parent"
         p1:layout_below="@id/chatUserImage"
-        p1:layout_marginBottom="50dp" />
+        p1:layout_marginBottom="50dp"
+        p1:divider="#FFCC00"
+        p1:dividerHeight="1px"
+        p1:transcriptMode="alwaysScroll"
+        p1:stackFromBottom="true" />
     <EditText
         p1:id="@+id/chatMessageText"
-        p1:text="Digitar mensagem..."
+        p1:hint="Digitar mensagem..."
         p1:layout_width="match_parent"
         p1:layout_height="50dp"
         p1:layout_marginRight="50dp"

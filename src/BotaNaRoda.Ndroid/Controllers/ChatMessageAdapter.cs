@@ -6,6 +6,7 @@ using Android.Widget;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
 using BotaNaRoda.Ndroid.Data;
+using Android.Support.V7.Widget;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -34,13 +35,20 @@ namespace BotaNaRoda.Ndroid
             var msg = this[position];
 
             view.FindViewById<TextView>(Resource.Id.chatMessageText).Text = msg.Message;
-            view.FindViewById<TextView>(Resource.Id.chatMessageTime).Text = msg.SentAt.ToString("MM-dd HH:mm:ss");
+            view.FindViewById<TextView>(Resource.Id.chatMessageTime).Text = msg.SentAt.ToString("dd/MM HH:mm");
+			var cardView = view.FindViewById<CardView> (Resource.Id.card_view);
 
 			if (_currentUser.Id == msg.SentBy) {
-				view.SetBackgroundColor (Android.Graphics.Color.Green);	
+				cardView.SetBackgroundColor (Android.Graphics.Color.PaleGreen);	
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).AddRule (LayoutRules.AlignParentRight, (int)LayoutRules.True);
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 100;
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 5;
 			} 
 			else {
-				view.SetBackgroundColor (Android.Graphics.Color.White);	
+				cardView.SetBackgroundColor (Android.Graphics.Color.White);	
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).AddRule (LayoutRules.AlignParentLeft, (int)LayoutRules.True);
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 100;
+				((RelativeLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 5;
 			}
 
             return view;

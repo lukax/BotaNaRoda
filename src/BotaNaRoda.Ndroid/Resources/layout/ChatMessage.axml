@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_view"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    card_view:cardCornerRadius="1dp">
-    <RelativeLayout
-        android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/relativeLayout1">
-        <TextView
-            android:id="@+id/chatMessageAuthor"
-            android:text="asdf"
+        android:layout_margin="5dp"
+        card_view:cardCornerRadius="1dp">
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/chatMessageText"
-            android:text="asdf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_below="@id/chatMessageAuthor" />
-        <TextView
-            android:id="@+id/chatMessageTime"
-            android:text="12:34pm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:textSize="11sp"
-            android:layout_alignParentRight="true" />
-    </RelativeLayout>
-</android.support.v7.widget.CardView>
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/chatMessageText"
+                android:text="asdf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp" />
+            <TextView
+                android:id="@+id/chatMessageTime"
+                android:text="12:34pm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="11sp"
+                android:gravity="end" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</RelativeLayout>
