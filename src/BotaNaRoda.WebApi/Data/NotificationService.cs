@@ -31,156 +31,199 @@ namespace BotaNaRoda.WebApi.Data
             _logger = logger;
         }
 
-        public async void OnItemPromise(Item item)
+        public void OnItemPromise(Item item)
         {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+            Task.Run(async () =>
+            {
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
-            var notification = new ItemNotification
+                var notification = new ItemNotification
                 {
                     itemId = item.Id,
                     itemName = item.Name,
                     message = "O produto foi reservado!"
                 };
-            await PostNotificationToUser(notification, receivingEndUser);
+                await PostNotificationToUser(notification, receivingEndUser);
+
+            });
         }
 
-        public async void OnItemPromiseDenied(Item item)
+        public void OnItemPromiseDenied(Item item)
         {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+            Task.Run(async () =>
+            {
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
-            var notification = new ItemNotification
+                var notification = new ItemNotification
+                    {
+                        itemId = item.Id,
+                        itemName = item.Name,
+                        message = "A reserva para o produto foi cancelada"
+                    };
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
+        }
+
+        public void OnItemReceived(Item item)
+        {
+            Task.Run(async () =>
+            {
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+
+                var notification = new ItemNotification
+                    {
+                        itemId = item.Id,
+                        itemName = item.Name,
+                        message = "Doação concluída!"
+                    };
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
+        }
+
+        public void OnItemDelete(Item item)
+        {
+            Task.Run(async () =>
+            {
+                var subscribers = await _itemsContext.Users.Find(x => item.Subscribers.Contains(x.Id)).ToListAsync();
+
+                var notification = new ItemNotification
                 {
                     itemId = item.Id,
                     itemName = item.Name,
-                    message = "A reserva para o produto foi cancelada"
+                    message = "O produto foi removido"
                 };
-            await PostNotificationToUser(notification, receivingEndUser);
+                subscribers.ForEach(async x => await PostNotificationToUser(notification, x));
+            });
         }
 
-        public async void OnItemReceived(Item item)
+        public void OnConversationMessageSent(Conversation conversation, string currentUserId)
         {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
+            Task.Run(async () =>
+            {
+                var item = await _itemsContext.Items.Find(x => x.Id == conversation.ItemId).FirstAsync();
 
-            var notification = new ItemNotification
+                var receivingEndUserId = conversation.FromUserId == currentUserId
+                    ? conversation.ToUserId
+                    : conversation.FromUserId;
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == receivingEndUserId).FirstAsync();
+
+                var notification = new ChatMessageNotification
                 {
                     itemId = item.Id,
                     itemName = item.Name,
-                    message = "Doação concluída!"
+                    conversationId = conversation.Id,
+                    message = "Mensagem recebida",
                 };
-            await PostNotificationToUser(notification, receivingEndUser);
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
         }
 
-        public async void OnItemDelete(Item item)
+        public void OnItemPost(Item item, string userId)
         {
-            var subscribers = await _itemsContext.Users.Find(x => item.Subscribers.Contains(x.Id)).ToListAsync();
-
-            var notification = new ItemNotification
+            Task.Run(async () =>
             {
-                itemId = item.Id,
-                itemName = item.Name,
-                message = "O produto foi removido"
-            };
-            subscribers.ForEach(async x => await PostNotificationToUser(notification, x));
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+
+                var notification = new ItemNotification
+                {
+                    itemId = item.Id,
+                    itemName = item.Name,
+                    message = "Seu produto " + item.Name + " foi postado!"
+                };
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
         }
 
-        public async Task OnConversationMessageSent(Conversation conversation, string currentUserId)
+        public void OnItemSubscribe(Item item, string userId)
         {
-            var item = await _itemsContext.Items.Find(x => x.Id == conversation.ItemId).FirstAsync();
-
-            var receivingEndUserId = conversation.FromUserId == currentUserId
-                ? conversation.ToUserId
-                : conversation.FromUserId;
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == receivingEndUserId).FirstAsync();
-
-            var notification = new ChatMessageNotification
+            Task.Run(async () =>
             {
-                itemId = item.Id,
-                itemName = item.Name,
-                conversationId = conversation.Id,
-                message = "Mensagem recebida",
-            };
-            await PostNotificationToUser(notification, receivingEndUser);
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+
+                var notification = new ItemNotification
+                {
+                    itemId = item.Id,
+                    itemName = item.Name,
+                    message = receivingEndUser.Name + " está de olho!"
+                };
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
         }
 
-        public async Task OnItemPost(Item item, string userId)
+        public void OnItemUnsubscribe(Item item, string userId)
         {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
-
-            var notification = new ItemNotification
+            Task.Run(async () =>
             {
-                itemId = item.Id,
-                itemName = item.Name,
-                message = "Seu produto " + item.Name + " foi postado!"
-            };
-            await PostNotificationToUser(notification, receivingEndUser);
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+
+                var notification = new ItemNotification
+                {
+                    itemId = item.Id,
+                    itemName = item.Name,
+                    message = receivingEndUser.Name + " desistiu"
+                };
+                await PostNotificationToUser(notification, receivingEndUser);
+            });
         }
 
-        public async Task OnItemSubscribe(Item item, string userId)
+        private async Task<bool> PostNotificationToUser(IDeviceNotification messageObj, User user)
         {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
-
-            var notification = new ItemNotification
-            {
-                itemId = item.Id,
-                itemName = item.Name,
-                message = receivingEndUser.Name + " está de olho!"
-            };
-            await PostNotificationToUser(notification, receivingEndUser);
-        }
-
-        public async Task OnItemUnsubscribe(Item item, string userId)
-        {
-            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
-
-            var notification = new ItemNotification
-            {
-                itemId = item.Id,
-                itemName = item.Name,
-                message = receivingEndUser.Name + " desistiu"
-            };
-            await PostNotificationToUser(notification, receivingEndUser);
-        }
-
-        private async Task<HttpClient> PostNotificationToUser(IDeviceNotification messageObj, User user)
-        {
-            HttpClient httpClient = new HttpClient();
+            HttpClient httpClient = new HttpClient {Timeout = TimeSpan.FromSeconds(30)};
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "key=" + _appSettings.Options.AndroidApiKey);
-            var response = await httpClient.PostAsync(new Uri("https://gcm-http.googleapis.com/gcm/send"), new StringContent(
-             new
-             {
-                 to = user.PushDeviceRegistrationId,
-                 data = messageObj
-             }.ToJson(), Encoding.Default, "application/json"));
+            try
+            {
+                var response =  await httpClient.PostAsync(new Uri("https://gcm-http.googleapis.com/gcm/send"), new StringContent(
+                        new
+                        {
+                            to = user.PushDeviceRegistrationId,
+                            data = messageObj
+                        }.ToJson(), Encoding.Default, "application/json"));
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Could not send notification to {user.Email}. ", response.Content.ReadAsStringAsync().Result);
+                }
+                else
+                {
+                    _logger.LogInformation("Notification sent. " + response.Content.ReadAsStringAsync().Result);
+                }
 
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError(string.Format("Could not send notification to {0}. ", user.Email), response.Content.ReadAsStringAsync().Result);
+                return response.IsSuccessStatusCode;
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogInformation("Notification sent. " + response.Content.ReadAsStringAsync().Result);
+                _logger.LogError(string.Format("Could not send notification", ex));
             }
-            return httpClient;
+            return false;
         }
 
-        private async Task<HttpClient> PostNotificationToGlobally(IDeviceNotification messageObj)
+        private async Task<bool> PostNotificationToGlobally(IDeviceNotification messageObj)
         {
-            HttpClient httpClient = new HttpClient();
+            HttpClient httpClient = new HttpClient {Timeout = TimeSpan.FromSeconds(30)};
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "key=" + _appSettings.Options.AndroidApiKey);
-            var response = await httpClient.PostAsync(new Uri("https://gcm-http.googleapis.com/gcm/send"), new StringContent(
-             new
-             {
-                 to = "/topics/global",
-                 data = messageObj
-             }.ToJson(), Encoding.Default, "application/json"));
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogError("Could not send notification globally. ", response.Content.ReadAsStringAsync().Result);
+                var response =
+                    await httpClient.PostAsync(new Uri("https://gcm-http.googleapis.com/gcm/send"), new StringContent(
+                        new
+                        {
+                            to = "/topics/global",
+                            data = messageObj
+                        }.ToJson(), Encoding.Default, "application/json"));
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Could not send notification globally. ", response.Content.ReadAsStringAsync().Result);
+                }
+
+                return response.IsSuccessStatusCode;
             }
-            return httpClient;
+            catch (Exception ex)
+            {
+                _logger.LogError(string.Format("Could not send notification", ex));
+            }
+            return false;
         }
 
         public void Dispose()

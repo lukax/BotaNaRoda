@@ -39,7 +39,9 @@ namespace BotaNaRoda.Ndroid.Data
 
         public void Update(TokenResponse response)
         {
-            IdentityToken = response.IdentityToken;
+			if (IdentityToken != null) {
+				IdentityToken = response.IdentityToken;
+			}
             AccessToken = response.AccessToken;
             RefreshToken = response.RefreshToken;
         }

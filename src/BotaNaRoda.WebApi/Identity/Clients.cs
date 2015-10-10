@@ -31,8 +31,10 @@ namespace BotaNaRoda.WebApi.Identity
                         "https://botanaroda.azurewebsites.net/core",
                         "http://192.168.1.106:44200/core",
                     },
-                    IdentityTokenLifetime = 360,
-                    AccessTokenLifetime = 36000
+                    IdentityTokenLifetime = 360 /* 5Min */,
+                    AccessTokenLifetime = 36000 * 10 /* 1Hour */,
+                    RefreshTokenUsage = TokenUsage.ReUse,
+                    SlidingRefreshTokenLifetime = 1296000 * 2 /* 30Days */
                 },
 #if DEBUG
                 new Client
