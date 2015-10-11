@@ -55,13 +55,13 @@ namespace BotaNaRoda.Ndroid.Data
         {
         }
 
-        public async Task<IList<ItemListViewModel>> GetAllItems(double radius, int skip, int limit)
+        public async Task<IList<ItemListViewModel>> GetAllItemsAsync(double radius, int skip, int limit)
         {
             var userInfo = _userRepository.Get();
-            return await GetAllItems(userInfo.Latitude, userInfo.Longitude, radius, skip, limit);
+            return await GetAllItemsAsync(userInfo.Latitude, userInfo.Longitude, radius, skip, limit);
         }
 
-        public async Task<IList<ItemListViewModel>> GetAllItems(double lat, double lon, double radius, int skip, int limit)
+        public async Task<IList<ItemListViewModel>> GetAllItemsAsync(double lat, double lon, double radius, int skip, int limit)
         {
             await SetupAuthorizationHeader();
 

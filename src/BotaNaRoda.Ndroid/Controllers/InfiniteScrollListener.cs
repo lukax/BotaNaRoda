@@ -12,6 +12,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Data;
+using Android.Support.V4.Widget;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -57,7 +58,13 @@ namespace BotaNaRoda.Ndroid.Controllers
             // if user flips between landscape/portrait.
             int currentPosition = lastVisibleItems.LastOrDefault(item => item > -1);
 
-            if (currentPosition == 0) return;
+			//if (_onScroll != null) {
+			//	_onScroll (currentPosition);
+			//}
+
+			if (currentPosition == 0) {
+				return;
+			}
 
             if (totalItemCount - currentPosition <= LoadNextItemsThreshold)
             {
@@ -68,5 +75,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                 }
             }
         }
+			
     }
 }

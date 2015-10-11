@@ -31,7 +31,7 @@ namespace BotaNaRoda.Ndroid.Data
         {
             IsBusy = true;
 
-            var loaded = await _itemRestService.GetAllItems(10000, CurrentPageValue, ItemsPerPage);
+			var loaded = await _itemRestService.GetAllItemsAsync(10000, CurrentPageValue, ItemsPerPage);
             var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
 			itemListViewModels = itemListViewModels.Where (x => !Items.Any (y => y.Id == x.Id)).ToArray();

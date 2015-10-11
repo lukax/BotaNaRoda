@@ -45,8 +45,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_refresher.Enabled = false;
 			_refresher.Refresh += delegate
 			{
-				_refresher.Refreshing = true;
-			    UpdateDataAdapter(false);
+				LoadItems();
 			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
@@ -59,10 +58,10 @@ namespace BotaNaRoda.Ndroid.Controllers
             _adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
-            var scrollListener = new InfiniteScrollListener(_adapter, sglm, () => UpdateDataAdapter(true));
+			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems);
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
 
-
+			LoadItems();
 
             return view;
 		}
@@ -75,9 +74,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 				Accuracy = Accuracy.Coarse,
 				PowerRequirement = Power.High
 			}, this, null);
-
-			_refresher.Refreshing = true;
-            UpdateDataAdapter(false);
         }
 
 		public override void OnPause ()
@@ -123,22 +119,26 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		}
 
-        private void UpdateDataAdapter(bool fromScroll)
+		private void LoadItems(){
+			_refresher.Refreshing = true;
+			_uiCancellation = new CancellationTokenSource ();
+			_itemsLoader.LoadMoreItemsAsync ().ContinueWith ((task) => {
+				_refresher.Refreshing = false;
+				_adapter.NotifyDataSetChanged ();
+			}, _uiScheduler);
+		}
+        
+		private void OnItemListLoadMoreItems()
         {
-            if ((fromScroll && _itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy) 
-                || !fromScroll)
+            if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
             {
                 Log.Info("InfiniteScrollListener", "Load more items requested");
-                _uiCancellation = new CancellationTokenSource();
-                _itemsLoader.LoadMoreItemsAsync()
-                    .ContinueWith(task =>
-                    {
-						_refresher.Refreshing = false;
-						_adapter.NotifyDataSetChanged();
-					}, _uiCancellation.Token, TaskContinuationOptions.OnlyOnRanToCompletion, _uiScheduler);
+				var newItemsCount = _itemsLoader.LoadMoreItemsAsync().Result;
+
+				_adapter.NotifyItemRangeInserted (_adapter.ItemCount - newItemsCount, newItemsCount);
             }
         }
-
+			
 		private async void UpdateUserLocation(Location location){
 			Geocoder geocdr = new Geocoder(Activity);
 			var addr = (await geocdr.GetFromLocationAsync(location.Latitude, location.Longitude, 1)).FirstOrDefault();

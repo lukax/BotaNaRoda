@@ -52,24 +52,20 @@ namespace BotaNaRoda.Ndroid.Controllers
             // you could also put an 'item type' enum field or property in your 
             // data item and do a 'switch/case' on that. It's less expensive 
             // than reflection...
-            if (holder.GetType() == typeof(ItemViewHolder))
+            var viewHolder = holder as ItemViewHolder;
+            if (viewHolder != null)
             {
-                var viewHolder = holder as ItemViewHolder;
-                if (viewHolder != null)
+                viewHolder.ItemId = item.Id;
+                viewHolder.Name.Text = item.Name;
+                viewHolder.Distance.Text = item.DistanceTo(UserLatLon);
+                viewHolder.Image.Post(() =>
                 {
-                    viewHolder.ItemId = item.Id;
-                    viewHolder.Name.Text = item.Name;
-                    viewHolder.Distance.Text = item.DistanceTo(UserLatLon);
-                    viewHolder.Image.Post(() =>
-                    {
-                        Picasso.With(_context)
-                            .Load(item.ThumbImage.Url)
-                            .Resize(viewHolder.Image.Width, 0)
-                            .Tag(_context)
-                            .Into(viewHolder.Image);
-                    });
-
-                }
+                    Picasso.With(_context)
+                        .Load(item.ThumbImage.Url)
+                        .Resize(viewHolder.Image.Width, 0)
+                        .Tag(_context)
+                        .Into(viewHolder.Image);
+                });
             }
         }
         
