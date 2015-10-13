@@ -17,6 +17,7 @@
     <!-- Support library compatibility -->
     <item name="windowActionBarOverlay">true</item>
     <item name="actionBarStyle">@style/ItemDetailActionBar</item>
+    <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
   </style>
   
   <!-- ActionBar styles -->
@@ -25,6 +26,5 @@
     <!-- Support library compatibility -->
     <item name="background">@color/action_bar_transparent</item>
   </style>
-
-
+  
 </resources>

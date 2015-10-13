@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+
+  <bool name="default_circle_indicator_centered">true</bool>
+  <color name="default_circle_indicator_fill_color">#FFFFFFFF</color>
+  <color name="default_circle_indicator_page_color">#00000000</color>
+  <integer name="default_circle_indicator_orientation">0</integer>
+  <dimen name="default_circle_indicator_radius">3dp</dimen>
+  <bool name="default_circle_indicator_snap">false</bool>
+  <color name="default_circle_indicator_stroke_color">#FFDDDDDD</color>
+  <dimen name="default_circle_indicator_stroke_width">1dp</dimen>
+  <declare-styleable name="ViewPagerIndicator">
+    <attr name="vpiCirclePageIndicatorStyle" format="reference"/>
+    <attr name="vpiTitlePageIndicatorStyle" format="reference"/>
+    <attr name="vpiTabPageIndicatorStyle" format="reference"/>
+    <attr name="vpiTabTextStyle" format="reference"/>
+  </declare-styleable>
+  <declare-styleable name="CirclePageIndicator">
+    <attr name="centered" format="boolean" />
+    <attr name="fillColor" format="color" />
+    <attr name="pageColor" format="color" />
+    <attr name="orientation">
+      <enum name="horizontal" value="0" />
+      <enum name="vertical" value="1" />
+    </attr>
+    <attr name="radius" format="dimension" />
+    <attr name="snap" format="boolean" />
+    <attr name="strokeColor" format="color" />
+    <attr name="strokeWidth" format="dimension" />
+  </declare-styleable>
+  <style name="Widget"></style>
+  <style name="Widget.CirclePageIndicator" parent="Widget">
+    <item name="centered">@bool/default_circle_indicator_centered</item>
+    <item name="fillColor">@color/default_circle_indicator_fill_color</item>
+    <item name="pageColor">@color/default_circle_indicator_page_color</item>
+    <item name="orientation">@integer/default_circle_indicator_orientation</item>
+    <item name="radius">@dimen/default_circle_indicator_radius</item>
+    <item name="snap">@bool/default_circle_indicator_snap</item>
+    <item name="strokeColor">@color/default_circle_indicator_stroke_color</item>
+    <item name="strokeWidth">@dimen/default_circle_indicator_stroke_width</item>
+  </style>
+  <style name="CustomCirclePageIndicator">
+    <item name="android:background">#FFCCCCCC</item>
+    <item name="fillColor">#FF888888</item>
+    <item name="strokeColor">#FF000000</item>
+    <item name="strokeWidth">2dp</item>
+    <item name="radius">15dp</item>
+    <item name="centered">true</item>
+  </style>
+
+</resources>

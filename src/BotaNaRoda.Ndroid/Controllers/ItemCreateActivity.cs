@@ -160,7 +160,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
 				attempts++;
 			}
-			RunOnUiThread(() => { locationDialog.Dismiss(); });
+			locationDialog.Dismiss(); 
 
 			if (_address == null) {
 				Toast.MakeText (this, "Não foi possível obter localização", ToastLength.Short).Show();

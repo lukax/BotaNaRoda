@@ -18,7 +18,12 @@ namespace BotaNaRoda.Ndroid.Util
     {
         public static string DistanceTo(this ILatLon loc1, ILatLon loc2)
         {
-            return string.Format("{0:0,0.00}m", DistanceTo(loc1.Latitude, loc1.Longitude, loc2.Latitude, loc2.Longitude));
+			if ((loc1 == null || loc2 == null) ||
+				(loc1.Latitude == 0 && loc1.Longitude == 0) || 
+				(loc2.Latitude == 0 && loc2.Longitude == 0)) {
+				return "";
+			}
+            return string.Format("{0:0,0.000}m", DistanceTo(loc1.Latitude, loc1.Longitude, loc2.Latitude, loc2.Longitude));
         }
 
 

@@ -61,9 +61,9 @@ namespace BotaNaRoda.Ndroid
 				_userAddressTextView.Text = _currentUsr.Address;
 				_pictureImageView.Post(() =>
                 {
+                    _pictureImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
                     Picasso.With(_host)
-							.Load(_currentUsr.Picture)
-                        .Fit()
+						.Load(_currentUsr.Picture)
                         .Tag(this)
                         .Into(_pictureImageView);
                 });

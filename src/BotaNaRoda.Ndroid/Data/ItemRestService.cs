@@ -98,7 +98,7 @@ namespace BotaNaRoda.Ndroid.Data
                 throw new ArgumentException("item");
             }
 
-            var imgs = await UploadImages(item.Images.Select(x => x.Url).ToArray());
+            var imgs = await UploadImages(item.Images.Select(x => x.Url).Distinct().ToArray());
             if (imgs == null)
             {
                 throw new ArgumentException("NÅao foi possivel carregar imagens", "item");    

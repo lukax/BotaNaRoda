@@ -8,23 +8,29 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <ImageView
+            <android.support.v4.view.ViewPager
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:id="@+id/itemsDetailImage"
-                android:background="@color/grey" />
+                android:background="@color/grey"
+                android:id="@+id/itemsDetailViewPager" />
+            <BotaNaRoda.Ndroid.Library.CirclePageIndicator
+                android:id="@+id/indicator"
+                android:layout_marginTop="-20dp"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_below="@id/itemsDetailViewPager" />
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:id="@+id/itemsDetailAuthorImage"
-                android:layout_below="@id/itemsDetailImage"
+                android:layout_below="@id/itemsDetailViewPager"
                 android:background="@color/grey" />
             <TextView
                 android:text="Autor..."
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailAuthorName"
-                android:layout_below="@id/itemsDetailImage"
+                android:layout_below="@id/itemsDetailViewPager"
                 android:layout_toRightOf="@id/itemsDetailAuthorImage"
                 android:layout_marginLeft="15dp" />
             <TextView
@@ -32,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDistance"
-                android:layout_below="@id/itemsDetailImage"
+                android:layout_below="@id/itemsDetailViewPager"
                 android:layout_marginRight="15dp"
                 android:layout_alignParentRight="true" />
             <TextView

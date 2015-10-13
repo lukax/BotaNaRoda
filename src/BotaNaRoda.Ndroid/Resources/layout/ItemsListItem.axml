@@ -16,13 +16,11 @@
             android:id="@+id/itemsImageView"
             android:adjustViewBounds="true" />
         <TextView
-            android:text="asdfasdfasdf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/itemsImageView"
             android:id="@+id/itemsDescription" />
         <TextView
-            android:text="200m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/itemsDescription"

@@ -43,10 +43,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
 			_refresher.Enabled = false;
-			_refresher.Refresh += delegate
-			{
-				LoadItems();
-			};
+			//_refresher.Refresh += delegate
+			//{
+			//	LoadItems();
+			//};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
@@ -60,13 +60,11 @@ namespace BotaNaRoda.Ndroid.Controllers
             
 			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems);
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
-
-			LoadItems();
-
+            
             return view;
 		}
 
-		public override void OnResume ()
+        public override void OnResume ()
 		{
 			base.OnResume ();
 			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
@@ -74,6 +72,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 				Accuracy = Accuracy.Coarse,
 				PowerRequirement = Power.High
 			}, this, null);
+
+            LoadItems();
         }
 
 		public override void OnPause ()
@@ -120,7 +120,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		}
 
 		private void LoadItems(){
-			_refresher.Refreshing = true;
+			//_refresher.Refreshing = true;
 			_uiCancellation = new CancellationTokenSource ();
 			_itemsLoader.LoadMoreItemsAsync ().ContinueWith ((task) => {
 				_refresher.Refreshing = false;
@@ -161,6 +161,24 @@ namespace BotaNaRoda.Ndroid.Controllers
 			if (_uiCancellation != null) {
 				_uiCancellation.Cancel();
 			}
+        }
+
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            base.OnCreateOptionsMenu(menu, inflater);
+            inflater.Inflate(Resource.Menu.ItemsMenu, menu);
+        }
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.actionRefresh:
+                    LoadItems();
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
         }
 
         readonly TaskScheduler _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();

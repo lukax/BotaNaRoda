@@ -11,5 +11,6 @@
       <item>Infantil</item>
       <item>Outros</item>
     </string-array>
+  <string name="itemimageview_description">Imagem do produto</string>
   <string name="gcm_defaultSenderId">472579673098</string>
 </resources>

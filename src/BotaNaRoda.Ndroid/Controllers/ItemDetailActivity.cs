@@ -19,6 +19,8 @@ using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
 using System.Collections.Generic;
 using Android.Content;
+using Android.Support.V4.View;
+using BotaNaRoda.Ndroid.Library;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -47,7 +49,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _holder = new ViewHolder
             {
-                ItemImageView = FindViewById<ImageView>(Resource.Id.itemsDetailImage),
+                ViewPager = FindViewById<ViewPager>(Resource.Id.itemsDetailViewPager),
+                ViewPagerIndicator = FindViewById<CirclePageIndicator>(Resource.Id.indicator),
                 ItemAuthorNameView = FindViewById<TextView>(Resource.Id.itemsDetailAuthorName),
                 ItemAuthorImageView = FindViewById<ImageView>(Resource.Id.itemsDetailAuthorImage),
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
@@ -84,8 +87,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                     return base.OnOptionsItemSelected(item);
             }
         }
-
-
 
         void DeleteItem()
         {
@@ -141,19 +142,18 @@ namespace BotaNaRoda.Ndroid.Controllers
             _holder.ItemDescriptionView.Text = _item.Description;
             _holder.ItemLocationView.Text = _item.Locality;
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
-            Picasso.With(this)
+            _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(), SupportFragmentManager);
+            _holder.ViewPagerIndicator.SetViewPager(_holder.ViewPager);
+            _holder.ViewPagerIndicator.SetSnap(true);
+            _holder.ItemAuthorImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
+            _holder.ItemAuthorImageView.Post(() =>
+            {
+                Picasso.With(this)
                 .Load(_item.User.Avatar)
-                .Resize(_holder.ItemAuthorImageView.Width, _holder.ItemAuthorImageView.Height)
-                .CenterCrop()
                 .Tag(this)
                 .Into(_holder.ItemAuthorImageView);
-            Picasso.With(this)
-               .Load(_item.Images.First().Url)
-               .Resize(_holder.ItemImageView.Width, _holder.ItemImageView.Height)
-               .CenterCrop()
-               .Tag(this)
-               .Into(_holder.ItemImageView);
-
+            });
+            
 			if (_userRepository.IsLoggedIn) {
 				if (_item.User.Username == _userRepository.Get ().Username) {
 					if (_menu != null) {
@@ -210,7 +210,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private class ViewHolder
         {
-            internal ImageView ItemImageView;
+            internal ViewPager ViewPager;
             internal TextView ItemAuthorNameView;
             internal TextView ItemDescriptionView;
             internal TextView ItemLocationView;
@@ -219,6 +219,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal ImageView ItemAuthorImageView;
 			internal ListView SubscribersListView;
 			internal LinearLayout SubscribersLayout;
+            internal CirclePageIndicator ViewPagerIndicator;
         }
     }
 

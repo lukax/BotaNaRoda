@@ -90,8 +90,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                 itemDetailIntent.PutExtra("itemId", ItemId);
                 v.Context.StartActivity(itemDetailIntent);
             }
-
-			public string Key { get; set; }
         }
     }
 }
