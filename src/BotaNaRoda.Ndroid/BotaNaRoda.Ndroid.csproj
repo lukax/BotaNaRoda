@@ -111,7 +111,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
-    <Compile Include="Controllers\ItemImageDetailFragment.cs" />
+    <Compile Include="Controllers\ItemImageDetailExpandedActivity.cs" />
+    <Compile Include="Controllers\ItemImageFragment.cs" />
     <Compile Include="Controllers\ItemImagePagerAdapter.cs" />
     <Compile Include="Library\CirclePageIndicator.cs" />
     <Compile Include="Models\ConversationChatConnectionViewModel.cs" />
@@ -256,5 +257,8 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\CirclePageIndicator.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\ItemImageDetailExpanded.xml" />
   </ItemGroup>
 </Project>

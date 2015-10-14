@@ -25,13 +25,15 @@ using BotaNaRoda.Ndroid.Library;
 namespace BotaNaRoda.Ndroid.Controllers
 {
     [Activity(Label = "Bota na Roda",
-        Theme = "@style/ItemDetailTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize), 
-        ParentActivity = typeof(MainActivity))]
+        Theme = "@style/ItemDetailTheme", 
+        ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTop)]
     public class ItemDetailActivity : AppCompatActivity, IOnMapReadyCallback
     {
+        public const string ItemIdExtra = "itemId";
         private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-        private ItemDetailViewModel _item;
+        private string _itemId;
 
+        private ItemDetailViewModel _item;
         private IMenu _menu;
         private ItemRestService _itemService;
         private UserRepository _userRepository;
@@ -43,6 +45,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ItemDetail);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+
+            _itemId = bundle != null ? bundle.GetString(ItemIdExtra) : Intent.GetStringExtra(ItemIdExtra);
 
             _userRepository = new UserRepository();
             _itemService = new ItemRestService(new UserRepository());
@@ -66,6 +70,12 @@ namespace BotaNaRoda.Ndroid.Controllers
         protected override void OnResume()
         {
             base.OnResume();
+        }
+
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutString(ItemIdExtra, _itemId);
+            base.OnSaveInstanceState(outState);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -110,7 +120,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
             _refreshWorker.DoWork += (sender, args) =>
             {
-                _item = _itemService.GetItem(Intent.GetStringExtra("itemId")).Result;
+                _item = _itemService.GetItem(_itemId).Result;
             };
             _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
@@ -136,11 +146,22 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
 
-            Title = _item.Name;
+            Title = "Produto " + _item.Name;
             _holder.ItemAuthorNameView.Text = _item.User.Name;
             _holder.ItemDescriptionView.Text = _item.Description;
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
-            _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(), SupportFragmentManager);
+            _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(), SupportFragmentManager,
+                () =>
+                {
+                    Intent imageDetailIntent = new Intent(this, typeof(ItemImageDetailExpandedActivity));
+                    imageDetailIntent.PutStringArrayListExtra(ItemImageDetailExpandedActivity.ImageUrlsExtra,
+                        _item.Images.Select(x => x.Url).ToList());
+                    imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImagePositionExtra,
+                        _holder.ViewPager.CurrentItem);
+                    imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImageItemName,
+                        _item.Name);
+                    StartActivity(imageDetailIntent);
+                });
             _holder.ViewPagerIndicator.SetViewPager(_holder.ViewPager);
             _holder.ViewPagerIndicator.SetSnap(true);
             _holder.ItemAuthorImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
@@ -150,7 +171,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 .Load(_item.User.Avatar)
                 .Into(_holder.ItemAuthorImageView);
             });
-            
+
 			if (_userRepository.IsLoggedIn) {
 				if (_item.User.Username == _userRepository.Get ().Username) {
 					if (_menu != null) {
@@ -217,7 +238,46 @@ namespace BotaNaRoda.Ndroid.Controllers
 			internal LinearLayout SubscribersLayout;
             internal CirclePageIndicator ViewPagerIndicator;
         }
-    }
 
+        private class OnViewPagerTouchListener : View.IOnTouchListener
+        {
+            private readonly Action _onClickListener;
+            int _tolerance = 50;
+            private float _pointX;
+            private float _pointY;
+
+            public OnViewPagerTouchListener(Action onClickListener)
+            {
+                _onClickListener = onClickListener;
+            }
+
+            public bool OnTouch(View v, MotionEvent e)
+            {
+                switch (e.Action)
+                {
+                    case MotionEventActions.Move:
+                        return false; //This is important, if you return TRUE the action of swipe will not take place.
+                    case MotionEventActions.Down:
+                        _pointX = e.GetX();
+                        _pointY = e.GetY();
+                        break;
+                    case MotionEventActions.Up:
+                        bool sameX = _pointX + _tolerance > e.GetX() && _pointX - _tolerance < e.GetX();
+                        bool sameY = _pointY + _tolerance > e.GetY() && _pointY - _tolerance < e.GetY();
+                        if (sameX && sameY)
+                        {
+                            if (_onClickListener != null)
+                            {
+                                _onClickListener();
+                            }
+                        }
+                        break;
+                }
+                return false;
+            }
+            public void Dispose() { }
+            public IntPtr Handle { get; }
+        }
+    }
 }
 

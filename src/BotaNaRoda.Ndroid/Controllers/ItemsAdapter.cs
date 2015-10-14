@@ -99,7 +99,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             public void OnClick(View v)
             {
                 Intent itemDetailIntent = new Intent(v.Context, typeof(ItemDetailActivity));
-                itemDetailIntent.PutExtra("itemId", ItemId);
+                itemDetailIntent.PutExtra(ItemDetailActivity.ItemIdExtra, ItemId);
                 v.Context.StartActivity(itemDetailIntent);
             }
 
