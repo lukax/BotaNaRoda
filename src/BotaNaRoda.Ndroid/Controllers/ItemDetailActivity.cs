@@ -245,46 +245,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			internal LinearLayout SubscribersLayout;
             internal CirclePageIndicator ViewPagerIndicator;
         }
-
-        private class OnViewPagerTouchListener : View.IOnTouchListener
-        {
-            private readonly Action _onClickListener;
-            int _tolerance = 50;
-            private float _pointX;
-            private float _pointY;
-
-            public OnViewPagerTouchListener(Action onClickListener)
-            {
-                _onClickListener = onClickListener;
-            }
-
-            public bool OnTouch(View v, MotionEvent e)
-            {
-                switch (e.Action)
-                {
-                    case MotionEventActions.Move:
-                        return false; //This is important, if you return TRUE the action of swipe will not take place.
-                    case MotionEventActions.Down:
-                        _pointX = e.GetX();
-                        _pointY = e.GetY();
-                        break;
-                    case MotionEventActions.Up:
-                        bool sameX = _pointX + _tolerance > e.GetX() && _pointX - _tolerance < e.GetX();
-                        bool sameY = _pointY + _tolerance > e.GetY() && _pointY - _tolerance < e.GetY();
-                        if (sameX && sameY)
-                        {
-                            if (_onClickListener != null)
-                            {
-                                _onClickListener();
-                            }
-                        }
-                        break;
-                }
-                return false;
-            }
-            public void Dispose() { }
-            public IntPtr Handle { get; }
-        }
     }
 }
 

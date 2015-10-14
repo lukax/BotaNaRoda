@@ -53,7 +53,8 @@ namespace BotaNaRoda.Ndroid
 	        _mLeftDataSet = new Dictionary<string, Type>
 	        {
 	            {"Itens próximos a mim", typeof (ItemsFragment)},
-	            {"Conversas", typeof (ConversationsFragment)}
+	            {"Conversas", typeof (ConversationsFragment)},
+                {"Mapa", typeof(ItemsMapFragment)}
 	        };
 	        _mLeftAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _mLeftDataSet.Keys.ToArray());
 			_mLeftDrawer.Adapter = _mLeftAdapter;

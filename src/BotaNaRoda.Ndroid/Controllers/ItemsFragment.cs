@@ -19,7 +19,6 @@ using BotaNaRoda.Ndroid.Models;
 using BotaNaRoda.Ndroid.Util;
 using Xamarin.Auth;
 using com.refractored.fab;
-using Javax.Xml.Xpath;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
