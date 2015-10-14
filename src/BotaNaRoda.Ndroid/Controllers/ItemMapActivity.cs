@@ -19,6 +19,8 @@ using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
 using System.Collections.Generic;
 using Android.Content;
+using Android.Locations;
+using ILocationListener = Android.Gms.Location.ILocationListener;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -51,7 +53,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
             _refreshWorker.DoWork += (sender, args) =>
             {
-				_items = _itemService.GetAllItems(1000, 0, 20).Result;
+				//_items = _itemService.GetAllItems(1000, 0, 20).Result;
             };
             _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
@@ -85,6 +87,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 			googleMap.MoveCamera(cameraUpdate);
 		}
 
+        public void OnLocationChanged(Location location)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

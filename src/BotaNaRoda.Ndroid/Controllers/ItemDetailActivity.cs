@@ -138,8 +138,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
-            googleMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
+            //googleMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle("Ponto de Encontro"));
             googleMap.MoveCamera(cameraUpdate);
+            googleMap.MapClick += (sender, args) =>
+            {
+                Intent mapExpandedIntent = new Intent(this, typeof(ItemDetailMapExpandedActivity));
+                mapExpandedIntent.PutExtra(ItemDetailMapExpandedActivity.ItemIdExtra, _item.Id);
+                mapExpandedIntent.PutExtra(ItemDetailMapExpandedActivity.ItemNameExtra, _item.Name);
+                StartActivity(mapExpandedIntent);
+            };
         }
 
         private void UpdateUi()

@@ -34,12 +34,12 @@ namespace BotaNaRoda.Ndroid.Controllers
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            SetContentView(Resource.Layout.ItemImageDetailExpanded);
+            SetContentView(Resource.Layout.ItemDetailImageExpanded);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            _imgUrls = Intent.Extras.GetStringArrayList(ImageUrlsExtra);
-            _imgPos = Intent.Extras.GetInt(ImagePositionExtra);
-            _itemName = Intent.Extras.GetString(ImageItemName);
+            _imgUrls = bundle != null ? bundle.GetStringArrayList(ImageUrlsExtra) : Intent.Extras.GetStringArrayList(ImageUrlsExtra);
+            _imgPos = bundle != null ? bundle.GetInt(ImagePositionExtra) : Intent.Extras.GetInt(ImagePositionExtra);
+            _itemName = bundle != null ? bundle.GetString(ImageItemName) : Intent.Extras.GetString(ImageItemName);
 
             Title = "Fotos do Produto " + _itemName;
 
@@ -52,6 +52,13 @@ namespace BotaNaRoda.Ndroid.Controllers
             _indicator.SetSnap(true);
         }
 
+        protected override void OnSaveInstanceState(Bundle outState)
+        {
+            outState.PutStringArrayList(ImageUrlsExtra, _imgUrls);
+            outState.PutInt(ImagePositionExtra, _imgPos);
+            outState.PutString(ImageItemName, _itemName);
+            base.OnSaveInstanceState(outState);
+        }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {

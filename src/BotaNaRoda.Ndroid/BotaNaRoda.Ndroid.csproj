@@ -111,9 +111,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
+    <Compile Include="Controllers\ItemDetailMapExpandedActivity.cs" />
     <Compile Include="Controllers\ItemImageDetailExpandedActivity.cs" />
     <Compile Include="Controllers\ItemImageFragment.cs" />
     <Compile Include="Controllers\ItemImagePagerAdapter.cs" />
+    <Compile Include="Controllers\ItemMapActivity.cs" />
     <Compile Include="Library\CirclePageIndicator.cs" />
     <Compile Include="Models\ConversationChatConnectionViewModel.cs" />
     <Compile Include="Data\ChatService.cs" />
@@ -186,6 +188,7 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\ItemDetailSubscribersListItem.axml" />
     <AndroidResource Include="Resources\menu\TakePictureMenu.xml" />
+    <AndroidResource Include="Resources\layout\ItemDetailMapExpanded.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />
@@ -253,12 +256,12 @@
     <AndroidResource Include="Resources\drawable-hdpi\contact_picture_placeholder.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\ItemImageDetailFragment.xml" />
+    <AndroidResource Include="Resources\layout\ItemDetailImageFragment.xml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\CirclePageIndicator.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\ItemImageDetailExpanded.xml" />
+    <AndroidResource Include="Resources\layout\ItemDetailImageExpanded.xml" />
   </ItemGroup>
 </Project>
