@@ -54,7 +54,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemAuthorNameView = FindViewById<TextView>(Resource.Id.itemsDetailAuthorName),
                 ItemAuthorImageView = FindViewById<ImageView>(Resource.Id.itemsDetailAuthorImage),
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
-                ItemLocationView = FindViewById<TextView>(Resource.Id.itemsDetailLocation),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
                 DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
 				SubscribersListView = FindViewById<ListView>(Resource.Id.subscribers),
@@ -125,7 +124,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             LatLng location = new LatLng(_item.Latitude, _item.Longitude);
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
-            builder.Zoom(18);
+            builder.Zoom(15);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
@@ -140,7 +139,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             Title = _item.Name;
             _holder.ItemAuthorNameView.Text = _item.User.Name;
             _holder.ItemDescriptionView.Text = _item.Description;
-            _holder.ItemLocationView.Text = _item.Locality;
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
             _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(), SupportFragmentManager);
             _holder.ViewPagerIndicator.SetViewPager(_holder.ViewPager);
@@ -150,7 +148,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             {
                 Picasso.With(this)
                 .Load(_item.User.Avatar)
-                .Tag(this)
                 .Into(_holder.ItemAuthorImageView);
             });
             
@@ -213,7 +210,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             internal ViewPager ViewPager;
             internal TextView ItemAuthorNameView;
             internal TextView ItemDescriptionView;
-            internal TextView ItemLocationView;
             internal Button ReserveButton;
             internal TextView DistanceView;
             internal ImageView ItemAuthorImageView;

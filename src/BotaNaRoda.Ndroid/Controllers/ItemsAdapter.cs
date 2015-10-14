@@ -19,19 +19,19 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemsAdapter : RecyclerView.Adapter
 	{
 	    private readonly Context _context;
-	    private readonly IList<ItemListViewModel> _items;
+	    public readonly IList<ItemListViewModel> Items = new List<ItemListViewModel>();
 	    public ILatLon UserLatLon { get; set; }
 
-		public ItemsAdapter (Context context, IList<ItemListViewModel> items, ILatLon userLatLon)
+		public ItemsAdapter (Context context, ILatLon userLatLon)
 		{
 		    _context = context;
-		    _items = items;
 		    UserLatLon = userLatLon;
+		    HasStableIds = true;
 		}
 
 	    public override int ItemCount
         {
-            get { return _items.Count; }
+            get { return Items.Count; }
         }
 
 	    public override long GetItemId(int position)
@@ -47,34 +47,45 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            var item = _items[position];
-
             // you could also put an 'item type' enum field or property in your 
             // data item and do a 'switch/case' on that. It's less expensive 
             // than reflection...
             var viewHolder = holder as ItemViewHolder;
             if (viewHolder != null)
             {
+                var item = Items[position];
+
                 viewHolder.ItemId = item.Id;
                 viewHolder.Name.Text = item.Name;
                 viewHolder.Distance.Text = item.DistanceTo(UserLatLon);
+                if (item.ThumbImage.Height.HasValue && item.ThumbImage.Width.HasValue)
+                {
+                    var rlp = viewHolder.Image.LayoutParameters;
+                    //float ratio = item.ThumbImage.Height.Value / item.ThumbImage.Width.Value;
+                    //rlp.Width = viewHolder.Image.Width;
+                    //rlp.Height = (int)(viewHolder.Image.Width * ratio);
+                    rlp.Height = (int) item.ThumbImage.Height.Value;
+                    viewHolder.Image.LayoutParameters = rlp;
+                }
+
                 viewHolder.Image.Post(() =>
                 {
                     Picasso.With(_context)
                         .Load(item.ThumbImage.Url)
-                        .Resize(viewHolder.Image.Width, 0)
-                        .Tag(_context)
+                        .Resize(viewHolder.Image.Width, viewHolder.Image.Height) //Not needed image already resized
+                        .CenterCrop()
                         .Into(viewHolder.Image);
                 });
             }
         }
-        
+       
         private class ItemViewHolder : RecyclerView.ViewHolder, View.IOnClickListener
         {
             internal new string ItemId;
             internal readonly ImageView Image;
             internal readonly TextView Name;
             internal readonly TextView Distance;
+            internal readonly CardView CardView;
 
             public ItemViewHolder(View view) : base(view)
             {
@@ -82,6 +93,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 Image = view.FindViewById<ImageView>(Resource.Id.itemsImageView);
                 Distance = view.FindViewById<TextView>(Resource.Id.itemsDistance);
                 Name = view.FindViewById<TextView>(Resource.Id.itemsDescription);
+                CardView = view.FindViewById<CardView>(Resource.Id.card_view);
             }
 
             public void OnClick(View v)
@@ -90,6 +102,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                 itemDetailIntent.PutExtra("itemId", ItemId);
                 v.Context.StartActivity(itemDetailIntent);
             }
+
+
         }
     }
 }

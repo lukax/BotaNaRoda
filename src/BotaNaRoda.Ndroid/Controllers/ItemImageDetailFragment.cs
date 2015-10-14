@@ -49,7 +49,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             base.OnActivityCreated(savedInstanceState);
             Picasso.With(Activity)
                 .Load(_mImageUrl)
-                .Tag(this)
                 .Into(_imageView);
         }
     }

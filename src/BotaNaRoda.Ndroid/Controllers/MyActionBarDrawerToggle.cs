@@ -64,7 +64,6 @@ namespace BotaNaRoda.Ndroid
                     _pictureImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
                     Picasso.With(_host)
 						.Load(_currentUsr.Picture)
-                        .Tag(this)
                         .Into(_pictureImageView);
                 });
             }

@@ -124,8 +124,8 @@ namespace BotaNaRoda.Ndroid
             _holder.ItemDistance.Text = _connectionViewModel.Item.DistanceTo(authInfo);
             _holder.UserName.Text = _connectionViewModel.ToUser.Name;
 
-            Picasso.With(this).Load(_connectionViewModel.Item.ThumbImage.Url).Fit().Tag(this).Into(_holder.ItemImage);
-            Picasso.With(this).Load(_connectionViewModel.ToUser.Avatar).Fit().Tag(this).Into(_holder.UserImage);
+            Picasso.With(this).Load(_connectionViewModel.Item.ThumbImage.Url).Fit().Into(_holder.ItemImage);
+            Picasso.With(this).Load(_connectionViewModel.ToUser.Avatar).Fit().Into(_holder.UserImage);
 
             _adapter.ChatMessages = _connectionViewModel.Messages;
             _adapter.NotifyDataSetChanged();

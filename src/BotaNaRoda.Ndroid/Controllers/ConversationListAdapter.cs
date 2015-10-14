@@ -38,7 +38,6 @@ namespace BotaNaRoda.Ndroid
             Picasso.With(_context)
                 .Load(conversation.ItemThumbImage)
                 .Fit()
-                .Tag(_context)
                 .Into(imageView);
 
             return view;

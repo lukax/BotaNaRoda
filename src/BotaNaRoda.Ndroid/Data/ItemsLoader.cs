@@ -3,49 +3,81 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Android.Content;
 using Android.Database;
 using Android.Locations;
 using BotaNaRoda.Ndroid.Models;
+using Square.Picasso;
 
 namespace BotaNaRoda.Ndroid.Data
 {
-    public class ItemsLoader
+    public class ItemsLoader 
     {
         private readonly ItemRestService _itemRestService;
+        private readonly Context _context;
         public int ItemsPerPage { get; set; }
 		public readonly List<ItemListViewModel> Items;
         public bool CanLoadMoreItems { get; set; }
         public int CurrentPageValue { get; set; }
-        public bool IsBusy { get; set; }
+        private bool IsBusy { get; set; }
+        public event Action<ItemListViewModel> OnItemFetched;
 
-        public ItemsLoader(ItemRestService itemRestService, int itemsPerPage)
+        public ItemsLoader(Context context, ItemRestService itemRestService, int itemsPerPage)
         {
             _itemRestService = itemRestService;
+            _context = context;
             ItemsPerPage = itemsPerPage;
             Items = new List<ItemListViewModel>();
             CanLoadMoreItems = true;
             CurrentPageValue = 0;
         }
 
-        public async Task<int> LoadMoreItemsAsync()
+        public void LoadMoreItemsAsync()
         {
-            IsBusy = true;
+            if (IsBusy || !CanLoadMoreItems) return;
 
-			var loaded = await _itemRestService.GetAllItemsAsync(10000, CurrentPageValue, ItemsPerPage);
-            var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
+            Task.Run(() =>
+            {
+                IsBusy = true;
 
-			itemListViewModels = itemListViewModels.Where (x => !Items.Any (y => y.Id == x.Id)).ToArray();
+                var loaded = _itemRestService.GetAllItemsAsync(10000, CurrentPageValue, ItemsPerPage).Result;
+                var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
-			Items.AddRange(itemListViewModels);
+                itemListViewModels = itemListViewModels.Where(x => Items.All(y => y.Id != x.Id)).ToArray();
 
-            CurrentPageValue = Items.Count;
-            CanLoadMoreItems = (itemListViewModels.Length != 0 &&
-                                ItemsPerPage == itemListViewModels.Length);
+                //Items.AddRange(itemListViewModels);
 
-            IsBusy = false;
+                CanLoadMoreItems = (itemListViewModels.Length != 0 &&
+                    ItemsPerPage == itemListViewModels.Length);
 
-            return itemListViewModels.Length;
+                Parallel.ForEach(itemListViewModels, (item) =>
+                {
+                    var img = Picasso.With(_context).Load(item.ThumbImage.Url).Get();
+                    if (img != null)
+                    {
+                        item.ThumbImage.Width = img.Width;
+                        item.ThumbImage.Height = img.Height;
+                        OnItemFetch(item);
+                    }
+                });
+
+                IsBusy = false;
+            });
+        }
+
+        private void OnItemFetch(ItemListViewModel item)
+        {
+            if (Items.All(x => x.Id != item.Id))
+            {
+                Items.Add(item);
+                CurrentPageValue = Items.Count;
+                if (OnItemFetched != null)
+                {
+                    OnItemFetched(item);
+                }
+            }
         }
 
     }
+
 }

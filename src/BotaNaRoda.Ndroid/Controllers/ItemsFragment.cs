@@ -39,7 +39,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 			_userRepository = new UserRepository();
 			_itemService = new ItemRestService(_userRepository);
-            _itemsLoader = new ItemsLoader(_itemService, 20);
+            _itemsLoader = new ItemsLoader(Activity, _itemService, 20);
+            _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
 
 			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
 			_refresher.Enabled = false;
@@ -51,11 +52,11 @@ namespace BotaNaRoda.Ndroid.Controllers
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
             _itemsRecyclerView = view.FindViewById<RecyclerView> (Resource.Id.itemsGridView);
-            _itemsRecyclerView.HasFixedSize = true;
+            _itemsRecyclerView.HasFixedSize = false;
 		    var sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.Vertical);
             _itemsRecyclerView.SetLayoutManager(sglm);
 
-            _adapter = new ItemsAdapter(Activity, _itemsLoader.Items, _userRepository.Get());
+            _adapter = new ItemsAdapter(Activity, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
 			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems);
@@ -63,6 +64,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             
             return view;
 		}
+
+        private void ItemsLoaderOnOnItemFetched(ItemListViewModel item)
+        {
+            Activity.RunOnUiThread(() =>
+            {
+                _adapter.Items.Add(item);
+                _adapter.NotifyItemInserted(_adapter.Items.Count - 1);   
+            });
+        }
 
         public override void OnResume ()
 		{
@@ -122,21 +132,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 		private void LoadItems(){
 			//_refresher.Refreshing = true;
 			_uiCancellation = new CancellationTokenSource ();
-			_itemsLoader.LoadMoreItemsAsync ().ContinueWith ((task) => {
-				_refresher.Refreshing = false;
-				_adapter.NotifyDataSetChanged ();
-			}, _uiScheduler);
+		    _itemsLoader.LoadMoreItemsAsync();
 		}
         
 		private void OnItemListLoadMoreItems()
         {
-            if (_itemsLoader.CanLoadMoreItems && !_itemsLoader.IsBusy)
-            {
-                Log.Info("InfiniteScrollListener", "Load more items requested");
-				var newItemsCount = _itemsLoader.LoadMoreItemsAsync().Result;
-
-				_adapter.NotifyItemRangeInserted (_adapter.ItemCount - newItemsCount, newItemsCount);
-            }
+            Log.Info("InfiniteScrollListener", "Load more items requested");
+			_itemsLoader.LoadMoreItemsAsync();
         }
 			
 		private async void UpdateUserLocation(Location location){

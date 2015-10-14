@@ -51,22 +51,12 @@
                 android:layout_marginBottom="25dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
-            <TextView
-                android:text="Localização..."
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/itemsDetailLocation"
-                android:layout_below="@id/itemsDetailDescription"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
             <fragment
                 android:id="@+id/mapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 class="com.google.android.gms.maps.MapFragment"
-                android:layout_below="@id/itemsDetailLocation" />
+                android:layout_below="@id/itemsDetailDescription" />
             <Button
                 android:layout_height="50dp"
                 android:layout_width="match_parent"

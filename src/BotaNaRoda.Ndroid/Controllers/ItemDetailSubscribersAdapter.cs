@@ -51,7 +51,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			Picasso.With(_context)
 				.Load(user.Avatar)
 				.Fit()
-				.Tag(_context)
 				.Into(imageView);
 
 			return view;
