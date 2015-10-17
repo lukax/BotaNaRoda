@@ -20,6 +20,8 @@ using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
 using Android.Views;
 using Android.Database;
+using BotaNaRoda.Ndroid.Controllers.Services;
+using Newtonsoft.Json;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -172,43 +174,26 @@ namespace BotaNaRoda.Ndroid.Controllers
                 return;
             }
 
-            var loadingDialog = ProgressDialog.Show(this, "", "Carregando...");
-
-            BackgroundWorker worker = new BackgroundWorker();
-	        worker.DoWork += (o, args) =>
-	        {
-				var item = new ItemCreateBindingModel
-				{
-					Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
-					Name = _holder.ItemTitleView.Text,
-					Description = _holder.ItemDescriptionView.Text,
-					Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
-					Address = _address.Thoroughfare,
-					PostalCode = _address.PostalCode,
-					CountryCode = _address.CountryCode,
-					Locality = _address.Locality,
-					Latitude = _currentLocation.Latitude,
-					Longitude = _currentLocation.Longitude
-				};
-				args.Result = _itemService.SaveItem(item).Result;
+			var item = new ItemCreateBindingModel
+			{
+				Images = _captureCodeImageUrlDictionary.Values.Select(x => new ImageInfo { Url = x.Path }).ToArray(),
+				Name = _holder.ItemTitleView.Text,
+				Description = _holder.ItemDescriptionView.Text,
+				Category = (CategoryType) _categoriesAdapter.GetPosition(_holder.ItemCategory.SelectedItem),
+				Address = _address.Thoroughfare,
+				PostalCode = _address.PostalCode,
+				CountryCode = _address.CountryCode,
+				Locality = _address.Locality,
+				Latitude = _currentLocation.Latitude,
+				Longitude = _currentLocation.Longitude
 			};
-	        worker.RunWorkerCompleted += (o, args) =>
-	        {
 
-				RunOnUiThread(() =>
-				{
-					if(args.Result != null) {
-						loadingDialog.Dismiss();
-						Finish();
-					}
-					else{
-						Toast.MakeText(this, "Não foi possível publicar produto", ToastLength.Short);
-					}
-				});
-	        };
-            worker.RunWorkerAsync();
+            Intent postItemIntent = new Intent(this, typeof(PostItemService));
+	        postItemIntent.PutExtra(PostItemService.ItemExtra, JsonConvert.SerializeObject(item));
+            StartService(postItemIntent);
+
+            Finish();
 		}
-
 
 	    void TakePicture(int capturePhotoCode, View view)
 	    {

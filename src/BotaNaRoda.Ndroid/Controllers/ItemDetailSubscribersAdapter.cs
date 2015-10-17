@@ -25,12 +25,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemDetailSubscribersAdapter : BaseAdapter<UserViewModel>
 	{
 		private readonly Activity _context;
-		public IList<UserViewModel> Users { get; set; }
+	    private readonly IList<UserViewModel> _users;
 
 		public ItemDetailSubscribersAdapter(Activity context, IList<UserViewModel> users)
 		{
 			_context = context;
-			Users = users;
+			_users = users;
 		}
 
 		public override long GetItemId(int position)
@@ -45,7 +45,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			var user = this[position];
 
 			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberName).Text = user.Name;
-			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberLocality).Text = user.Locality;
+			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberLocality).Text = user.Locality ?? "";
 
 			var imageView = view.FindViewById<ImageView>(Resource.Id.itemDetailSubscriberProfileImage);
 			Picasso.With(_context)
@@ -58,12 +58,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public override int Count
 		{
-			get { return Users.Count; }
+			get { return _users.Count; }
 		}
 
 		public override UserViewModel this[int index]
 		{
-			get { return Users[index]; }
+			get { return _users[index]; }
 		}
 
 	}

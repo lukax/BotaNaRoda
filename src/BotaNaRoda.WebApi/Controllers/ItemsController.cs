@@ -113,7 +113,6 @@ namespace BotaNaRoda.WebApi.Controllers
             var item = new Item(model, User.GetSubjectId());
             await _itemsContext.Items.InsertOneAsync(item);
 
-            _notificationService.OnItemPost(item, User.GetSubjectId());
             return new JsonResult(item.Id);
         }
 

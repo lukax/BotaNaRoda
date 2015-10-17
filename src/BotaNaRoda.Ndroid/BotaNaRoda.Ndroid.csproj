@@ -116,6 +116,7 @@
     <Compile Include="Controllers\ItemImageDetailExpandedActivity.cs" />
     <Compile Include="Controllers\ItemImageFragment.cs" />
     <Compile Include="Controllers\ItemImagePagerAdapter.cs" />
+    <Compile Include="Controllers\Services\PostItemService.cs" />
     <Compile Include="Library\CirclePageIndicator.cs" />
     <Compile Include="Models\ConversationChatConnectionViewModel.cs" />
     <Compile Include="Data\ChatService.cs" />

@@ -69,9 +69,10 @@
                 android:id="@+id/subscribersLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reserveButton"
+                android:layout_below="@id/mapFragment"
                 android:visibility="gone"
-                android:layout_marginTop="50dp">
+                android:orientation="vertical"
+                android:layout_marginTop="80dp">
                 <TextView
                     android:text="Interessados"
                     android:textSize="16dp"
@@ -81,7 +82,7 @@
                 <ListView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/subscribers" />
+                    android:id="@+id/itemDetailSubscribers" />
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>

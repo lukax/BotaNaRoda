@@ -39,6 +39,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private UserRepository _userRepository;
         private ViewHolder _holder;
         private BackgroundWorker _refreshWorker;
+        private ItemDetailSubscribersAdapter _subscribersAdapter;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -60,7 +61,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ItemDescriptionView = FindViewById<TextView>(Resource.Id.itemsDetailDescription),
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
                 DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
-				SubscribersListView = FindViewById<ListView>(Resource.Id.subscribers),
+				SubscribersListView = FindViewById<ListView>(Resource.Id.itemDetailSubscribers),
 				SubscribersLayout = FindViewById<LinearLayout>(Resource.Id.subscribersLayout)
             };
 
@@ -103,7 +104,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             alertConfirm.SetCancelable(false);
             alertConfirm.SetPositiveButton("OK", ConfirmDelete);
             alertConfirm.SetNegativeButton("Cancel", delegate { });
-            alertConfirm.SetMessage("Tem certeza que quer remover o Item?");
+            alertConfirm.SetMessage("Tem certeza que quer remover este produto?");
             alertConfirm.Show();
         }
 
@@ -179,25 +180,41 @@ namespace BotaNaRoda.Ndroid.Controllers
                 .Into(_holder.ItemAuthorImageView);
             });
 
-			if (_userRepository.IsLoggedIn) {
-				if (_item.User.Username == _userRepository.Get ().Username) {
-					if (_menu != null) {
-						_menu.FindItem (Resource.Id.actionDelete).SetVisible (_item.User.Username == _userRepository.Get ().Username);
-					}
-				} 
-				if (!_item.IsSubscribed) {
-					_holder.ReserveButton.Visibility = ViewStates.Visible;
-					_holder.ReserveButton.Text = "Reservar";
-					_holder.ReserveButton.Click += Subscribe;
-				} else {
-					_holder.ReserveButton.Visibility = ViewStates.Visible;
-					_holder.ReserveButton.Text = "Reservado";
-				}
-			}
-			if (_item.Subscribers != null && _item.Subscribers.Count > 0) {
-				_holder.SubscribersLayout.Visibility = ViewStates.Visible;
-				_holder.SubscribersListView.Adapter = new ItemDetailSubscribersAdapter (this, _item.Subscribers);
-				_holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+			if (_userRepository.IsLoggedIn)
+            {
+			    if (_item.User.Username == _userRepository.Get().Username)
+			    {
+                    //ITEM'S OWNER
+			        if (_menu != null)
+			        {
+			            _menu.FindItem(Resource.Id.actionDelete)
+			                .SetVisible(_item.User.Username == _userRepository.Get().Username);
+			        }
+                    if (_item.Subscribers != null && _item.Subscribers.Count > 0)
+                    {
+                        _holder.SubscribersLayout.Visibility = ViewStates.Visible;
+                        _subscribersAdapter = new ItemDetailSubscribersAdapter(this, _item.Subscribers);
+                        _holder.SubscribersListView.Adapter = _subscribersAdapter;
+                        _holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+                    }
+                }
+			    else
+			    {
+                    //ITEM'S VIEWER
+                    if (!_item.IsSubscribed)
+                    {
+                        _holder.ReserveButton.Visibility = ViewStates.Visible;
+                        _holder.ReserveButton.Text = "Reservar";
+                        _holder.ReserveButton.Enabled = true;
+                        _holder.ReserveButton.Click += Subscribe;
+                    }
+                    else
+                    {
+                        _holder.ReserveButton.Visibility = ViewStates.Visible;
+                        _holder.ReserveButton.Text = "Você está olho!";
+                        _holder.ReserveButton.Enabled = false;
+                    }
+                }
 			}
         }
 
@@ -221,7 +238,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			var conversationId = await _itemService.Promise (_item.Id, _item.Subscribers [e.Position].Id);
 
 			Intent chatIntent = new Intent(this, typeof(ChatActivity));
-			chatIntent.PutExtra("conversationId", conversationId);
+			chatIntent.PutExtra(ChatActivity.ConversationIdExtra, conversationId);
 			StartActivity(chatIntent);
 		}
 

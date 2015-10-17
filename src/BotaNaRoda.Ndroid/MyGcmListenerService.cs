@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using BotaNaRoda.Ndroid.Controllers;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -25,13 +26,30 @@ namespace BotaNaRoda.Ndroid
 			Log.Debug("MyGcmListenerService", "Message: " + message);
 
 			// Forward the received message in a local notification:
-			SendNotification (message);
+		    var conversationId = data.GetString("conversationId");
+		    var itemId = data.GetString("itemId");
+
+			SendNotification (message, conversationId, itemId);
 		}
 
 		// Use Notification Builder to create and launch the notification:
-		void SendNotification (string message)
+		void SendNotification (string message, string conversationId, string itemId)
 		{
-			var intent = new Intent (this, typeof(MainActivity));
+		    Intent intent;
+		    if (conversationId != null)
+		    {
+		        intent = new Intent(this, typeof(ChatActivity));
+		        intent.PutExtra(ChatActivity.ConversationIdExtra, conversationId);
+		    }
+            else if (itemId != null)
+            {
+                intent = new Intent(this, typeof(ItemDetailActivity));
+                intent.PutExtra(ItemDetailActivity.ItemIdExtra, itemId);
+            }
+            else
+            {
+                intent = new Intent(this, typeof(MainActivity));
+            }
 			intent.AddFlags (ActivityFlags.ClearTop);
 			var pendingIntent = PendingIntent.GetActivity (this, 0, intent, PendingIntentFlags.OneShot);
 

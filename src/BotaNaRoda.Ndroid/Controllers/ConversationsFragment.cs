@@ -60,7 +60,7 @@ namespace BotaNaRoda.Ndroid
         private void _itemsListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             Intent itemDetailIntent = new Intent(Activity, typeof(ChatActivity));
-			itemDetailIntent.PutExtra("conversationId", _conversations[e.Position].Id);
+			itemDetailIntent.PutExtra(ChatActivity.ConversationIdExtra, _conversations[e.Position].Id);
             Activity.StartActivity(itemDetailIntent);
         }
 

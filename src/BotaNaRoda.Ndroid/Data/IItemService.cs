@@ -10,7 +10,7 @@ namespace BotaNaRoda.Ndroid.Data
         Task<IList<ItemListViewModel>> GetAllItemsAsync(double lat, double lon, double radius, int skip, int limit);
         void RefreshCache();
         Task<ItemDetailViewModel> GetItem(string id);
-        Task<string> SaveItem(ItemCreateBindingModel item);
+        Task<string> PostItem(ItemCreateBindingModel item);
         Task<bool> DeleteItem(string id);
     }
 }

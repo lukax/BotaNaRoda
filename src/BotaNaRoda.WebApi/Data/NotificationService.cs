@@ -84,14 +84,16 @@ namespace BotaNaRoda.WebApi.Data
         {
             Task.Run(async () =>
             {
+                var owner = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
                 var subscribers = await _itemsContext.Users.Find(x => item.Subscribers.Contains(x.Id)).ToListAsync();
 
                 var notification = new ItemNotification
                 {
                     itemId = item.Id,
                     itemName = item.Name,
-                    message = "O produto foi removido"
+                    message = "O produto " + item.Name + " foi excluído"
                 };
+                await PostNotificationToUser(notification, owner);
                 subscribers.ForEach(async x => await PostNotificationToUser(notification, x));
             });
         }
@@ -112,23 +114,7 @@ namespace BotaNaRoda.WebApi.Data
                     itemId = item.Id,
                     itemName = item.Name,
                     conversationId = conversation.Id,
-                    message = "Mensagem recebida",
-                };
-                await PostNotificationToUser(notification, receivingEndUser);
-            });
-        }
-
-        public void OnItemPost(Item item, string userId)
-        {
-            Task.Run(async () =>
-            {
-                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
-
-                var notification = new ItemNotification
-                {
-                    itemId = item.Id,
-                    itemName = item.Name,
-                    message = "Seu produto " + item.Name + " foi postado!"
+                    message = "Nova mensagem recebida",
                 };
                 await PostNotificationToUser(notification, receivingEndUser);
             });
@@ -138,13 +124,14 @@ namespace BotaNaRoda.WebApi.Data
         {
             Task.Run(async () =>
             {
-                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+                var emittingUser = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+                var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == item.UserId).FirstAsync();
 
                 var notification = new ItemNotification
                 {
                     itemId = item.Id,
                     itemName = item.Name,
-                    message = receivingEndUser.Name + " está de olho!"
+                    message = emittingUser.Name + " está de olho em " + item.Name + "!"
                 };
                 await PostNotificationToUser(notification, receivingEndUser);
             });
@@ -160,7 +147,7 @@ namespace BotaNaRoda.WebApi.Data
                 {
                     itemId = item.Id,
                     itemName = item.Name,
-                    message = receivingEndUser.Name + " desistiu"
+                    message = receivingEndUser.Name + " não está mais de olho em " + item.Name
                 };
                 await PostNotificationToUser(notification, receivingEndUser);
             });

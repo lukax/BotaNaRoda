@@ -89,7 +89,7 @@ namespace BotaNaRoda.Ndroid.Data
             return null;
         }
 
-        public async Task<string> SaveItem(ItemCreateBindingModel item)
+        public async Task<string> PostItem(ItemCreateBindingModel item)
         {
             await SetupAuthorizationHeader();
 

@@ -25,6 +25,7 @@ namespace BotaNaRoda.Ndroid
         ParentActivity = typeof (MainActivity))]
     public class ChatActivity : AppCompatActivity
     {
+        public const string ConversationIdExtra = "conversationId";
         private UserRepository _userRepository;
         private ViewHolder _holder;
         private ChatMessageAdapter _adapter;
