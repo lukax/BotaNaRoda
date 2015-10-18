@@ -50,7 +50,11 @@ namespace BotaNaRoda.Ndroid.Controllers
                     .Load(_mImageUrl)
                     .Into(_imageView);
             });
-            _imageView.Click += (sender, args) => { _onImageClick?.Invoke(); };
+            _imageView.Click += (sender, args) => { 
+				if(_onImageClick != null){
+					_onImageClick.Invoke();
+				}
+			 };
             return view;
         }
 
