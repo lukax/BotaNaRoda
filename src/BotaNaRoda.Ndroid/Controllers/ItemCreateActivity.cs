@@ -167,7 +167,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		 	var locationDialog = ProgressDialog.Show (this, "", "Obtendo localização...");
 			int attempts = 0;
-			while (_address == null && attempts < 100) {
+			while (_address == null && attempts < 10) {
 				Geocoder geocdr = new Geocoder(this);
 				_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
 				attempts++;

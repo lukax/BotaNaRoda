@@ -18,7 +18,6 @@ namespace BotaNaRoda.Ndroid
         private ListView _itemsListView;
         private ConversationListAdapter _adapter;
         private IList<ConversationListViewModel> _conversations;
-        private BackgroundWorker _refreshWorker;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -37,22 +36,9 @@ namespace BotaNaRoda.Ndroid
             return view;
         }
 
-        private void Refresh()
+        private async void Refresh()
         {
-            _refreshWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
-            _refreshWorker.DoWork += (sender, args) =>
-            {
-                _conversations = _itemService.GetAllConversations().Result;
-            };
-            _refreshWorker.RunWorkerCompleted += (sender, args) =>
-            {
-                Activity.RunOnUiThread(UpdateUi);    
-            };
-            _refreshWorker.RunWorkerAsync();
-        }
-
-        private void UpdateUi()
-        {
+            _conversations = await _itemService.GetAllConversations();
             _adapter.Conversations = _conversations;
             _adapter.NotifyDataSetChanged();
         }
@@ -64,14 +50,6 @@ namespace BotaNaRoda.Ndroid
             Activity.StartActivity(itemDetailIntent);
         }
 
-        public override void OnDestroyView()
-        {
-            if (_refreshWorker != null)
-            {
-                _refreshWorker.CancelAsync();
-            }
-            base.OnDestroyView();
-        }
 
     }
 }

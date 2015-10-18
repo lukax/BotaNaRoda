@@ -33,16 +33,12 @@ namespace BotaNaRoda.Ndroid.Controllers
     {
         public const string ItemIdExtra = "itemId";
         public const string ItemNameExtra = "itemName";
-        private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         private string _itemId;
 
         private ItemDetailViewModel _item;
-        private IMenu _menu;
         private ItemRestService _itemService;
-        private UserRepository _userRepository;
-        private BackgroundWorker _refreshWorker;
         private string _itemName;
-        private LocationManager _locMgr;
+        private MapFragment _mapFragment;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -54,7 +50,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemName = bundle != null ? bundle.GetString(ItemNameExtra) : Intent.GetStringExtra(ItemNameExtra);
             Title = "Localização do Produto " + _itemName;
 
-            _userRepository = new UserRepository();
+            _mapFragment = FragmentManager.FindFragmentById<MapFragment>(Resource.Id.itemDetailMapExpandedMapFragment);
+
             _itemService = new ItemRestService(new UserRepository());
 
             Refresh();
@@ -78,23 +75,11 @@ namespace BotaNaRoda.Ndroid.Controllers
             return base.OnOptionsItemSelected(item);
         }
 
-        void Refresh()
+        private async void Refresh()
         {
-            _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
-            _refreshWorker.DoWork += (sender, args) =>
-            {
-                _item = _itemService.GetItem(_itemId).Result;
-            };
-            _refreshWorker.RunWorkerCompleted += (sender, args) =>
-            {
-                RunOnUiThread(UpdateUi);
-            };
-            _refreshWorker.RunWorkerAsync();
-        }
-
-        private void UpdateUi()
-        {
-            FragmentManager.FindFragmentById<MapFragment>(Resource.Id.itemDetailMapExpandedMapFragment).GetMapAsync(callback: this);
+            _item = await _itemService.GetItem(_itemId);
+    
+            _mapFragment.GetMapAsync(this);
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -113,15 +98,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             googleMap.AnimateCamera(cameraUpdate);
             googleMap.MyLocationEnabled = true;
         }
-
-        protected override void OnDestroy()
-        {
-			if (_refreshWorker != null) {
-				_refreshWorker.CancelAsync();
-			}
-            base.OnDestroy();
-        }
-
     }
 }
 

@@ -21,19 +21,11 @@
         p1:padding="20dp"
         p1:textSize="20dp" />
     <Button
-        p1:id="@+id/loginWithGoogle"
-        p1:text="Login with Google"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:layout_below="@id/conversationUserName"
-        p1:width="250dp"
-        p1:layout_centerHorizontal="true" />
-    <Button
         p1:id="@+id/loginWithFacebook"
         p1:text="Login with Facebook"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_below="@id/loginWithGoogle"
+        p1:layout_below="@id/conversationUserName"
         p1:width="250dp"
         p1:layout_centerHorizontal="true" />
 </RelativeLayout>

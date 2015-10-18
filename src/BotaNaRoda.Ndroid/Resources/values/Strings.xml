@@ -13,4 +13,5 @@
     </string-array>
   <string name="itemimageview_description">Imagem do produto</string>
   <string name="gcm_defaultSenderId">472579673098</string>
+  <string name="fb_appId">450077978528041</string>
 </resources>

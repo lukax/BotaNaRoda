@@ -29,7 +29,6 @@ namespace BotaNaRoda.Ndroid
         private UserRepository _userRepository;
         private ViewHolder _holder;
         private ChatMessageAdapter _adapter;
-        private BackgroundWorker _refreshWorker;
         private IHubProxy _chatHubProxy;
         private ConversationChatConnectionViewModel _connectionViewModel;
         private string _conversationId;
@@ -79,35 +78,28 @@ namespace BotaNaRoda.Ndroid
             });
         }
 
-        private void Refresh()
+        private async void Refresh()
         {
-            _refreshWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
-            _refreshWorker.DoWork += (sender, args) =>
-            {
-                var authInfo = _userRepository.Get();
-                // Connect to the server
-				_hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
-				_hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
-                // Create a proxy to the 'ChatHub' SignalR Hub
-				_chatHubProxy = _hubConnection.CreateHubProxy("ChatHub");
+            var authInfo = _userRepository.Get();
+            // Connect to the server
+			_hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
+			_hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
+            // Create a proxy to the 'ChatHub' SignalR Hub
+			_chatHubProxy = _hubConnection.CreateHubProxy("ChatHub");
 
-                // Wire up a handler for the 'UpdateChatMessage' for the server
-                // to be called on our client
-                _chatHubProxy.On<ConversationChatMessage>("OnMessageReceived", message =>
-                {
-					RunOnUiThread(() => MessageReceived(message));
-                });
-
-                // Start the connection
-				_hubConnection.Start().Wait();
-                _connectionViewModel = _chatHubProxy.Invoke<ConversationChatConnectionViewModel>("Connect", _conversationId).Result;
-                //---
-            };
-            _refreshWorker.RunWorkerCompleted += (sender, args) =>
+            // Wire up a handler for the 'UpdateChatMessage' for the server
+            // to be called on our client
+            _chatHubProxy.On<ConversationChatMessage>("OnMessageReceived", message =>
             {
-                RunOnUiThread(UpdateUi);
-            };
-            _refreshWorker.RunWorkerAsync();
+				RunOnUiThread(() => MessageReceived(message));
+            });
+
+            // Start the connection
+			await _hubConnection.Start();
+            _connectionViewModel = await _chatHubProxy.Invoke<ConversationChatConnectionViewModel>("Connect", _conversationId);
+
+            //---
+            UpdateUi();
         }
 
         private void UpdateUi()
@@ -143,9 +135,6 @@ namespace BotaNaRoda.Ndroid
         {
 			if (_hubConnection != null) {
 				_hubConnection.Dispose ();
-			}
-			if (_refreshWorker != null) {
-				_refreshWorker.CancelAsync ();
 			}
             base.OnDestroy();
         }

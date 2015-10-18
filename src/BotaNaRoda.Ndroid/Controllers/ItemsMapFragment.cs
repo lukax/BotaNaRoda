@@ -17,7 +17,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         private IList<ItemListViewModel> _items;
         private ItemRestService _itemService;
         private UserRepository _userRepository;
-        private BackgroundWorker _refreshWorker;
         private MapFragment _mapFragment;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -34,22 +33,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             return view;
         }
 
-        void Refresh()
+        private async void Refresh()
         {
-            _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
-            _refreshWorker.DoWork += (sender, args) =>
-            {
-                var usr = _userRepository.Get();
-                _items = _itemService.GetAllItemsAsync(usr.Latitude, usr.Longitude, 10000, 0, 100).Result;
-            };
-            _refreshWorker.RunWorkerCompleted += (sender, args) =>
-            {
-                Activity.RunOnUiThread(() =>
-                {
-                    _mapFragment.GetMapAsync(this);
-                });
-            };
-            _refreshWorker.RunWorkerAsync();
+            var usr = _userRepository.Get();
+            _items = await _itemService.GetAllItemsAsync(usr.Latitude, usr.Longitude, 10000, 0, 100);
+           
+            _mapFragment.GetMapAsync(this);
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -83,10 +72,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         public override void OnDestroyView()
         {
-            if (_refreshWorker != null)
-            {
-                _refreshWorker.CancelAsync();
-            }
             if (_mapFragment != null)
             {
                 Activity.FragmentManager.BeginTransaction().Remove(_mapFragment).Commit();

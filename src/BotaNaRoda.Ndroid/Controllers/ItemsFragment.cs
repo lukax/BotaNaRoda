@@ -95,6 +95,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
+            UpdateUserLocation(location);
+
             var usr = _userRepository.Get();
             usr.Latitude = location.Latitude;
             usr.Longitude = location.Longitude;
@@ -102,8 +104,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _adapter.UserLatLon = usr;
 			_adapter.NotifyDataSetChanged ();
-
-			UpdateUserLocation (location);
 		}
 
 		public void OnProviderDisabled (string provider)

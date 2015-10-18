@@ -9,10 +9,11 @@ using Xamarin.Auth;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
-	[Activity (Label = "Fazer Login - Bota na Roda",
+	[Activity (Label = "Entrar - Bota na Roda",
 		ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize),
         LaunchMode = Android.Content.PM.LaunchMode.SingleTask,
-        ParentActivity = typeof(MainActivity))]
+        ParentActivity = typeof(MainActivity),
+        Theme = "@style/MainTheme")]
 	public class LoginActivity : Activity
 	{
 		private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
@@ -21,17 +22,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
-			//SetContentView (Resource.Layout.Login);
-            //ActionBar.SetDisplayHomeAsUpEnabled(true);
+			SetContentView (Resource.Layout.Login);
+            ActionBar.SetDisplayHomeAsUpEnabled(true);
 
             _userRepository = new UserRepository();
-            Login();
+            //Login();
 		}
 
 		protected override void OnResume ()
 		{
 			base.OnResume ();
-			Finish ();
+			//Finish ();
 		}
 
         void Login()

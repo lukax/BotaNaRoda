@@ -69,6 +69,10 @@
     <Reference Include="Xamarin.Android.Support.v4">
       <HintPath>..\..\packages\Xamarin.Android.Support.v4.23.0.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Facebook, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xamarin.Facebook.Android.4.6.0.0\lib\MonoAndroid403\Xamarin.Facebook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Base">
       <HintPath>..\..\packages\Xamarin.GooglePlayServices.Base.26.0.0.0\lib\MonoAndroid41\Xamarin.GooglePlayServices.Base.dll</HintPath>
     </Reference>
@@ -220,6 +224,10 @@
     <AndroidResource Include="Resources\values\Dimens.xml" />
   </ItemGroup>
   <ItemGroup>
+    <XamarinComponentReference Include="facebookandroid">
+      <Visible>False</Visible>
+      <Version>4.6.0.0</Version>
+    </XamarinComponentReference>
     <XamarinComponentReference Include="signalr">
       <Version>2.1.2.2</Version>
       <Visible>False</Visible>

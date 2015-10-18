@@ -30,15 +30,12 @@ namespace BotaNaRoda.Ndroid.Controllers
     public class ItemDetailActivity : AppCompatActivity, IOnMapReadyCallback
     {
         public const string ItemIdExtra = "itemId";
-        private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         private string _itemId;
-
         private ItemDetailViewModel _item;
         private IMenu _menu;
         private ItemRestService _itemService;
         private UserRepository _userRepository;
         private ViewHolder _holder;
-        private BackgroundWorker _refreshWorker;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -76,15 +73,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             Refresh();
         }
 
-        protected override void OnPause()
-        {
-            if (_refreshWorker != null)
-            {
-                _refreshWorker.CancelAsync();
-            }
-            base.OnPause();
-        }
-
         protected override void OnSaveInstanceState(Bundle outState)
         {
             outState.PutString(ItemIdExtra, _itemId);
@@ -120,26 +108,19 @@ namespace BotaNaRoda.Ndroid.Controllers
             alertConfirm.Show();
         }
 
-        private void ConfirmDelete(object sender, EventArgs e)
+        private async void ConfirmDelete(object sender, EventArgs e)
         {
-            _itemService.DeleteItem(_item.Id);
+            await _itemService.DeleteItem(_item.Id);
             Toast toast = Toast.MakeText(this, "Produto foi removido", ToastLength.Short);
             toast.Show();
             Finish();
         }
 
-        private void Refresh()
+        private async void Refresh()
         {
-            _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
-            _refreshWorker.DoWork += (sender, args) =>
-            {
-                _item = _itemService.GetItem(_itemId).Result;
-            };
-            _refreshWorker.RunWorkerCompleted += (sender, args) =>
-            {
-                RunOnUiThread(UpdateUi);
-            };
-            _refreshWorker.RunWorkerAsync();
+            _item = await _itemService.GetItem(_itemId);
+
+            UpdateUi();
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -231,7 +212,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			}
         }
 
-		async void Subscribe(object sender, EventArgs e)
+		private async void Subscribe(object sender, EventArgs e)
 		{
 			var result = await _itemService.Subscribe (_item.Id);
 			RunOnUiThread(() =>
