@@ -46,9 +46,6 @@ namespace BotaNaRoda.WebApi.Hubs
             var fromUsr = await _context.Users.Find(x => x.Id == conversation.FromUserId).FirstOrDefaultAsync();
             var toUsr = await _context.Users.Find(x => x.Id == conversation.ToUserId).FirstOrDefaultAsync();
 
-            //update conversation hub info
-            conversation.HubInfo = conversation.HubInfo ?? new ConversationHubInfo();
-
             var viewModel = new ConversationChatConnectionViewModel
             {
                 UpdatedAt = conversation.UpdatedAt,
@@ -63,20 +60,22 @@ namespace BotaNaRoda.WebApi.Hubs
 
             if (conversation.FromUserId == currentUserId)
             {
-                conversation.HubInfo.FromUserConnectionId = Context.ConnectionId;
-                conversation.HubInfo.FromUserIsConnected = true;
+                conversation.FromUserHubInfo.ConnectionId = Context.ConnectionId;
+                conversation.FromUserHubInfo.IsConnected = true;
                 viewModel.ToUser = new UserViewModel(toUsr);
             }
             else
             {
-                conversation.HubInfo.ToUserConnectionId = Context.ConnectionId;
-                conversation.HubInfo.ToUserIsConnected = true;
+                conversation.ToUserHubInfo.ConnectionId = Context.ConnectionId;
+                conversation.ToUserHubInfo.IsConnected = true;
                 viewModel.ToUser = new UserViewModel(fromUsr);
             }
 
             await _context.Conversations.UpdateOneAsync(
                 Builders<Conversation>.Filter.Eq(x => x.Id, conversation.Id),
-                Builders<Conversation>.Update.Set(x => x.HubInfo, conversation.HubInfo));
+                Builders<Conversation>.Update
+                    .Set(x => x.FromUserHubInfo, conversation.FromUserHubInfo)
+                    .Set(x => x.ToUserHubInfo, conversation.ToUserHubInfo));
 
             Clients.CallerState.conversationId = conversationId;
 
@@ -85,38 +84,41 @@ namespace BotaNaRoda.WebApi.Hubs
 
         public async Task SendMessage(SendConversationMessageBindingModel sendMessageModel)
         {
-            var currentUserId = Context.User.GetSubjectId();
-
             if (string.IsNullOrEmpty(sendMessageModel.Message))
             {
                 throw new HubException("Invalid message");
             }
 
+            var currentUserId = Context.User.GetSubjectId();
+
             var conversation = await _context.Conversations
                 .Find(x => x.Id == sendMessageModel.ConversationId && (x.FromUserId == currentUserId || x.ToUserId == currentUserId))
                 .FirstOrDefaultAsync();
-            if (conversation != null)
+            if (conversation == null)
             {
-                //add msg to conversation
-                await _context.Conversations.UpdateOneAsync(
-                    Builders<Conversation>.Filter.Eq(x => x.Id, sendMessageModel.ConversationId),
-                    Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage
-                    {
-                        Message = sendMessageModel.Message,
-                        SentBy = currentUserId
-                    }));
-
-                Clients.Clients(new [] { conversation.HubInfo.ToUserConnectionId, conversation.HubInfo.FromUserConnectionId})
-                    .OnMessageReceived(new ConversationChatMessageViewModel
-                    {
-                        Message = sendMessageModel.Message,
-                        SentAt = DateProvider.Get,
-                        SentBy = currentUserId
-                    });
-
-
-                _notificationService.OnConversationMessageSent(conversation, currentUserId);
+                throw new HubException("Conversation not found");
             }
+
+            //add msg to conversation
+            await _context.Conversations.UpdateOneAsync(
+                Builders<Conversation>.Filter.Eq(x => x.Id, sendMessageModel.ConversationId),
+                Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage
+                {
+                    Message = sendMessageModel.Message,
+                    SentBy = currentUserId
+                }));
+
+            Clients.Clients(new[]
+            {conversation.FromUserHubInfo.ConnectionId, conversation.ToUserHubInfo.ConnectionId})
+                .OnMessageReceived(new ConversationChatMessageViewModel
+                {
+                    Message = sendMessageModel.Message,
+                    SentAt = DateProvider.Get,
+                    SentBy = currentUserId
+                });
+
+
+            _notificationService.OnConversationMessageSent(conversation, currentUserId);
         }
 
         public override async Task OnDisconnected(bool stopCalled)
@@ -130,12 +132,12 @@ namespace BotaNaRoda.WebApi.Hubs
                 if (conversation.FromUserId == currentUserId)
                 {
                     await _context.Conversations
-                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.HubInfo.FromUserIsConnected, false));
+                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.FromUserHubInfo.IsConnected, false));
                 }
                 else
                 {
                     await _context.Conversations
-                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.HubInfo.ToUserIsConnected, false));
+                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.ToUserHubInfo.IsConnected, false));
                 }
             }
         }

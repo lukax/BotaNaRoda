@@ -35,19 +35,34 @@ namespace BotaNaRoda.WebApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<ConversationListViewModel>> GetAll()
         {
-            var userId = User.GetSubjectId();
-            var user = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+            var currentUserId = User.GetSubjectId();
 
             var conversations = await _itemsContext.Conversations
-                .Find(x => x.ToUserId == userId || x.FromUserId == userId).ToListAsync();
+                .Find(x => x.ToUserId == currentUserId || x.FromUserId == currentUserId).ToListAsync();
 
             var itemIds = conversations.Select(x => x.ItemId);
+
+            HashSet<string> userIds = new HashSet<string>();
+            foreach (var id in conversations.Select(x => x.ToUserId))
+            {
+                userIds.Add(id);
+            }
+            foreach (var id in conversations.Select(x => x.FromUserId))
+            {
+                userIds.Add(id);
+            }
+
             var items = await _itemsContext.Items
                 .Find(Builders<Item>.Filter.Where(x => itemIds.Contains(x.Id))).ToListAsync();
+            var users = await _itemsContext.Users
+                .Find(Builders<User>.Filter.Where(x => userIds.Contains(x.Id))).ToListAsync();
 
-            return conversations.Select(x =>
+            return conversations
+                .Select(x =>
             {
                 var item = items.First(i => i.Id == conversations.First(c => c.Id == x.Id).ItemId);
+
+                var receivingEndUser = users.First(usr => usr.Id == x.GetReceivingEndUserId(currentUserId));
 
                 return new ConversationListViewModel
                 {
@@ -55,7 +70,7 @@ namespace BotaNaRoda.WebApi.Controllers
                     ItemName = item.Name,
                     ItemThumbImage = item.ThumbImage.Url,
                     LastUpdated = item.LastUpdated(),
-                    ToUserName = user.Name
+                    ToUserName = receivingEndUser.Name
                 };
             });
         }
@@ -66,20 +81,21 @@ namespace BotaNaRoda.WebApi.Controllers
         {
             var conversation = await _itemsContext.Conversations.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-            var userId = User.GetSubjectId();
-            if (conversation == null || !(conversation.ToUserId == userId || conversation.FromUserId == userId))
+            var currentUserId = User.GetSubjectId();
+            if (conversation == null || !(conversation.ToUserId == currentUserId || conversation.FromUserId == currentUserId))
             {
                 return HttpNotFound();
             }
 
-            var user = await _itemsContext.Users.Find(x => x.Id == userId).FirstAsync();
+            var receivingEndUser = await _itemsContext.Users.Find(x => x.Id == conversation.GetReceivingEndUserId(currentUserId)).FirstAsync();
+
             var item = await _itemsContext.Items.Find(x => x.Id == conversation.Id).FirstAsync();
 
             return new ObjectResult(new ConversationDetailViewModel
             {
                 Id = conversation.Id,
-                ToUserName = user.Name,
-                ToUserAvatar = user.Avatar,
+                ToUserName = receivingEndUser.Name,
+                ToUserAvatar = receivingEndUser.Avatar,
                 Latitude = item.Loc.Latitude,
                 Longitude = item.Loc.Longitude,
                 ItemName = item.Name,

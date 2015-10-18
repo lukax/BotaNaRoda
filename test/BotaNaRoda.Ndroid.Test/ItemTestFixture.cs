@@ -28,7 +28,7 @@ namespace BotaNaRoda.Ndroid.Test
         {
             ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
 
-            string id = _itemService.SaveItem(newItem).Result;
+            string id = _itemService.PostItem(newItem).Result;
 
             _itemService.RefreshCache();
             ItemDetailViewModel item = _itemService.GetItem(id).Result;
@@ -41,13 +41,13 @@ namespace BotaNaRoda.Ndroid.Test
         {
             ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
 
-            string testId = _itemService.SaveItem(newItem).Result;
+            string testId = _itemService.PostItem(newItem).Result;
 
             _itemService.RefreshCache();
             ItemDetailViewModel item = _itemService.GetItem(testId).Result;
             item.Description = "Luva de neve novíssima";
 
-            _itemService.SaveItem(new ItemCreateBindingModel
+            _itemService.PostItem(new ItemCreateBindingModel
             {
                 Description = item.Description
             });
@@ -64,7 +64,7 @@ namespace BotaNaRoda.Ndroid.Test
         {
             ItemCreateBindingModel newItem = new ItemCreateBindingModel {Description = "Luva de neve"};
 
-            string testId = _itemService.SaveItem(newItem).Result;
+            string testId = _itemService.PostItem(newItem).Result;
 
             _itemService.RefreshCache();
             ItemDetailViewModel item = _itemService.GetItem(testId).Result;

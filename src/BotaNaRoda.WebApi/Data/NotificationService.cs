@@ -104,8 +104,7 @@ namespace BotaNaRoda.WebApi.Data
             {
                 var item = await _itemsContext.Items.Find(x => x.Id == conversation.ItemId).FirstAsync();
 
-                if ((conversation.FromUserId == currentUserId && conversation.HubInfo.ToUserIsConnected)
-                   ||(conversation.ToUserId == currentUserId && conversation.HubInfo.FromUserIsConnected))
+                if (conversation.GetReceivingEndHubInfo(currentUserId).IsConnected)
                 {
                     //Receiving user is connected, no need to send notification
                     return;

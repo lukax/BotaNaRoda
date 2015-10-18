@@ -40,15 +40,15 @@ namespace BotaNaRoda.Ndroid
 
 			if (_currentUser.Id == msg.SentBy) {
 				cardView.SetBackgroundColor (Android.Graphics.Color.PaleGreen);	
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).AddRule (LayoutRules.AlignParentRight, (int)LayoutRules.True);
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 100;
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 5;
+				((FrameLayout.LayoutParams)cardView.LayoutParameters).Gravity = GravityFlags.End;
+				((FrameLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 150;
+				((FrameLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 5;
 			} 
 			else {
-				cardView.SetBackgroundColor (Android.Graphics.Color.White);	
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).AddRule (LayoutRules.AlignParentLeft, (int)LayoutRules.True);
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 100;
-				((RelativeLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 5;
+				cardView.SetBackgroundColor (Android.Graphics.Color.White);
+			    ((FrameLayout.LayoutParams) cardView.LayoutParameters).Gravity = GravityFlags.Start;
+				((FrameLayout.LayoutParams)cardView.LayoutParameters).RightMargin = 150;
+				((FrameLayout.LayoutParams)cardView.LayoutParameters).LeftMargin = 5;
 			}
 
             return view;

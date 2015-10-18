@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:p1="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     p1:layout_width="match_parent"
-    p1:layout_height="match_parent"
-    p1:minWidth="25px"
-    p1:minHeight="25px">
-    <ImageView
-        p1:id="@+id/itemDetailSubscriberProfileImage"
-        p1:src="@drawable/contact_picture_placeholder"
-        p1:layout_width="40dp"
-        p1:layout_height="40dp" />
-    <TextView
-        p1:id="@+id/itemDetailSubscriberName"
-        p1:text="Lucas E."
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:layout_marginTop="5dp"
-        p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
-        p1:layout_marginLeft="5dp" />
-    <TextView
-        p1:id="@+id/itemDetailSubscriberLocality"
-        p1:text="(Ativo)"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:layout_below="@id/itemDetailSubscriberName"
-        p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
-        p1:layout_marginLeft="5dp" />
-    <ImageView
-        p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
-        p1:layout_alignParentRight="true"
-        p1:layout_width="25dp"
-        p1:layout_height="40dp" />
-</RelativeLayout>
+    p1:layout_height="wrap_content"
+    p1:layout_margin="5dp"
+    card_view:cardCornerRadius="1dp">
+    <RelativeLayout
+        p1:layout_width="match_parent"
+        p1:layout_height="wrap_content">
+        <ImageView
+            p1:id="@+id/itemDetailSubscriberProfileImage"
+            p1:src="@drawable/contact_picture_placeholder"
+            p1:layout_width="50dp"
+            p1:layout_height="50dp" />
+        <TextView
+            p1:id="@+id/itemDetailSubscriberName"
+            p1:text="Lucas E."
+            p1:layout_width="wrap_content"
+            p1:layout_height="wrap_content"
+            p1:layout_marginTop="10dp"
+            p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
+            p1:layout_marginLeft="10dp" />
+        <TextView
+            p1:id="@+id/itemDetailSubscriberLocality"
+            p1:text="(Ativo)"
+            p1:layout_width="wrap_content"
+            p1:layout_height="wrap_content"
+            p1:layout_below="@id/itemDetailSubscriberName"
+            p1:layout_toRightOf="@id/itemDetailSubscriberProfileImage"
+            p1:layout_marginLeft="10dp" />
+        <ImageView
+            p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+            p1:layout_alignParentRight="true"
+            p1:layout_width="25dp"
+            p1:layout_height="40dp" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

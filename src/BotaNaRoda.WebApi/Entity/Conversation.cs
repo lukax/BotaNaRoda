@@ -27,22 +27,32 @@ namespace BotaNaRoda.WebApi.Entity
 
         public List<ConversationChatMessage> Messages { get; set; }
 
-        [BsonIgnoreIfNull]
-        public ConversationHubInfo HubInfo { get; set; }
+        [BsonIgnoreIfNull] public ConversationHubInfo ToUserHubInfo { get; set; }
+        [BsonIgnoreIfNull] public ConversationHubInfo FromUserHubInfo { get; set; }
 
         public Conversation()
         {
             Id = ObjectId.GenerateNewId().ToString();
             CreatedAt = DateProvider.Get;
             Messages = new List<ConversationChatMessage>();
+            ToUserHubInfo = new ConversationHubInfo();
+            FromUserHubInfo = new ConversationHubInfo();
+        }
+
+        public string GetReceivingEndUserId(string currentUserId)
+        {
+            return FromUserId == currentUserId ? ToUserId : FromUserId;
+        }
+
+        public ConversationHubInfo GetReceivingEndHubInfo(string currentUserId)
+        {
+            return FromUserId == currentUserId ? ToUserHubInfo : FromUserHubInfo;
         }
     }
 
     public class ConversationHubInfo
     {
-        public bool FromUserIsConnected { get; set; }
-        public string FromUserConnectionId { get; set; }
-        public bool ToUserIsConnected { get; set; }
-        public string ToUserConnectionId { get; set; }
+        public bool IsConnected { get; set; }
+        public string ConnectionId { get; set; }
     }
 }

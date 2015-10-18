@@ -15,13 +15,15 @@
         p1:text="Lucas E."
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_marginTop="20dp"
+        p1:layout_marginTop="10dp"
+        p1:layout_marginLeft="10dp"
         p1:layout_toRightOf="@id/conversationProfileImage" />
     <TextView
         p1:id="@+id/conversationItemName"
         p1:text="Luva de Neve"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
+        p1:layout_marginLeft="10dp"
         p1:layout_below="@id/conversationUserName"
         p1:layout_toRightOf="@id/conversationProfileImage" />
     <TextView
@@ -29,6 +31,7 @@
         p1:text="11 horas atrás"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
+        p1:layout_marginLeft="10dp"
         p1:layout_below="@id/conversationItemName"
         p1:layout_toRightOf="@id/conversationProfileImage" />
     <ImageView
