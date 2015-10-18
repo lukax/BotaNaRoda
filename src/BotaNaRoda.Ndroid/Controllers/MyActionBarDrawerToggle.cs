@@ -17,7 +17,7 @@ namespace BotaNaRoda.Ndroid
         private readonly TextView _userNameTextView;
         private readonly ImageView _pictureImageView;
 	    private readonly AppCompatActivity _host;
-		private AuthInfo _currentUsr;
+		private string _currentUsername;
 
 	    public MyActionBarDrawerToggle (AppCompatActivity host,
                 DrawerLayout drawerLayout, int openedResource, int closedResource,
@@ -53,17 +53,24 @@ namespace BotaNaRoda.Ndroid
 
         private void GetUserInfo()
         {
-			if (_userRepository.IsLoggedIn && _currentUsr != _userRepository.Get())
-            {
-				_currentUsr = _userRepository.Get();
+			if (_userRepository.IsLoggedIn)
+			{
+			    var usr = _userRepository.Get();
+			    if (usr.Username == _currentUsername)
+			    {
+			        return;
+			    }
 
-				_userNameTextView.Text = _currentUsr.Name;
-				_userAddressTextView.Text = _currentUsr.Address;
+				_currentUsername = usr.Username;
+
+				_userNameTextView.Text = usr.Name;
+				_userAddressTextView.Text = usr.Address;
 				_pictureImageView.Post(() =>
                 {
                     _pictureImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
                     Picasso.With(_host)
-						.Load(_currentUsr.Picture)
+						.Load(usr.Picture)
+                        .NoFade()
                         .Into(_pictureImageView);
                 });
             }

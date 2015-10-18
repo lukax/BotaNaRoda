@@ -64,11 +64,13 @@ namespace BotaNaRoda.WebApi.Hubs
             if (conversation.FromUserId == currentUserId)
             {
                 conversation.HubInfo.FromUserConnectionId = Context.ConnectionId;
+                conversation.HubInfo.FromUserIsConnected = true;
                 viewModel.ToUser = new UserViewModel(toUsr);
             }
             else
             {
                 conversation.HubInfo.ToUserConnectionId = Context.ConnectionId;
+                conversation.HubInfo.ToUserIsConnected = true;
                 viewModel.ToUser = new UserViewModel(fromUsr);
             }
 
@@ -76,12 +78,14 @@ namespace BotaNaRoda.WebApi.Hubs
                 Builders<Conversation>.Filter.Eq(x => x.Id, conversation.Id),
                 Builders<Conversation>.Update.Set(x => x.HubInfo, conversation.HubInfo));
 
+            Clients.CallerState.conversationId = conversationId;
+
             return viewModel;
         }
 
         public async Task SendMessage(SendConversationMessageBindingModel sendMessageModel)
         {
-            var userId = Context.User.GetSubjectId();
+            var currentUserId = Context.User.GetSubjectId();
 
             if (string.IsNullOrEmpty(sendMessageModel.Message))
             {
@@ -89,7 +93,7 @@ namespace BotaNaRoda.WebApi.Hubs
             }
 
             var conversation = await _context.Conversations
-                .Find(x => x.Id == sendMessageModel.ConversationId && (x.FromUserId == userId || x.ToUserId == userId))
+                .Find(x => x.Id == sendMessageModel.ConversationId && (x.FromUserId == currentUserId || x.ToUserId == currentUserId))
                 .FirstOrDefaultAsync();
             if (conversation != null)
             {
@@ -99,7 +103,7 @@ namespace BotaNaRoda.WebApi.Hubs
                     Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage
                     {
                         Message = sendMessageModel.Message,
-                        SentBy = userId
+                        SentBy = currentUserId
                     }));
 
                 Clients.Clients(new [] { conversation.HubInfo.ToUserConnectionId, conversation.HubInfo.FromUserConnectionId})
@@ -107,16 +111,33 @@ namespace BotaNaRoda.WebApi.Hubs
                     {
                         Message = sendMessageModel.Message,
                         SentAt = DateProvider.Get,
-                        SentBy = userId
+                        SentBy = currentUserId
                     });
 
-                _notificationService.OnConversationMessageSent(conversation, userId);
+
+                _notificationService.OnConversationMessageSent(conversation, currentUserId);
             }
         }
 
-        public override Task OnDisconnected(bool stopCalled)
+        public override async Task OnDisconnected(bool stopCalled)
         {
-            return base.OnDisconnected(stopCalled);
+            var currentUserId = Context.User.GetSubjectId();
+            string conversationId = Clients.CallerState.conversationId;
+            if (conversationId != null)
+            {
+                var conversation = await _context.Conversations.Find(x => x.Id == conversationId).FirstOrDefaultAsync();
+
+                if (conversation.FromUserId == currentUserId)
+                {
+                    await _context.Conversations
+                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.HubInfo.FromUserIsConnected, false));
+                }
+                else
+                {
+                    await _context.Conversations
+                        .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.HubInfo.ToUserIsConnected, false));
+                }
+            }
         }
 
     }

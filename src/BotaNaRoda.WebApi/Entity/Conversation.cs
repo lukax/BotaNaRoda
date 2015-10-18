@@ -40,7 +40,9 @@ namespace BotaNaRoda.WebApi.Entity
 
     public class ConversationHubInfo
     {
+        public bool FromUserIsConnected { get; set; }
         public string FromUserConnectionId { get; set; }
+        public bool ToUserIsConnected { get; set; }
         public string ToUserConnectionId { get; set; }
     }
 }

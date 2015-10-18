@@ -88,7 +88,6 @@ namespace BotaNaRoda.Ndroid
                 // Connect to the server
 				_hubConnection = new HubConnection(Path.Combine(Constants.BotaNaRodaEndpoint, "signalr"));
 				_hubConnection.Headers.Add("Authorization", "Bearer " + authInfo.AccessToken);
-
                 // Create a proxy to the 'ChatHub' SignalR Hub
 				_chatHubProxy = _hubConnection.CreateHubProxy("ChatHub");
 

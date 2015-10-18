@@ -58,7 +58,8 @@ namespace BotaNaRoda.Ndroid
 				.SetContentTitle ("Bota Na Roda")
 				.SetContentText (message)
 				.SetAutoCancel (true)
-				.SetContentIntent (pendingIntent);
+                .SetPriority((int)NotificationPriority.High)
+                .SetContentIntent (pendingIntent);
 
 			var notificationManager = (NotificationManager)GetSystemService (Context.NotificationService);
 			notificationManager.Notify (0, notificationBuilder.Build ());

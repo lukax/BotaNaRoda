@@ -73,8 +73,9 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
             var notificationBuilder = new Notification.Builder(this)
                 .SetSmallIcon(Resource.Drawable.ic_gps)
                 .SetContentTitle("Bota Na Roda")
-                .SetContentText("Não foi possível postar produto " + item.Name)
+                .SetContentText("Não foi possível colocar produto " + item.Name + " na roda.")
                 .SetAutoCancel(true)
+                .SetPriority((int) NotificationPriority.High)
                 .SetContentIntent(pendingIntent);
             var notificationManager = (NotificationManager)GetSystemService(Context.NotificationService);
             notificationManager.Notify(notificationId, notificationBuilder.Build());
@@ -108,6 +109,7 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
                 .SetContentTitle("Bota Na Roda")
                 .SetContentText(item.Name + " está na roda!")
                 .SetAutoCancel(true)
+                .SetPriority((int)NotificationPriority.High)
                 .SetContentIntent(pendingIntent);
             var notificationManager = (NotificationManager)GetSystemService(Context.NotificationService);
             notificationManager.Notify(notificationId, notificationBuilder.Build());
