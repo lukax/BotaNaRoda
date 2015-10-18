@@ -81,15 +81,18 @@ namespace BotaNaRoda.Ndroid.Controllers
             googleMap.MyLocationEnabled = true;
         }
 
-        public override void OnDetach()
+        public override void OnDestroyView()
         {
             if (_refreshWorker != null)
             {
                 _refreshWorker.CancelAsync();
             }
-            base.OnDetach();
+            if (_mapFragment != null)
+            {
+                Activity.FragmentManager.BeginTransaction().Remove(_mapFragment).Commit();
+            }
+            base.OnDestroyView();
         }
-
     }
 }
 

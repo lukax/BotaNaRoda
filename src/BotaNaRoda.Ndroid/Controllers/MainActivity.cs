@@ -125,10 +125,11 @@ namespace BotaNaRoda.Ndroid
 				SupportFragmentManager.PopBackStack ();
 			}
 
-            var tx = SupportFragmentManager.BeginTransaction();
             _currentFragment = (Fragment) Activator.CreateInstance(value);
-			tx.Replace(Resource.Id.container, _currentFragment, value.Name);
-            tx.Commit();
+            SupportFragmentManager
+                .BeginTransaction()
+                .Replace(Resource.Id.container, _currentFragment, value.Name)
+                .Commit();
         }
 
         public void OnItemClick(AdapterView parent, View view, int position, long id)

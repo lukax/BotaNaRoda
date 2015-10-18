@@ -64,10 +64,14 @@ namespace BotaNaRoda.Ndroid
             Activity.StartActivity(itemDetailIntent);
         }
 
-        public override void OnDestroy()
+        public override void OnDestroyView()
         {
-            _refreshWorker.CancelAsync();
-            base.OnDetach();
+            if (_refreshWorker != null)
+            {
+                _refreshWorker.CancelAsync();
+            }
+            base.OnDestroyView();
         }
+
     }
 }
