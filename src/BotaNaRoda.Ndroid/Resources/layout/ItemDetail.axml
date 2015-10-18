@@ -26,7 +26,7 @@
                 android:layout_below="@id/itemsDetailViewPager"
                 android:background="@color/grey" />
             <TextView
-                android:text="Autor..."
+                android:text="Autor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailAuthorName"
@@ -34,7 +34,7 @@
                 android:layout_toRightOf="@id/itemsDetailAuthorImage"
                 android:layout_marginLeft="15dp" />
             <TextView
-                android:text="Distance..."
+                android:text="Distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDistance"
@@ -42,7 +42,7 @@
                 android:layout_marginRight="15dp"
                 android:layout_alignParentRight="true" />
             <TextView
-                android:text="Descrição..."
+                android:text="Descrição"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/itemsDetailDescription"

@@ -71,11 +71,12 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
             var pendingIntent = PendingIntent.GetActivity(this, 0, mainIntent, PendingIntentFlags.CancelCurrent);
 
             var notificationBuilder = new Notification.Builder(this)
+                .SetDefaults(NotificationDefaults.Sound | NotificationDefaults.Lights)
+                .SetPriority((int)NotificationPriority.Max)
                 .SetSmallIcon(Resource.Drawable.ic_gps)
                 .SetContentTitle("Bota Na Roda")
                 .SetContentText("Não foi possível colocar produto " + item.Name + " na roda.")
                 .SetAutoCancel(true)
-                .SetPriority((int) NotificationPriority.High)
                 .SetContentIntent(pendingIntent);
             var notificationManager = (NotificationManager)GetSystemService(Context.NotificationService);
             notificationManager.Notify(notificationId, notificationBuilder.Build());
@@ -88,6 +89,8 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
             var pendingIntent = PendingIntent.GetActivity(this, 0, mainIntent, PendingIntentFlags.CancelCurrent);
 
             var notificationBuilder = new Notification.Builder(this)
+                .SetDefaults(NotificationDefaults.Lights)
+                .SetPriority((int)NotificationPriority.High)
                 .SetSmallIcon(Resource.Drawable.ic_gps)
                 .SetContentTitle("Bota Na Roda")
                 .SetContentText("Colocando " + item.Name + " na roda...")
@@ -105,11 +108,12 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
             var pendingIntent = PendingIntent.GetActivity(this, 0, itemDetailIntent, PendingIntentFlags.CancelCurrent);
 
             var notificationBuilder = new Notification.Builder(this)
+                .SetDefaults(NotificationDefaults.All)
+                .SetPriority((int)NotificationPriority.Max)
                 .SetSmallIcon(Resource.Drawable.ic_gps)
                 .SetContentTitle("Bota Na Roda")
                 .SetContentText(item.Name + " está na roda!")
                 .SetAutoCancel(true)
-                .SetPriority((int)NotificationPriority.High)
                 .SetContentIntent(pendingIntent);
             var notificationManager = (NotificationManager)GetSystemService(Context.NotificationService);
             notificationManager.Notify(notificationId, notificationBuilder.Build());

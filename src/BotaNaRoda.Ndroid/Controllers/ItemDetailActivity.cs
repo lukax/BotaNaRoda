@@ -39,7 +39,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         private UserRepository _userRepository;
         private ViewHolder _holder;
         private BackgroundWorker _refreshWorker;
-        private ItemDetailSubscribersAdapter _subscribersAdapter;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -62,15 +61,28 @@ namespace BotaNaRoda.Ndroid.Controllers
                 ReserveButton = FindViewById<Button>(Resource.Id.reserveButton),
                 DistanceView = FindViewById<TextView>(Resource.Id.itemsDetailDistance),
 				SubscribersListView = FindViewById<ListView>(Resource.Id.itemDetailSubscribers),
-				SubscribersLayout = FindViewById<LinearLayout>(Resource.Id.subscribersLayout)
+				SubscribersLayout = FindViewById<LinearLayout>(Resource.Id.subscribersLayout),
+                MapFragment = FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment)
             };
 
-            Refresh();
+            _holder.ReserveButton.Click += Subscribe;
+            _holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
         }
 
         protected override void OnResume()
         {
             base.OnResume();
+
+            Refresh();
+        }
+
+        protected override void OnPause()
+        {
+            if (_refreshWorker != null)
+            {
+                _refreshWorker.CancelAsync();
+            }
+            base.OnPause();
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
@@ -98,7 +110,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             }
         }
 
-        void DeleteItem()
+        private void DeleteItem()
         {
             AlertDialog.Builder alertConfirm = new AlertDialog.Builder(this);
             alertConfirm.SetCancelable(false);
@@ -108,15 +120,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             alertConfirm.Show();
         }
 
-        void ConfirmDelete(object sender, EventArgs e)
+        private void ConfirmDelete(object sender, EventArgs e)
         {
             _itemService.DeleteItem(_item.Id);
-            Toast toast = Toast.MakeText(this, "Item removido", ToastLength.Short);
+            Toast toast = Toast.MakeText(this, "Produto foi removido", ToastLength.Short);
             toast.Show();
             Finish();
         }
 
-        void Refresh()
+        private void Refresh()
         {
             _refreshWorker = new BackgroundWorker {WorkerSupportsCancellation = true};
             _refreshWorker.DoWork += (sender, args) =>
@@ -152,32 +164,36 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private void UpdateUi()
         {
-            FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment).GetMapAsync(callback: this);
+            _holder.MapFragment.GetMapAsync(this);
 
             Title = "Produto " + _item.Name;
             _holder.ItemAuthorNameView.Text = _item.User.Name;
-            _holder.ItemDescriptionView.Text = _item.Description;
+            _holder.ItemDescriptionView.Text = _item.Description ?? "Nenhuma descrição";
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
-            _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(), SupportFragmentManager,
-                () =>
-                {
-                    Intent imageDetailIntent = new Intent(this, typeof(ItemImageDetailExpandedActivity));
-                    imageDetailIntent.PutStringArrayListExtra(ItemImageDetailExpandedActivity.ImageUrlsExtra,
-                        _item.Images.Select(x => x.Url).ToList());
-                    imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImagePositionExtra,
-                        _holder.ViewPager.CurrentItem);
-                    imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImageItemName,
-                        _item.Name);
-                    StartActivity(imageDetailIntent);
-                });
-            _holder.ViewPagerIndicator.SetViewPager(_holder.ViewPager);
-            _holder.ViewPagerIndicator.SetSnap(true);
-            _holder.ItemAuthorImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
+            _holder.ViewPager.Post(() =>
+            {
+                _holder.ViewPager.Adapter = new ItemImagePagerAdapter(this, _item.Images.Select(x => x.Url).ToArray(),
+                    SupportFragmentManager,
+                    () =>
+                    {
+                        Intent imageDetailIntent = new Intent(this, typeof (ItemImageDetailExpandedActivity));
+                        imageDetailIntent.PutStringArrayListExtra(ItemImageDetailExpandedActivity.ImageUrlsExtra,
+                            _item.Images.Select(x => x.Url).ToList());
+                        imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImagePositionExtra,
+                            _holder.ViewPager.CurrentItem);
+                        imageDetailIntent.PutExtra(ItemImageDetailExpandedActivity.ImageItemName,
+                            _item.Name);
+                        StartActivity(imageDetailIntent);
+                    });
+                _holder.ViewPagerIndicator.SetViewPager(_holder.ViewPager);
+                _holder.ViewPagerIndicator.SetSnap(true);
+            });
             _holder.ItemAuthorImageView.Post(() =>
             {
+                _holder.ItemAuthorImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
                 Picasso.With(this)
-                .Load(_item.User.Avatar)
-                .Into(_holder.ItemAuthorImageView);
+                    .Load(_item.User.Avatar)
+                    .Into(_holder.ItemAuthorImageView);
             });
 
 			if (_userRepository.IsLoggedIn)
@@ -193,9 +209,7 @@ namespace BotaNaRoda.Ndroid.Controllers
                     if (_item.Subscribers != null && _item.Subscribers.Count > 0)
                     {
                         _holder.SubscribersLayout.Visibility = ViewStates.Visible;
-                        _subscribersAdapter = new ItemDetailSubscribersAdapter(this, _item.Subscribers);
-                        _holder.SubscribersListView.Adapter = _subscribersAdapter;
-                        _holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+                        _holder.SubscribersListView.Adapter = new ItemDetailSubscribersAdapter(this, _item.Subscribers);
                     }
                 }
 			    else
@@ -206,7 +220,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                         _holder.ReserveButton.Visibility = ViewStates.Visible;
                         _holder.ReserveButton.Text = "Reservar";
                         _holder.ReserveButton.Enabled = true;
-                        _holder.ReserveButton.Click += Subscribe;
                     }
                     else
                     {
@@ -233,7 +246,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				});
 		}
 
-		async void _holder_SubscribersListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+		private async void _holder_SubscribersListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
 		{
 			var conversationId = await _itemService.Promise (_item.Id, _item.Subscribers [e.Position].Id);
 
@@ -241,14 +254,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			chatIntent.PutExtra(ChatActivity.ConversationIdExtra, conversationId);
 			StartActivity(chatIntent);
 		}
-
-        protected override void OnDestroy()
-        {
-			if (_refreshWorker != null) {
-				_refreshWorker.CancelAsync();
-			}
-            base.OnDestroy();
-        }
 
         private class ViewHolder
         {
@@ -261,6 +266,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			internal ListView SubscribersListView;
 			internal LinearLayout SubscribersLayout;
             internal CirclePageIndicator ViewPagerIndicator;
+            internal MapFragment MapFragment;
         }
     }
 }

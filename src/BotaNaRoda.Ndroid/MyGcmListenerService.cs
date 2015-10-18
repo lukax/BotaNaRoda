@@ -6,6 +6,8 @@ using System.Text;
 using Android.App;
 using Android.Content;
 using Android.Gms.Gcm;
+using Android.Graphics;
+using Android.Media;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -54,7 +56,8 @@ namespace BotaNaRoda.Ndroid
 			var pendingIntent = PendingIntent.GetActivity (this, 0, intent, PendingIntentFlags.OneShot);
 
 			var notificationBuilder = new Notification.Builder (this)
-				.SetSmallIcon (Resource.Drawable.ic_gps)
+                .SetDefaults(NotificationDefaults.All)
+                .SetSmallIcon (Resource.Drawable.ic_gps)
 				.SetContentTitle ("Bota Na Roda")
 				.SetContentText (message)
 				.SetAutoCancel (true)

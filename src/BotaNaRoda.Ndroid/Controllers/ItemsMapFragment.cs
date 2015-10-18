@@ -7,6 +7,7 @@ using Android.Views;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -17,6 +18,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemRestService _itemService;
         private UserRepository _userRepository;
         private BackgroundWorker _refreshWorker;
+        private MapFragment _mapFragment;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -24,6 +26,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _userRepository = new UserRepository();
             _itemService = new ItemRestService(new UserRepository());
+
+            _mapFragment = Activity.FragmentManager.FindFragmentById<MapFragment>(Resource.Id.itemDetailMapExpandedMapFragment);
 
             Refresh();
 
@@ -40,21 +44,28 @@ namespace BotaNaRoda.Ndroid.Controllers
             };
             _refreshWorker.RunWorkerCompleted += (sender, args) =>
             {
-                Activity.RunOnUiThread(UpdateUi);
+                Activity.RunOnUiThread(() =>
+                {
+                    _mapFragment.GetMapAsync(this);
+                });
             };
             _refreshWorker.RunWorkerAsync();
-        }
-
-        private void UpdateUi()
-        {
-            Activity.FragmentManager.FindFragmentById<MapFragment>(Resource.Id.itemDetailMapExpandedMapFragment).GetMapAsync(callback: this);
         }
 
         public void OnMapReady(GoogleMap googleMap)
         {
             var usr = _userRepository.Get();
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(new LatLng(googleMap.MyLocation.Latitude, googleMap.MyLocation.Longitude));
+
+            double targetLat = usr.Latitude;
+            double targetLon = usr.Longitude;
+            if (usr.Latitude == 0 && usr.Longitude == 0 && _items.Count > 0)
+            {
+                targetLat = _items.First().Latitude;
+                targetLon = _items.First().Longitude;
+            }
+
+            builder.Target(new LatLng(targetLat, targetLon));
             builder.Zoom(15);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);

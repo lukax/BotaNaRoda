@@ -36,7 +36,10 @@ namespace BotaNaRoda.Ndroid.Controllers
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
-			_userRepository = new UserRepository();
+
+            _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
+
+            _userRepository = new UserRepository();
 			_itemService = new ItemRestService(_userRepository);
             _itemsLoader = new ItemsLoader(Activity, _itemService, 20);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
@@ -76,10 +79,9 @@ namespace BotaNaRoda.Ndroid.Controllers
         public override void OnResume ()
 		{
 			base.OnResume ();
-			_locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 			_locMgr.RequestSingleUpdate (new Criteria {
 				Accuracy = Accuracy.Coarse,
-				PowerRequirement = Power.High
+				PowerRequirement = Power.NoRequirement
 			}, this, null);
 
             LoadItems();

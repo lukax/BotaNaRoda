@@ -48,7 +48,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			SetContentView (Resource.Layout.ItemCreate);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
-			_locMgr = GetSystemService(LocationService) as LocationManager;
+            _locMgr = (LocationManager) GetSystemService(LocationService);
             _itemService = new ItemRestService(new UserRepository());
 
             _holder = new ViewHolder
@@ -74,10 +74,20 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    protected override void OnResume()
 	    {
 	        base.OnResume();
-            GetLocation();
-	    }
+            _locMgr.RequestSingleUpdate(new Criteria
+            {
+                Accuracy = Accuracy.Coarse,
+                PowerRequirement = Power.NoRequirement
+            }, this, null);
+        }
 
-		protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
+        protected override void OnPause()
+        {
+            base.OnPause();
+            _locMgr.RemoveUpdates(this);
+        }
+
+        protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
 		{
 			if (requestCode == CapturePhoto1Id || 
 				requestCode == CapturePhoto2Id || 
@@ -151,7 +161,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    async void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-				Toast.MakeText (this, "Obtendo dados do GPS...", ToastLength.Short).Show();
+				Toast.MakeText (this, "Por favor ligue o GPS", ToastLength.Long).Show();
 				return;
 			}
 
@@ -235,17 +245,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				}
 			};
         }
-
-		void GetLocation ()
-		{
-		    Criteria criteria = new Criteria
-		    {
-		        Accuracy = Accuracy.Fine,
-		        PowerRequirement = Power.High
-		    };
-		    _locMgr.RequestSingleUpdate (criteria, this, null);
-		}
-
+        
 	    private class ViewHolder
 	    {
 	        internal EditText ItemDescriptionView;
