@@ -104,11 +104,11 @@ namespace BotaNaRoda.WebApi.Data
             {
                 var item = await _itemsContext.Items.Find(x => x.Id == conversation.ItemId).FirstAsync();
 
-                if (conversation.GetReceivingEndHubInfo(currentUserId).IsConnected)
-                {
-                    //Receiving user is connected, no need to send notification
-                    return;
-                }
+                //if (conversation.GetReceivingEndHubInfo(currentUserId).IsConnected)
+                //{
+                //    //Receiving user is connected, no need to send notification
+                //    return;
+                //}
 
                 var receivingEndUserId = conversation.FromUserId == currentUserId
                     ? conversation.ToUserId

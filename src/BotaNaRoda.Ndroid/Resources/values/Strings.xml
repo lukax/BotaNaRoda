@@ -14,4 +14,7 @@
   <string name="itemimageview_description">Imagem do produto</string>
   <string name="gcm_defaultSenderId">472579673098</string>
   <string name="fb_appId">450077978528041</string>
+
+  <string name="cancelled">Cancelado</string>
+  <string name="permission_not_granted">Não foi possível realizar ação, pois as permissões necessárias não foram consedidas.</string>
 </resources>

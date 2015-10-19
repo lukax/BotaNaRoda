@@ -32,6 +32,8 @@ namespace BotaNaRoda.WebApi.Hubs
 
         public async Task<dynamic> Connect(string conversationId)
         {
+            Clients.CallerState.conversationId = conversationId;
+
             var currentUserId = Context.User.GetSubjectId();
 
             var conversation = await _context.Conversations
@@ -77,8 +79,6 @@ namespace BotaNaRoda.WebApi.Hubs
                     .Set(x => x.FromUserHubInfo, conversation.FromUserHubInfo)
                     .Set(x => x.ToUserHubInfo, conversation.ToUserHubInfo));
 
-            Clients.CallerState.conversationId = conversationId;
-
             return viewModel;
         }
 
@@ -123,13 +123,12 @@ namespace BotaNaRoda.WebApi.Hubs
 
         public override async Task OnDisconnected(bool stopCalled)
         {
-            var currentUserId = Context.User.GetSubjectId();
             string conversationId = Clients.CallerState.conversationId;
             if (conversationId != null)
             {
                 var conversation = await _context.Conversations.Find(x => x.Id == conversationId).FirstOrDefaultAsync();
 
-                if (conversation.FromUserId == currentUserId)
+                if (conversation.FromUserId == Context.User.GetSubjectId())
                 {
                     await _context.Conversations
                         .UpdateOneAsync(x => x.Id == conversationId, Builders<Conversation>.Update.Set(x => x.FromUserHubInfo.IsConnected, false));
