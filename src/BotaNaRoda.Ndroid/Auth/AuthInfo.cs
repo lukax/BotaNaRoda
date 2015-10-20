@@ -29,23 +29,6 @@ namespace BotaNaRoda.Ndroid.Data
         {
         }
 
-        //public void Update(AuthorizeResponse response)
-        //{
-        //    UpdatedAt = DateTime.UtcNow;
-        //    ExpiresIn = response.ExpiresIn;
-        //    IdentityToken = response.IdentityToken;
-        //    AccessToken = response.AccessToken;
-        //}
-
-        public void Update(TokenResponse response)
-        {
-			if (response.IdentityToken != null) {
-				IdentityToken = response.IdentityToken;
-			}
-            AccessToken = response.AccessToken;
-            RefreshToken = response.RefreshToken;
-        }
-
         public bool IsExpired()
         {
 			if (AccessToken != null)

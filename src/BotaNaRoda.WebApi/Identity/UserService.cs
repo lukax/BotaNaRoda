@@ -46,7 +46,6 @@ namespace BotaNaRoda.WebApi.Identity
         {
             // look for the user in our local identity system from the external identifiers
             var user = await _itemsContext.Users.Find(x => x.Provider == context.ExternalIdentity.Provider && x.ProviderId == context.ExternalIdentity.ProviderId).FirstOrDefaultAsync();
-
             if (user == null)
             {
                 // new user, so add them here
@@ -75,15 +74,7 @@ namespace BotaNaRoda.WebApi.Identity
             User user = await _itemsContext.Users.Find(x => x.Id == context.Subject.GetSubjectId()).FirstOrDefaultAsync();
             if (user != null)
             {
-                //TODO setup claims
-                context.IssuedClaims = new List<Claim>
-                {
-                    new Claim(Constants.ClaimTypes.Name, user.Name),
-                    new Claim(Constants.ClaimTypes.PreferredUserName, user.Username),
-                    new Claim(Constants.ClaimTypes.Email, user.Email),
-                    new Claim(Constants.ClaimTypes.Picture, user.Avatar ?? ""),
-                    new Claim(Constants.ClaimTypes.Address, user.Address ?? ""),
-                };
+                context.IssuedClaims = user.GetClaims();
             }
         }
 

@@ -72,7 +72,8 @@ namespace BotaNaRoda.WebApi
             app.Map("/core", core =>
             {
                 var userService = new Registration<IUserService>(resolver => new UserService(new ItemsContext(appSettings)));
-                
+                var fbCustomGrant = new Registration<ICustomGrantValidator>(resolver => new FacebookCustomGrantValidator(new ItemsContext(appSettings)));
+
                 var idSvrMongoDbSettings = IdentityServer3.MongoDb.StoreSettings.DefaultSettings();
                 idSvrMongoDbSettings.ConnectionString = appSettings.Options.BotaNaRodaConnectionString;
                 idSvrMongoDbSettings.Database = appSettings.Options.BotaNaRodaDatabaseName;
@@ -83,6 +84,7 @@ namespace BotaNaRoda.WebApi
                 };
                 idSvrMongoDbFactory.UseInMemoryClients(Clients.Get());
                 idSvrMongoDbFactory.UseInMemoryScopes(Scopes.Get());
+                idSvrMongoDbFactory.CustomGrantValidators.Add(fbCustomGrant);
 
                 var idsrvOptions = new IdentityServerOptions
                 {
@@ -162,29 +164,17 @@ namespace BotaNaRoda.WebApi
                 {
                     OnAuthenticated = async context =>
                     {
-                        string userInformationEndpoint = "https://graph.facebook.com/me?fields=name,email,picture&access_token=" + Uri.EscapeDataString(context.AccessToken);
-
-                        HttpResponseMessage graphResponse = await new HttpClient().GetAsync(userInformationEndpoint);
-                        graphResponse.EnsureSuccessStatusCode();
-                        var text = await graphResponse.Content.ReadAsStringAsync();
-                        JObject user = JObject.Parse(text);
-
-                        foreach (var x in user)
+                        var fbClaims = await FacebookUtil.GetClaimsAsync(context.AccessToken);
+                        foreach (var claim in fbClaims)
                         {
-                            var claimType = $"urn:facebook:{x.Key}";
-                            string claimValue = x.Value.ToString();
-                            if (!context.Identity.HasClaim(claimType, claimValue))
-                                context.Identity.AddClaim(new Claim(claimType, claimValue, XmlSchemaString, "Facebook"));
+                            if (!context.Identity.HasClaim(claim.Type, claim.Value))
+                                context.Identity.AddClaim(claim);
                         }
-
-                        //Parse facebook picture object into our custom avatar url claim
-                        context.Identity.AddClaim(new Claim(Constants.ClaimTypes.Picture, (string)user["picture"]["data"]["url"]));
                     }
                 }
             };
             app.UseFacebookAuthentication(fb);
         }
 
-        const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
     }
 }

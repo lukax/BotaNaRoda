@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
+    <Compile Include="Auth\IdSvrOAuth2Util.cs" />
     <Compile Include="Controllers\ItemsMapFragment.cs" />
     <Compile Include="Controllers\ItemDetailMapExpandedActivity.cs" />
     <Compile Include="Controllers\ItemImageDetailExpandedActivity.cs" />

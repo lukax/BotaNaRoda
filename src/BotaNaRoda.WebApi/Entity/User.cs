@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using BotaNaRoda.WebApi.Models;
 using BotaNaRoda.WebApi.Util;
+using IdentityServer3.Core;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.GeoJsonObjectModel;
@@ -58,5 +60,17 @@ namespace BotaNaRoda.WebApi.Entity
             CountryCode = model.CountryCode;
             PostalCode = model.PostalCode;
         }
+
+        public List<Claim> GetClaims()
+        {
+            return new List<Claim>
+                {
+                    new Claim(Constants.ClaimTypes.Name, Name),
+                    new Claim(Constants.ClaimTypes.PreferredUserName, Username),
+                    new Claim(Constants.ClaimTypes.Email, Email),
+                    new Claim(Constants.ClaimTypes.Picture, Avatar ?? ""),
+                    new Claim(Constants.ClaimTypes.Address, Address ?? ""),
+                };
+        } 
     }
 }

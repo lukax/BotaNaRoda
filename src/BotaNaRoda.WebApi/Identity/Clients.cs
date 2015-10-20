@@ -36,13 +36,42 @@ namespace BotaNaRoda.WebApi.Identity
                     RefreshTokenUsage = TokenUsage.ReUse,
                     SlidingRefreshTokenLifetime = 1296000 * 2 /* 30Days */
                 },
+                //-------------------- CLIENT FOR CUSTOM GRANT
+                new Client
+                {
+                    ClientName = "Bota na Roda",
+                    ClientId = "custom.android.botanaroda.com.br",
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("150D23DAE26C4629BC58A7104B1AECFB".Sha256()) //Dummy secret as requirement of the hybrid flow
+                    },
+                    Flow = Flows.Custom,
+                    ClientUri = "https://botanaroda.com.br",
+                    RequireConsent = false,
+                    AllowAccessToAllScopes = true, //<------------TODO review this
+                    AllowedCustomGrantTypes = new List<string>
+                    {
+                      "facebook"
+                    },
+                    RedirectUris = new List<string>
+                    {
+                        "https://botanaroda.azurewebsites.net/core",
+                        "http://192.168.1.106:44200/core",
+                    },
+                    UpdateAccessTokenClaimsOnRefresh = true,
+                    IdentityTokenLifetime = 360 /* 5Min */,
+                    AccessTokenLifetime = 36000 * 10 /* 1Hour */,
+                    RefreshTokenUsage = TokenUsage.ReUse,
+                    SlidingRefreshTokenLifetime = 1296000 * 2 /* 30Days */
+                },
+#region DEBUG CLIENTS
 #if DEBUG
                 new Client
                 {
-                    ClientName = "Hybrid Client Demo",
+                    ClientName = "Code Client Demo",
                     Enabled = true,
 
-                    ClientId = "hybridclient",
+                    ClientId = "codeclient",
                     ClientSecrets = new List<Secret>
                     {
                         new Secret("secret".Sha256())
@@ -165,6 +194,7 @@ namespace BotaNaRoda.WebApi.Identity
                     AccessTokenLifetime = 3600,
                 },
 #endif
+#endregion
             };
         }
     }

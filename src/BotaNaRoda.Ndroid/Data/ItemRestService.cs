@@ -12,6 +12,7 @@ using Android.Graphics;
 using Android.Locations;
 using Android.Media;
 using Android.Util;
+using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
 using IdentityModel.Client;
@@ -257,31 +258,26 @@ namespace BotaNaRoda.Ndroid.Data
             if (_userRepository.IsLoggedIn)
             {
                 var authInfo = _userRepository.Get();
-                if (authInfo.IsExpired())
+                if (!authInfo.IsExpired())
                 {
-                	//bug doing this manually because of crazy issue with IdentityModel
-                    var httpResponseMessage = await _httpClient.PostAsync(Constants.IdSvrTokenEndpoint,
-                        new FormUrlEncodedContent(new Dictionary<string, string>
-                        {
-                            { "client_id", Constants.ClientId },
-                            { "client_secret", Constants.ClientSecret },
-                            { "grant_type", "refresh_token" },
-                            { "refresh_token", authInfo.RefreshToken }
-                        }));
-                    var raw = await httpResponseMessage.Content.ReadAsStringAsync();
-
-                    var response = new TokenResponse(raw);
-					if (response.IsError) {
-						_userRepository.DeleteExistingAccounts ();
-						_context.StartActivity (typeof(LoginActivity));
-						Log.Error ("ItemRestService", "Could not refresh token. " + response.Error);
-					} else {
-						authInfo.Update(response);
-						_userRepository.Save(authInfo);
-					}					
+                    _httpClient.SetBearerToken(authInfo.AccessToken);
+                }
+                else
+                {
+                    var tokenResponse = await IdSvrOAuth2Util.ExchangeRefreshToken(authInfo.RefreshToken);
+                    if (!tokenResponse.IsError)
+                    {
+                        _userRepository.Update(tokenResponse);
+                        _httpClient.SetBearerToken(authInfo.AccessToken);
+                    }
+                    else
+                    {
+                        _userRepository.DeleteExistingAccounts();
+                        _context.StartActivity(typeof(LoginActivity));
+                        Log.Error("ItemRestService", "Could not refresh token. " + tokenResponse.Error);
+                    }
                 }
 
-                _httpClient.SetBearerToken(authInfo.AccessToken);
             }
         }
 

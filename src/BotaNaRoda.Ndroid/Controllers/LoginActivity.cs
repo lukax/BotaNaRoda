@@ -24,11 +24,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         Theme = "@style/MainTheme")]
 	public class LoginActivity : AppCompatActivity
 	{
+        public const string PendingActionBundleKey = "br.com.botanaroda.ndroid:PendingAction";
 		private UserRepository _userRepository;
 	    private ICallbackManager _callbackManager;
-        const string PendingActionBundleKey = "br.com.botanaroda.ndroid:PendingAction";
-        PendingAction _pendingAction = PendingAction.None;
-	    private LoginButton _loginButton;
+        private PendingAction _pendingAction = PendingAction.None;
+	    private CustomAccessTokenTracker _accessTokenTracker;
 
 	    enum PendingAction
         {
@@ -41,16 +41,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 			base.OnCreate (bundle);
 
-            if (bundle != null)
-            {
-                var name = bundle.GetString(PendingActionBundleKey);
-                _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
-            }
-
             _userRepository = new UserRepository();
-
-            _loginButton = FindViewById<LoginButton>(Resource.Id.fbLoginButton);
-            _loginButton.SetReadPermissions("public_profile", "email");
 
             FacebookSdk.SdkInitialize(ApplicationContext);
 
@@ -58,11 +49,14 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             var loginCallback = new FacebookCallback<LoginResult>
             {
-                HandleSuccess = loginResult => {
+                HandleSuccess = loginResult =>
+                {
+                    //UpdateUser(loginResult.AccessToken);
                     HandlePendingAction();
                     UpdateUI();
                 },
-                HandleCancel = () => {
+                HandleCancel = () => 
+                {
                     if (_pendingAction != PendingAction.None)
                     {
                         ShowAlert(
@@ -72,7 +66,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                     }
                     UpdateUI();
                 },
-                HandleError = loginError => {
+                HandleError = loginError => 
+                {
                     if (_pendingAction != PendingAction.None
                         && loginError is FacebookAuthorizationException)
                     {
@@ -87,12 +82,57 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             LoginManager.Instance.RegisterCallback(_callbackManager, loginCallback);
 
-            //---
+            //---------------------------
+            if (bundle != null)
+            {
+                var name = bundle.GetString(PendingActionBundleKey);
+                _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
+            }
+
             SetContentView(Resource.Layout.Login);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-        }
 
-        protected override void OnSaveInstanceState(Bundle outState)
+            var loginButton = FindViewById<LoginButton>(Resource.Id.fbLoginButton);
+            loginButton.SetReadPermissions("public_profile", "email");
+
+            //_profileTracker = new CustomProfileTracker
+            //{
+            //    HandleCurrentProfileChanged = (oldProfile, currentProfile) => 
+            //    {
+            //        UpdateUI();
+            //        HandlePendingAction();
+            //    }
+            //};
+
+            _accessTokenTracker = new CustomAccessTokenTracker
+            {
+                HandleCurrentAccessTokenChanged = (oldAccessToken, currentAccessToken) =>
+                {
+                    UpdateUser(currentAccessToken);
+                    UpdateUI();
+                    HandlePendingAction();
+                }
+            };
+		}
+
+	    private async void UpdateUser(AccessToken accessToken)
+	    {
+	        if (accessToken == null)
+	        {
+	            _userRepository.DeleteExistingAccounts();
+	            return;
+	        }
+
+	        var dialog = new AlertDialog.Builder(this)
+	            .SetTitle("Aguarde...")
+	            .Show();
+            var token = await IdSvrOAuth2Util.RequestTokenForFacebookGrantAsync(accessToken.Token);
+	        var userInfo = await IdSvrOAuth2Util.GetUserInfo(token.AccessToken);
+            _userRepository.Update(token);
+            dialog.Cancel();
+	    }
+
+	    protected override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
             outState.PutString(PendingActionBundleKey, _pendingAction.ToString());
@@ -116,6 +156,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             AppEventsLogger.DeactivateApp(this);
         }
 
+	    protected override void OnDestroy()
+	    {
+	        base.OnDestroy();
+            _accessTokenTracker.StopTracking();
+	    }
+
 	    private void UpdateUI()
 	    {
 	        
@@ -123,7 +169,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         void ShowAlert(string title, string msg, string buttonText = null)
         {
-            new AlertDialog.Builder(Parent)
+            new AlertDialog.Builder(this)
                 .SetTitle(title)
                 .SetMessage(msg)
                 .SetPositiveButton(buttonText, (s2, e2) => { })
@@ -147,6 +193,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                     break;
             }
         }
+
+
 
     }
 
@@ -189,6 +237,20 @@ namespace BotaNaRoda.Ndroid.Controllers
             var p = HandleCurrentProfileChanged;
             if (p != null)
                 p(oldProfile, currentProfile);
+        }
+    }
+
+    class CustomAccessTokenTracker : AccessTokenTracker
+    {
+        public delegate void CurrentAccessTokenChangedDelegate(AccessToken oldAccessToken, AccessToken curreAccessToken);
+
+        public CurrentAccessTokenChangedDelegate HandleCurrentAccessTokenChanged { get; set; }
+
+        protected override void OnCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken)
+        {
+            var p = HandleCurrentAccessTokenChanged;
+            if (p != null)
+                p(oldAccessToken, currentAccessToken);
         }
     }
 }

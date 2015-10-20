@@ -13,6 +13,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using IdentityModel.Client;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 
@@ -28,15 +29,7 @@ namespace BotaNaRoda.Ndroid.Data
             _context = Application.Context;
         }
 
-        public bool IsLoggedIn
-        {
-            get
-            {
-                return AccountStore.Create(_context)
-                      .FindAccountsForService(ServiceId)
-                      .Any(x => !string.IsNullOrWhiteSpace(x.Username));
-            }
-        }
+        public bool IsLoggedIn => AccountStore.Create(_context).FindAccountsForService(ServiceId).Any();
 
         public AuthInfo Get()
         {
@@ -51,6 +44,18 @@ namespace BotaNaRoda.Ndroid.Data
                 }
             }
             return user;
+        }
+
+        public void Update(TokenResponse tokenResponse)
+        {
+            var usr = Get();
+            if (tokenResponse.IdentityToken != null)
+            {
+                usr.IdentityToken = tokenResponse.IdentityToken;
+            }
+            usr.AccessToken = tokenResponse.AccessToken;
+            usr.RefreshToken = tokenResponse.RefreshToken;
+            Save(usr);
         }
 
         public void Save(AuthInfo authInfo)

@@ -92,11 +92,9 @@ namespace BotaNaRoda.Ndroid.Auth
                 Log.Error("CustomOAuth2Authenticator", "Could not request authorization code. " + tokenResponse.Error);
             }
 
-            var authInfo = _userRepository.Get();
-            authInfo.Update(tokenResponse);
-            _userRepository.Save(authInfo);
+            _userRepository.Update(tokenResponse);
 
-            OnSucceeded(new Account(authInfo.Username));
+            OnSucceeded(new Account());
 		}
 
 
