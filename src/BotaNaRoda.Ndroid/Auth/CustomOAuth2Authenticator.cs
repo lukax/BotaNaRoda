@@ -19,6 +19,7 @@ using Xamarin.Utilities;
 
 namespace BotaNaRoda.Ndroid.Auth
 {
+    [Obsolete]
     public class CustomOAuth2Authenticator : WebAuthenticator
     {
         private readonly UserRepository _userRepository;
@@ -92,7 +93,8 @@ namespace BotaNaRoda.Ndroid.Auth
                 Log.Error("CustomOAuth2Authenticator", "Could not request authorization code. " + tokenResponse.Error);
             }
 
-            _userRepository.Update(tokenResponse);
+            //------------------
+            //----_userRepository.Update(tokenResponse);
 
             OnSucceeded(new Account());
 		}

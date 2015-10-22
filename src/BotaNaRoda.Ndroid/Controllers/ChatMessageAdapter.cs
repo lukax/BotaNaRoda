@@ -14,9 +14,9 @@ namespace BotaNaRoda.Ndroid
     {
         private readonly Activity _context;
         public IList<ConversationChatMessage> ChatMessages { get; set; }
-		private readonly AuthInfo _currentUser;
+		private readonly User _currentUser;
 
-        public ChatMessageAdapter(Activity context, IList<ConversationChatMessage> chatMessages, AuthInfo currentUser)
+        public ChatMessageAdapter(Activity context, IList<ConversationChatMessage> chatMessages, User currentUser)
         {
             _context = context;
 			_currentUser = currentUser;

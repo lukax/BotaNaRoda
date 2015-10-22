@@ -32,11 +32,12 @@ namespace BotaNaRoda.Ndroid.Data
             CurrentPageValue = 0;
         }
 
-        public void LoadMoreItemsAsync()
+        public async Task<bool> LoadMoreItemsAsync()
         {
-            if (IsBusy || !CanLoadMoreItems) return;
+            var cantLoad = IsBusy || !CanLoadMoreItems;
+            if (cantLoad) return false;
 
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 IsBusy = true;
 
@@ -63,6 +64,8 @@ namespace BotaNaRoda.Ndroid.Data
 
                 IsBusy = false;
             });
+
+            return true;
         }
 
         private void OnItemFetch(ItemListViewModel item)

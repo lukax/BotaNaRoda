@@ -265,10 +265,11 @@ namespace BotaNaRoda.Ndroid.Data
                 else
                 {
                     var tokenResponse = await IdSvrOAuth2Util.ExchangeRefreshToken(authInfo.RefreshToken);
+                    var userInfoResponse = await IdSvrOAuth2Util.GetUserInfoAsync(tokenResponse.RefreshToken);
                     if (!tokenResponse.IsError)
                     {
-                        _userRepository.Update(tokenResponse);
-                        _httpClient.SetBearerToken(authInfo.AccessToken);
+                        _userRepository.Update(tokenResponse, userInfoResponse);
+                        _httpClient.SetBearerToken(tokenResponse.AccessToken);
                     }
                     else
                     {

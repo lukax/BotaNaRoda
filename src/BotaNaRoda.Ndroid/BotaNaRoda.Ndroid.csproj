@@ -136,7 +136,7 @@
     <Compile Include="Data\IItemService.cs" />
     <Compile Include="Data\ItemRestService.cs" />
     <Compile Include="Data\ItemsLoader.cs" />
-    <Compile Include="Auth\AuthInfo.cs" />
+    <Compile Include="Auth\User.cs" />
     <Compile Include="Data\UserRepository.cs" />
     <Compile Include="Models\CategoryType.cs" />
     <Compile Include="Models\ILatLon.cs" />

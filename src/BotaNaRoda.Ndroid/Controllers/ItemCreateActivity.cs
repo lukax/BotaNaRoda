@@ -172,7 +172,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
 				attempts++;
 			}
-			locationDialog.Dismiss(); 
+			locationDialog.Cancel(); 
 
 			if (_address == null) {
 				Toast.MakeText (this, "Não foi possível obter localização", ToastLength.Short).Show();

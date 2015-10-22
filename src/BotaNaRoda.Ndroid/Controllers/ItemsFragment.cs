@@ -28,7 +28,7 @@ namespace BotaNaRoda.Ndroid.Controllers
         private RecyclerView _itemsRecyclerView;
         private ItemsAdapter _adapter;
         private LocationManager _locMgr;
-        private SwipeRefreshLayout _refresher;
+        private SwipeRefreshLayout _refreshLayout;
         private UserRepository _userRepository;
         private ItemRestService _itemService;
         private ItemsLoader _itemsLoader;
@@ -44,12 +44,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemsLoader = new ItemsLoader(Activity, _itemService, 20);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
 
-			_refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-			_refresher.Enabled = false;
-			//_refresher.Refresh += delegate
-			//{
-			//	LoadItems();
-			//};
+			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+			_refreshLayout.Enabled = false;
+			_refreshLayout.Refresh += delegate
+			{
+				Refresh();
+			};
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
@@ -61,7 +61,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             _adapter = new ItemsAdapter(Activity, _userRepository.Get());
             _itemsRecyclerView.SetAdapter(_adapter);
             
-			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems);
+			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems, _refreshLayout);
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
             
             return view;
@@ -84,7 +84,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 				PowerRequirement = Power.NoRequirement
 			}, this, null);
 
-            LoadItems();
+            Refresh();
         }
 
 		public override void OnPause ()
@@ -130,16 +130,16 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		}
 
-		private void LoadItems(){
-			//_refresher.Refreshing = true;
-			_uiCancellation = new CancellationTokenSource ();
-		    _itemsLoader.LoadMoreItemsAsync();
+		private async void Refresh(){
+            _refreshLayout.Refreshing = await _itemsLoader.LoadMoreItemsAsync();
+		    _refreshLayout.Refreshing = false;
 		}
         
-		private void OnItemListLoadMoreItems()
+		private async void OnItemListLoadMoreItems()
         {
             Log.Info("InfiniteScrollListener", "Load more items requested");
-			_itemsLoader.LoadMoreItemsAsync();
+            _refreshLayout.Refreshing = await _itemsLoader.LoadMoreItemsAsync();
+            _refreshLayout.Refreshing = false;
         }
 			
 		private async void UpdateUserLocation(Location location){
@@ -161,9 +161,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         public override void OnDetach()
         {
             base.OnDetach();
-			if (_uiCancellation != null) {
-				_uiCancellation.Cancel();
-			}
         }
 
 
@@ -176,16 +173,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
             switch (item.ItemId)
             {
-                case Resource.Id.actionRefresh:
-                    LoadItems();
-                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
         }
 
-        readonly TaskScheduler _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-        private CancellationTokenSource _uiCancellation;
     }
 }
 

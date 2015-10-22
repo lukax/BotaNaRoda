@@ -18,7 +18,7 @@ namespace BotaNaRoda.Ndroid.Auth
     {
         public const string StandardScopes = "openid profile address https://api.botanaroda.com.br offline_access";
 
-        public static async Task<UserInfoResponse> GetUserInfo(string accessToken)
+        public static async Task<UserInfoResponse> GetUserInfoAsync(string accessToken)
         {
             var client = new UserInfoClient(
                 new Uri(Constants.IdSvrUserInfoEndpoint),

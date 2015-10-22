@@ -123,12 +123,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 	            return;
 	        }
 
-	        var dialog = new AlertDialog.Builder(this)
-	            .SetTitle("Aguarde...")
-	            .Show();
+            var dialog = ProgressDialog.Show(this, "", "Aguarde...");
             var token = await IdSvrOAuth2Util.RequestTokenForFacebookGrantAsync(accessToken.Token);
-	        var userInfo = await IdSvrOAuth2Util.GetUserInfo(token.AccessToken);
-            _userRepository.Update(token);
+	        var userInfo = await IdSvrOAuth2Util.GetUserInfoAsync(token.AccessToken);
+            _userRepository.Update(token, userInfo);
             dialog.Cancel();
 	    }
 
