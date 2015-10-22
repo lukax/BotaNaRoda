@@ -6,20 +6,20 @@
     p1:orientation="vertical"
     p1:minWidth="25px"
     p1:minHeight="25px">
-    <ImageView
+<!--<ImageView
         p1:id="@+id/conversationProfileImage"
         p1:src="@android:drawable/ic_menu_gallery"
         p1:layout_gravity="center_horizontal"
         p1:layout_width="250dp"
-        p1:layout_height="250dp" />
+        p1:layout_height="250dp" />-->
     <TextView
         p1:id="@+id/conversationUserName"
         p1:text="Bota na Roda"
+        p1:textSize="30dp"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_gravity="center_horizontal"
-        p1:padding="20dp"
-        p1:textSize="20dp" />
+        p1:layout_gravity="center"
+        p1:padding="20dp" />
     <com.facebook.login.widget.LoginButton
         p1:id="@+id/fbLoginButton"
         p1:layout_width="wrap_content"

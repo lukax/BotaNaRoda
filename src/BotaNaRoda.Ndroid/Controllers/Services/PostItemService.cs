@@ -90,7 +90,7 @@ namespace BotaNaRoda.Ndroid.Controllers.Services
 
             var notificationBuilder = new Notification.Builder(this)
                 .SetDefaults(NotificationDefaults.Lights)
-                .SetPriority((int)NotificationPriority.High)
+                .SetPriority((int)NotificationPriority.Max)
                 .SetSmallIcon(Resource.Drawable.ic_gps)
                 .SetContentTitle("Bota Na Roda")
                 .SetContentText("Colocando " + item.Name + " na roda...")

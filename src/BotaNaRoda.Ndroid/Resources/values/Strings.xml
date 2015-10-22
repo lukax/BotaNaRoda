@@ -16,5 +16,5 @@
   <string name="fb_appId">450077978528041</string>
 
   <string name="cancelled">Cancelado</string>
-  <string name="permission_not_granted">Não foi possível realizar ação, pois as permissões necessárias não foram consedidas.</string>
+  <string name="permission_not_granted">Não foi possível completar ação :(</string>
 </resources>

@@ -44,12 +44,8 @@ namespace BotaNaRoda.Ndroid.Controllers
             _itemsLoader = new ItemsLoader(Activity, _itemService, 20);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
 
-			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-			_refreshLayout.Enabled = false;
-			_refreshLayout.Refresh += delegate
-			{
-				Refresh();
-			};
+			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.itemsRefreshLayout);
+            _refreshLayout.Refresh += (sender, args) => Refresh();
 
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
@@ -126,7 +122,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		    else
 		    {
-		        Activity.StartActivity(typeof(LoginActivity));
+                Intent loginIntent = new Intent(Activity, typeof(LoginActivity));
+		        loginIntent.PutExtra(LoginActivity.PendingActionBundleKey, LoginActivity.PendingAction.PostItem.ToString());
+		        Activity.StartActivity(loginIntent);
 		    }
 		}
 

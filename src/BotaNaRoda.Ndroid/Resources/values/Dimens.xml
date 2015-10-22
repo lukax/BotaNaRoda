@@ -6,4 +6,11 @@
   <dimen name="widget_min_height">110dp</dimen>
   <dimen name="notification_icon_width_height">64dp</dimen>
   <dimen name="item_image_detail_height">200dp</dimen>
+
+  <dimen name="fb_margin_override_top">13dp</dimen>
+  <dimen name="fb_margin_override_bottom">13dp</dimen>
+  <!--The next value changes the margin between the FB icon and the left border:-->
+  <dimen name="fb_margin_override_lr">10dp</dimen>
+  <!--The next value changes the margin between the FB icon and the login text:-->
+  <dimen name="fb_margin_override_textpadding">17dp</dimen>
 </resources>

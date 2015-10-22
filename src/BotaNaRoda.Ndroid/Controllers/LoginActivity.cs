@@ -5,7 +5,9 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
+using Android.Widget;
 using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Data;
 using Xamarin.Auth;
@@ -30,11 +32,10 @@ namespace BotaNaRoda.Ndroid.Controllers
         private PendingAction _pendingAction = PendingAction.None;
 	    private CustomAccessTokenTracker _accessTokenTracker;
 
-	    enum PendingAction
+	    public enum PendingAction
         {
             None,
-            PostPhoto,
-            PostStatusUpdate
+            PostItem
         }
 
         protected override void OnCreate (Bundle bundle)
@@ -83,6 +84,11 @@ namespace BotaNaRoda.Ndroid.Controllers
             LoginManager.Instance.RegisterCallback(_callbackManager, loginCallback);
 
             //---------------------------
+            if (Intent != null)
+            {
+                var name = Intent.GetStringExtra(PendingActionBundleKey);
+                _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
+            }
             if (bundle != null)
             {
                 var name = bundle.GetString(PendingActionBundleKey);
@@ -94,6 +100,18 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             var loginButton = FindViewById<LoginButton>(Resource.Id.fbLoginButton);
             loginButton.SetReadPermissions("public_profile", "email");
+            float fbIconScale = 1.45F;
+            var drawable = ContextCompat.GetDrawable(this, Resource.Drawable.com_facebook_button_icon);
+            drawable.SetBounds(0, 0, (int)(drawable.IntrinsicWidth * fbIconScale),
+                                     (int)(drawable.IntrinsicHeight * fbIconScale));
+            loginButton.SetCompoundDrawables(drawable, null, null, null);
+            loginButton.CompoundDrawablePadding = (Resources.GetDimensionPixelSize(Resource.Dimension.fb_margin_override_textpadding));
+            loginButton.SetPadding(
+                    Resources.GetDimensionPixelSize(Resource.Dimension.fb_margin_override_lr),
+                    Resources.GetDimensionPixelSize(Resource.Dimension.fb_margin_override_top),
+                    0,
+                    Resources.GetDimensionPixelSize(Resource.Dimension.fb_margin_override_bottom));
+
 
             //_profileTracker = new CustomProfileTracker
             //{
@@ -124,9 +142,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 	        }
 
             var dialog = ProgressDialog.Show(this, "", "Aguarde...");
-            var token = await IdSvrOAuth2Util.RequestTokenForFacebookGrantAsync(accessToken.Token);
-	        var userInfo = await IdSvrOAuth2Util.GetUserInfoAsync(token.AccessToken);
-            _userRepository.Update(token, userInfo);
+	        try
+	        {
+	            var token = await IdSvrOAuth2Util.RequestTokenForFacebookGrantAsync(accessToken.Token);
+	            var userInfo = await IdSvrOAuth2Util.GetUserInfoAsync(token.AccessToken);
+	            _userRepository.Update(token, userInfo);
+	        }
+	        catch
+	        {
+	            Toast.MakeText(this, "Não foi possível conectar-se :(", ToastLength.Long);
+	        }
+
             dialog.Cancel();
 	    }
 
@@ -183,16 +209,16 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             switch (previouslyPendingAction)
             {
-                case PendingAction.PostPhoto:
-                    //PostPhoto();
-                    break;
-                case PendingAction.PostStatusUpdate:
-                    //PostStatusUpdate();
+                case PendingAction.PostItem:
+                    PostItem();
                     break;
             }
         }
 
-
+	    private void PostItem()
+	    {
+            StartActivity(typeof(ItemCreateActivity));
+	    }
 
     }
 

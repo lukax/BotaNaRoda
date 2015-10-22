@@ -57,11 +57,11 @@ namespace BotaNaRoda.Ndroid
 
 			var notificationBuilder = new Notification.Builder (this)
                 .SetDefaults(NotificationDefaults.All)
+                .SetPriority((int)NotificationPriority.Max)
                 .SetSmallIcon (Resource.Drawable.ic_gps)
 				.SetContentTitle ("Bota Na Roda")
 				.SetContentText (message)
 				.SetAutoCancel (true)
-                .SetPriority((int)NotificationPriority.High)
                 .SetContentIntent (pendingIntent);
 
 			var notificationManager = (NotificationManager)GetSystemService (Context.NotificationService);
