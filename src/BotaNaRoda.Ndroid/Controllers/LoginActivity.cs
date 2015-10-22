@@ -7,6 +7,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
+using Android.Views;
 using Android.Widget;
 using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Data;
@@ -31,6 +32,8 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    private ICallbackManager _callbackManager;
         private PendingAction _pendingAction = PendingAction.None;
 	    private CustomAccessTokenTracker _accessTokenTracker;
+	    private ProgressBar _progressBar;
+	    private LinearLayout _loginButtonsLinearLayout;
 
 	    public enum PendingAction
         {
@@ -53,8 +56,8 @@ namespace BotaNaRoda.Ndroid.Controllers
                 HandleSuccess = loginResult =>
                 {
                     //UpdateUser(loginResult.AccessToken);
-                    HandlePendingAction();
-                    UpdateUI();
+                    //HandlePendingAction();
+                    //UpdateUI();
                 },
                 HandleCancel = () => 
                 {
@@ -98,7 +101,10 @@ namespace BotaNaRoda.Ndroid.Controllers
             SetContentView(Resource.Layout.Login);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
-            var loginButton = FindViewById<LoginButton>(Resource.Id.fbLoginButton);
+            _progressBar = FindViewById<ProgressBar>(Resource.Id.loginProgressBar);
+            _loginButtonsLinearLayout = FindViewById<LinearLayout>(Resource.Id.loginButtonsLinearLayout);
+
+            var loginButton = FindViewById<LoginButton>(Resource.Id.loginFacebookButton);
             loginButton.SetReadPermissions("public_profile", "email");
             float fbIconScale = 1.45F;
             var drawable = ContextCompat.GetDrawable(this, Resource.Drawable.com_facebook_button_icon);
@@ -126,14 +132,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             {
                 HandleCurrentAccessTokenChanged = (oldAccessToken, currentAccessToken) =>
                 {
-                    UpdateUser(currentAccessToken);
-                    UpdateUI();
-                    HandlePendingAction();
+                    UpdateUserAsync(currentAccessToken);
                 }
             };
 		}
 
-	    private async void UpdateUser(AccessToken accessToken)
+	    private async void UpdateUserAsync(AccessToken accessToken)
 	    {
 	        if (accessToken == null)
 	        {
@@ -141,20 +145,25 @@ namespace BotaNaRoda.Ndroid.Controllers
 	            return;
 	        }
 
-            var dialog = ProgressDialog.Show(this, "", "Aguarde...");
+            _progressBar.Visibility = ViewStates.Visible;
+            _loginButtonsLinearLayout.Visibility = ViewStates.Gone;
 	        try
 	        {
 	            var token = await IdSvrOAuth2Util.RequestTokenForFacebookGrantAsync(accessToken.Token);
 	            var userInfo = await IdSvrOAuth2Util.GetUserInfoAsync(token.AccessToken);
 	            _userRepository.Update(token, userInfo);
-	        }
+
+                UpdateUI();
+                HandlePendingAction();
+            }
 	        catch
 	        {
 	            Toast.MakeText(this, "Não foi possível conectar-se :(", ToastLength.Long);
 	        }
 
-            dialog.Cancel();
-	    }
+            _progressBar.Visibility = ViewStates.Gone;
+            _loginButtonsLinearLayout.Visibility = ViewStates.Visible;
+        }
 
 	    protected override void OnSaveInstanceState(Bundle outState)
         {

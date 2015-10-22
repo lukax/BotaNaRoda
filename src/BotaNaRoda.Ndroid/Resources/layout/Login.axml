@@ -4,8 +4,7 @@
     p1:layout_width="match_parent"
     p1:layout_height="match_parent"
     p1:orientation="vertical"
-    p1:minWidth="25px"
-    p1:minHeight="25px">
+    p1:background="@color/primary_dark">
 <!--<ImageView
         p1:id="@+id/conversationProfileImage"
         p1:src="@android:drawable/ic_menu_gallery"
@@ -13,19 +12,32 @@
         p1:layout_width="250dp"
         p1:layout_height="250dp" />-->
     <TextView
-        p1:id="@+id/conversationUserName"
         p1:text="Bota na Roda"
-        p1:textSize="30dp"
+        p1:textSize="40dp"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:layout_gravity="center"
+        p1:textColor="@color/white"
         p1:padding="20dp" />
-    <com.facebook.login.widget.LoginButton
-        p1:id="@+id/fbLoginButton"
+    <ProgressBar
+        p1:id="@+id/loginProgressBar"
+        style="?android:attr/progressBarStyleSmall"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
-        p1:layout_marginTop="5dp"
         p1:layout_gravity="center_horizontal"
-        facebook:com_facebook_confirm_logout="false"
-        facebook:com_facebook_tooltip_mode="never_display" />
+        p1:visibility="gone" />
+    <LinearLayout
+        p1:id="@+id/loginButtonsLinearLayout"
+        p1:layout_width="match_parent"
+        p1:layout_height="match_parent"
+        p1:orientation="vertical">
+        <com.facebook.login.widget.LoginButton
+            p1:id="@+id/loginFacebookButton"
+            p1:layout_width="wrap_content"
+            p1:layout_height="wrap_content"
+            p1:layout_marginTop="5dp"
+            p1:layout_gravity="center_horizontal"
+            facebook:com_facebook_confirm_logout="false"
+            facebook:com_facebook_tooltip_mode="never_display" />
+    </LinearLayout>
 </LinearLayout>

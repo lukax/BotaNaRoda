@@ -32,7 +32,8 @@ namespace BotaNaRoda.Ndroid.Data
             _context = Application.Context;
         }
 
-        public bool IsLoggedIn => AccountStore.Create(_context).FindAccountsForService(ServiceId).Any();
+		public bool IsLoggedIn { get { return AccountStore.Create (_context).FindAccountsForService (ServiceId).Any (); }}
+		
 
         public User Get()
         {
