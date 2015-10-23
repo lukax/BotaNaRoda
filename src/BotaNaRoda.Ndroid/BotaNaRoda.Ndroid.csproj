@@ -266,12 +266,12 @@
     <AndroidResource Include="Resources\drawable-hdpi\contact_picture_placeholder.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\ItemDetailImageFragment.xml" />
+    <AndroidResource Include="Resources\layout\ItemDetailImageFragment.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\CirclePageIndicator.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\ItemDetailImageExpanded.xml" />
+    <AndroidResource Include="Resources\layout\ItemDetailImageExpanded.axml" />
   </ItemGroup>
 </Project>
