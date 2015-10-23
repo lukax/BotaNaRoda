@@ -69,6 +69,20 @@ namespace BotaNaRoda.WebApi.Controllers
             return items.Select(x => new ItemListViewModel(x));
         }
 
+        // GET: api/items/mine
+        [Authorize]
+        [HttpGet("mine")]
+        public async Task<IEnumerable<ItemListViewModel>> GetMyItems(int skip = 0, int limit = 20)
+        {
+            var filter = Builders<Item>.Filter
+                .Eq(x => x.UserId, User.GetSubjectId());
+
+            var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
+            return items
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new ItemListViewModel(x));
+        }
+
         // GET api/items/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOne(string id)

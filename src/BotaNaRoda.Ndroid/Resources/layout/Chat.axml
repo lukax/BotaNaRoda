@@ -6,18 +6,18 @@
     p1:layout_height="match_parent"
     p1:id="@+id/relativeLayout1">
     <ImageView
-      p1:id="@+id/chatItemImage"
-      p1:src="@android:drawable/ic_menu_gallery"
-      p1:layout_width="65dp"
-      p1:layout_height="65dp"
-      p1:layout_alignParentRight="true" />
+        p1:id="@+id/chatItemImage"
+        p1:src="@android:drawable/ic_menu_gallery"
+        p1:layout_width="65dp"
+        p1:layout_height="65dp"
+        p1:layout_alignParentRight="true" />
     <TextView
-      p1:id="@+id/chatItemName"
-      p1:text="Luva de Neve"
-      p1:layout_marginRight="5dp"
-      p1:layout_width="wrap_content"
-      p1:layout_height="wrap_content"
-      p1:layout_toLeftOf="@id/chatItemImage" />
+        p1:id="@+id/chatItemName"
+        p1:text="Luva de Neve"
+        p1:layout_marginRight="5dp"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:layout_toLeftOf="@id/chatItemImage" />
     <ImageView
         p1:id="@+id/chatUserImage"
         p1:src="@android:drawable/ic_menu_gallery"
@@ -41,14 +41,12 @@
         p1:layout_toLeftOf="@id/chatItemImage" />
     <ListView
         p1:id="@+id/chatMessageList"
-        p1:minWidth="25px"
-        p1:minHeight="25px"
         p1:layout_width="wrap_content"
         p1:layout_height="match_parent"
         p1:layout_below="@id/chatUserImage"
         p1:layout_marginBottom="50dp"
-        p1:divider="#00000000"
         p1:background="#e0e0e0"
+        p1:divider="#00000000"
         p1:dividerHeight="1px"
         p1:transcriptMode="alwaysScroll"
         p1:stackFromBottom="true" />

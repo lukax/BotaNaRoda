@@ -102,11 +102,13 @@ namespace BotaNaRoda.WebApi.Hubs
             //add msg to conversation
             await _context.Conversations.UpdateOneAsync(
                 Builders<Conversation>.Filter.Eq(x => x.Id, sendMessageModel.ConversationId),
-                Builders<Conversation>.Update.AddToSet(x => x.Messages, new ConversationChatMessage
-                {
-                    Message = sendMessageModel.Message,
-                    SentBy = currentUserId
-                }));
+                Builders<Conversation>.Update
+                    .Set(x => x.UpdatedAt, DateProvider.Get)
+                    .AddToSet(x => x.Messages, new ConversationChatMessage
+                    {
+                        Message = sendMessageModel.Message,
+                        SentBy = currentUserId
+                    }));
 
             Clients.Clients(new[]
             {conversation.FromUserHubInfo.ConnectionId, conversation.ToUserHubInfo.ConnectionId})

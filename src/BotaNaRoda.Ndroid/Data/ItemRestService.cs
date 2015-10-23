@@ -56,17 +56,26 @@ namespace BotaNaRoda.Ndroid.Data
         {
         }
 
-        public async Task<IList<ItemListViewModel>> GetAllItemsAsync(double radius, int skip, int limit)
-        {
-            var userInfo = _userRepository.Get();
-            return await GetAllItemsAsync(userInfo.Latitude, userInfo.Longitude, radius, skip, limit);
-        }
-
         public async Task<IList<ItemListViewModel>> GetAllItemsAsync(double lat, double lon, double radius, int skip, int limit)
         {
             await SetupAuthorizationHeader();
 
 			var response = await _httpClient.GetAsync(BotaNaRodaItemsEndpoint + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit));
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IList<ItemListViewModel>>(json);
+            }
+
+            return new List<ItemListViewModel>();
+        }
+
+        public async Task<IList<ItemListViewModel>> GetMyItemsAsync(double lat, double lon, double radius, int skip, int limit)
+        {
+            await SetupAuthorizationHeader();
+
+            var response = await _httpClient.GetAsync(
+                Path.Combine(BotaNaRodaItemsEndpoint, "mine" + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit)));
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
@@ -264,18 +273,26 @@ namespace BotaNaRoda.Ndroid.Data
                 }
                 else
                 {
-                    var tokenResponse = await IdSvrOAuth2Util.ExchangeRefreshToken(authInfo.RefreshToken);
-                    var userInfoResponse = await IdSvrOAuth2Util.GetUserInfoAsync(tokenResponse.RefreshToken);
-                    if (!tokenResponse.IsError)
+                    try
                     {
-                        _userRepository.Update(tokenResponse, userInfoResponse);
-                        _httpClient.SetBearerToken(tokenResponse.AccessToken);
+                        var tokenResponse = await IdSvrOAuth2Util.ExchangeRefreshToken(authInfo.RefreshToken);
+                        var userInfoResponse = await IdSvrOAuth2Util.GetUserInfoAsync(tokenResponse.RefreshToken);
+                        if (!tokenResponse.IsError)
+                        {
+                            _userRepository.Update(tokenResponse, userInfoResponse);
+                            _httpClient.SetBearerToken(tokenResponse.AccessToken);
+                        }
+                        else
+                        {
+                            _userRepository.DeleteExistingAccounts();
+                            _context.StartActivity(typeof(LoginActivity));
+                            Log.Error("ItemRestService", "Could not refresh token. " + tokenResponse.Error);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         _userRepository.DeleteExistingAccounts();
-                        _context.StartActivity(typeof(LoginActivity));
-                        Log.Error("ItemRestService", "Could not refresh token. " + tokenResponse.Error);
+                        Log.Error("ItemRestService", "Could not refresh token. " + ex.Message);
                     }
                 }
 

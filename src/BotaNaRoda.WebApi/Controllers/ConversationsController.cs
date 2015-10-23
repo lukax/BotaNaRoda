@@ -58,6 +58,7 @@ namespace BotaNaRoda.WebApi.Controllers
                 .Find(Builders<User>.Filter.Where(x => userIds.Contains(x.Id))).ToListAsync();
 
             return conversations
+                .OrderByDescending(x => x.UpdatedAt)
                 .Select(x =>
             {
                 var item = items.First(i => i.Id == conversations.First(c => c.Id == x.Id).ItemId);
@@ -69,7 +70,7 @@ namespace BotaNaRoda.WebApi.Controllers
                     Id = x.Id,
                     ItemName = item.Name,
                     ItemThumbImage = item.ThumbImage.Url,
-                    LastUpdated = item.LastUpdated(),
+                    LastUpdated = x.UpdatedAt,
                     ToUserName = receivingEndUser.Name
                 };
             });

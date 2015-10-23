@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
+using Android.Content;
 using SupportActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 using Android.Support.V7.App;
 using Android.Support.V4.Widget;
 using Android.Widget;
+using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Data;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
@@ -28,8 +30,13 @@ namespace BotaNaRoda.Ndroid
             _userRepository = userRepository;
             //Profile
 		    _pictureImageView = host.FindViewById<ImageView>(Resource.Id.avatar);
+	        _pictureImageView.Click += Login;
+
             _userNameTextView = host.FindViewById<TextView>(Resource.Id.userName);
+	        _userNameTextView.Click += Login;
+
             _userAddressTextView = host.FindViewById<TextView>(Resource.Id.userLocality);
+	        _userAddressTextView.Click += Login;
 
 			GetUserInfo();
         }
@@ -51,25 +58,35 @@ namespace BotaNaRoda.Ndroid
 			base.OnDrawerSlide (drawerView, slideOffset);
 		}
 
+	    private void Login(object sender, EventArgs args)
+	    {
+            if (!_userRepository.IsLoggedIn)
+            {
+                Intent loginIntent = new Intent(_host, typeof(LoginActivity));
+                loginIntent.PutExtra(LoginActivity.PendingActionBundleKey, LoginActivity.PendingAction.None.ToString());
+                _host.StartActivity(loginIntent);
+            }
+        }
+
         private void GetUserInfo()
         {
-			if (_userRepository.IsLoggedIn)
-			{
-			    var usr = _userRepository.Get();
-			    if (usr.Username == _currentUsername)
-			    {
-			        return;
-			    }
+            if (_userRepository.IsLoggedIn)
+            {
+                var usr = _userRepository.Get();
+                if (usr.Username == _currentUsername)
+                {
+                    return;
+                }
 
-				_currentUsername = usr.Username;
+                _currentUsername = usr.Username;
 
-				_userNameTextView.Text = usr.Name;
-				_userAddressTextView.Text = usr.Address;
-				_pictureImageView.Post(() =>
+                _userNameTextView.Text = usr.Name;
+                _userAddressTextView.Text = usr.Address;
+                _pictureImageView.Post(() =>
                 {
                     _pictureImageView.SetScaleType(ImageView.ScaleType.CenterCrop);
                     Picasso.With(_host)
-						.Load(usr.Picture)
+                        .Load(usr.Picture)
                         .NoFade()
                         .Into(_pictureImageView);
                 });

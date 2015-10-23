@@ -34,7 +34,7 @@ namespace BotaNaRoda.Ndroid
 	{
         private DrawerLayout _mDrawerLayout;
         private ListView _mLeftDrawer;
-        private Dictionary<string, Type> _mLeftDataSet;
+        private Dictionary<string, Tuple<Type, Lazy<Bundle>>> _mLeftDataSet;
         private ArrayAdapter<string> _mLeftAdapter;
 		private MyActionBarDrawerToggle _mDrawerToggle;
 	    private Fragment _currentFragment;
@@ -50,11 +50,18 @@ namespace BotaNaRoda.Ndroid
 			SupportActionBar.SetDisplayHomeAsUpEnabled (true);
 			SupportActionBar.SetHomeButtonEnabled(true);
 
-	        _mLeftDataSet = new Dictionary<string, Type>
-	        {
-	            {"Itens próximos a mim", typeof (ItemsFragment)},
-	            {"Conversas", typeof (ConversationsFragment)},
-                {"Mapa", typeof(ItemsMapFragment)}
+	        _mLeftDataSet = new Dictionary<string, Tuple<Type, Lazy<Bundle>>>
+            {
+                {"Produtos próximos a mim", new Tuple<Type, Lazy<Bundle>>(typeof (ItemsFragment), null)},
+                {"Meus produtos", new Tuple<Type, Lazy<Bundle>>(typeof (ItemsFragment), 
+                    new Lazy<Bundle>(() =>
+                    {
+                        var b = new Bundle();
+                        b.PutString(ItemsFragment.BundleItemsFilter, ItemsLoader.Filter.MyItemsOnly.ToString());
+                        return b;
+                    }))},
+                {"Reservas", new Tuple<Type, Lazy<Bundle>>(typeof (ConversationsFragment), null)},
+                {"Mapa", new Tuple<Type, Lazy<Bundle>>(typeof(ItemsMapFragment), null)}
 	        };
 	        _mLeftAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _mLeftDataSet.Keys.ToArray());
 			_mLeftDrawer.Adapter = _mLeftAdapter;
@@ -119,16 +126,20 @@ namespace BotaNaRoda.Ndroid
 			_mDrawerToggle.OnConfigurationChanged(newConfig);
 		}
         
-        private void LoadFragment(Type value)
+        private void LoadFragment(Tuple<Type, Lazy<Bundle>> value)
         {
 			for (int i = 0; i < SupportFragmentManager.BackStackEntryCount; i++) {
 				SupportFragmentManager.PopBackStack ();
 			}
 
-            _currentFragment = (Fragment) Activator.CreateInstance(value);
+            _currentFragment = (Fragment) Activator.CreateInstance(value.Item1);
+            if (value.Item2 != null)
+            {
+                _currentFragment.Arguments = value.Item2.Value;
+            }
             SupportFragmentManager
                 .BeginTransaction()
-                .Replace(Resource.Id.container, _currentFragment, value.Name)
+                .Replace(Resource.Id.container, _currentFragment, value.Item1.Name)
                 .Commit();
         }
 

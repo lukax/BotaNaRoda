@@ -13,8 +13,16 @@ namespace BotaNaRoda.Ndroid.Data
 {
     public class ItemsLoader 
     {
+        public enum Filter
+        {
+            AllItems,
+            MyItemsOnly
+        }
+
         private readonly ItemRestService _itemRestService;
+        private readonly Filter _filter;
         private readonly Context _context;
+        private readonly UserRepository _userRepository;
         public int ItemsPerPage { get; set; }
 		public readonly List<ItemListViewModel> Items;
         public bool CanLoadMoreItems { get; set; }
@@ -22,10 +30,12 @@ namespace BotaNaRoda.Ndroid.Data
         private bool IsBusy { get; set; }
         public event Action<ItemListViewModel> OnItemFetched;
 
-        public ItemsLoader(Context context, ItemRestService itemRestService, int itemsPerPage)
+        public ItemsLoader(Context context, UserRepository userRepository, ItemRestService itemRestService, int itemsPerPage, Filter filter)
         {
             _itemRestService = itemRestService;
+            _filter = filter;
             _context = context;
+            _userRepository = userRepository;
             ItemsPerPage = itemsPerPage;
             Items = new List<ItemListViewModel>();
             CanLoadMoreItems = true;
@@ -41,7 +51,17 @@ namespace BotaNaRoda.Ndroid.Data
             {
                 IsBusy = true;
 
-                var loaded = _itemRestService.GetAllItemsAsync(10000, CurrentPageValue, ItemsPerPage).Result;
+                var userInfo = _userRepository.Get();
+
+                IList<ItemListViewModel> loaded;
+                if (_filter == Filter.AllItems)
+                {
+                    loaded = _itemRestService.GetAllItemsAsync(userInfo.Latitude, userInfo.Longitude, 10000, CurrentPageValue, ItemsPerPage).Result;
+                }
+                else
+                {
+                    loaded = _itemRestService.GetMyItemsAsync(userInfo.Latitude, userInfo.Longitude, 10000, CurrentPageValue, ItemsPerPage).Result;
+                }
                 var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
                 itemListViewModels = itemListViewModels.Where(x => Items.All(y => y.Id != x.Id)).ToArray();

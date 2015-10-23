@@ -25,6 +25,8 @@ namespace BotaNaRoda.Ndroid.Controllers
     [Activity(Label = "Bota na Roda")]
 	public class ItemsFragment : Android.Support.V4.App.Fragment, ILocationListener
     {
+        public const string BundleItemsFilter = "BundleItemsFilter";
+
         private RecyclerView _itemsRecyclerView;
         private ItemsAdapter _adapter;
         private LocationManager _locMgr;
@@ -32,16 +34,24 @@ namespace BotaNaRoda.Ndroid.Controllers
         private UserRepository _userRepository;
         private ItemRestService _itemService;
         private ItemsLoader _itemsLoader;
+        private ItemsLoader.Filter _itemsFilter = ItemsLoader.Filter.AllItems;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 
+            if (savedInstanceState != null || Arguments != null)
+            {
+                var filterExtra = savedInstanceState?.GetString(BundleItemsFilter, _itemsFilter.ToString())
+                    ?? Arguments?.GetString(BundleItemsFilter, _itemsFilter.ToString());
+                Enum.TryParse(filterExtra, out _itemsFilter);
+            }
+
             _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 
             _userRepository = new UserRepository();
 			_itemService = new ItemRestService(_userRepository);
-            _itemsLoader = new ItemsLoader(Activity, _itemService, 20);
+            _itemsLoader = new ItemsLoader(Activity, _userRepository, _itemService, 20, _itemsFilter);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
 
 			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.itemsRefreshLayout);
@@ -63,9 +73,15 @@ namespace BotaNaRoda.Ndroid.Controllers
             return view;
 		}
 
+        public override void OnSaveInstanceState(Bundle outState)
+        {
+            base.OnSaveInstanceState(outState);
+            outState.PutString(BundleItemsFilter, _itemsFilter.ToString());
+        }
+
         private void ItemsLoaderOnOnItemFetched(ItemListViewModel item)
         {
-            Activity.RunOnUiThread(() =>
+            Activity?.RunOnUiThread(() =>
             {
                 _adapter.Items.Add(item);
                 _adapter.NotifyItemInserted(_adapter.Items.Count - 1);   
@@ -89,7 +105,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_locMgr.RemoveUpdates (this);
 		}
 
-		public void OnLocationChanged (Location location)
+        public override void OnDestroyView()
+        {
+            base.OnDestroyView();
+            _itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
+        }
+
+        public void OnLocationChanged (Location location)
 		{
             UpdateUserLocation(location);
 

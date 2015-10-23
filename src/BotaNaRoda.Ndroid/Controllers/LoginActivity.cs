@@ -90,12 +90,14 @@ namespace BotaNaRoda.Ndroid.Controllers
             if (Intent != null)
             {
                 var name = Intent.GetStringExtra(PendingActionBundleKey);
-                _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
+                if(name != null)
+                    _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
             }
             if (bundle != null)
             {
                 var name = bundle.GetString(PendingActionBundleKey);
-                _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
+                if (name != null)
+                    _pendingAction = (PendingAction)Enum.Parse(typeof(PendingAction), name);
             }
 
             SetContentView(Resource.Layout.Login);

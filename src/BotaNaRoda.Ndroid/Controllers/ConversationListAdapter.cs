@@ -32,7 +32,7 @@ namespace BotaNaRoda.Ndroid
 
             view.FindViewById<TextView>(Resource.Id.conversationUserName).Text = conversation.ToUserName;
             view.FindViewById<TextView>(Resource.Id.conversationItemName).Text = conversation.ItemName;
-            view.FindViewById<TextView>(Resource.Id.conversationLastMessageTime).Text = conversation.LastUpdated.ToString("dd/MM hh:mm");
+            view.FindViewById<TextView>(Resource.Id.conversationLastMessageTime).Text = "Última mensagem " + conversation.LastUpdated.ToString("dd/MM hh:mm");
 
             var imageView = view.FindViewById<ImageView>(Resource.Id.conversationProfileImage);
             Picasso.With(_context)
