@@ -40,12 +40,16 @@ namespace BotaNaRoda.Ndroid.Controllers
         {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
 
-            if (savedInstanceState != null || Arguments != null)
+			var defaultFilterExtra = _itemsFilter.ToString ();
+            if (savedInstanceState != null)
             {
-                var filterExtra = savedInstanceState?.GetString(BundleItemsFilter, _itemsFilter.ToString())
-                    ?? Arguments?.GetString(BundleItemsFilter, _itemsFilter.ToString());
+				var filterExtra = savedInstanceState.GetString(BundleItemsFilter, _itemsFilter.ToString()) ?? defaultFilterExtra;
                 Enum.TryParse(filterExtra, out _itemsFilter);
             }
+			if (Arguments != null) {
+				var filterExtra = Arguments.GetString(BundleItemsFilter, _itemsFilter.ToString()) ?? defaultFilterExtra;
+				Enum.TryParse(filterExtra, out _itemsFilter);
+			}
 
             _locMgr = Activity.GetSystemService(Context.LocationService) as LocationManager;
 
@@ -81,11 +85,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         private void ItemsLoaderOnOnItemFetched(ItemListViewModel item)
         {
-            Activity?.RunOnUiThread(() =>
-            {
-                _adapter.Items.Add(item);
-                _adapter.NotifyItemInserted(_adapter.Items.Count - 1);   
-            });
+			if (Activity != null) {
+				Activity.RunOnUiThread(() =>
+					{
+						_adapter.Items.Add(item);
+						_adapter.NotifyItemInserted(_adapter.Items.Count - 1);   
+					});
+			}
         }
 
         public override void OnResume ()
