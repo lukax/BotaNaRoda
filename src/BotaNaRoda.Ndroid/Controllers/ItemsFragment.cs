@@ -31,14 +31,18 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemsAdapter _adapter;
         private LocationManager _locMgr;
         private SwipeRefreshLayout _refreshLayout;
+		private TextView _itemsEmptyText;
         private UserRepository _userRepository;
         private ItemRestService _itemService;
         private ItemsLoader _itemsLoader;
         private ItemsLoader.Filter _itemsFilter = ItemsLoader.Filter.AllItems;
+		private CancellationTokenSource _uiCancellationToken;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
 			var view =  inflater.Inflate (Resource.Layout.Items, container, false);
+
+			_uiCancellationToken = new CancellationTokenSource ();
 
 			var defaultFilterExtra = _itemsFilter.ToString ();
             if (savedInstanceState != null)
@@ -61,6 +65,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.itemsRefreshLayout);
             _refreshLayout.Refresh += (sender, args) => Refresh();
 
+			_itemsEmptyText = view.FindViewById<TextView> (Resource.Id.itemsEmptyText);
 			view.FindViewById<FloatingActionButton> (Resource.Id.fab).Click += NewItem;
 
             _itemsRecyclerView = view.FindViewById<RecyclerView> (Resource.Id.itemsGridView);
@@ -73,8 +78,17 @@ namespace BotaNaRoda.Ndroid.Controllers
             
 			var scrollListener = new InfiniteScrollListener(_adapter, sglm, OnItemListLoadMoreItems, _refreshLayout);
             _itemsRecyclerView.AddOnScrollListener(scrollListener);
-            
+
+			Refresh();
+
             return view;
+		}
+
+		public override void OnDestroyView()
+		{
+			base.OnDestroyView();
+			_uiCancellationToken.Cancel ();
+			_itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
 		}
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -102,7 +116,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 				PowerRequirement = Power.NoRequirement
 			}, this, null);
 
-            Refresh();
         }
 
 		public override void OnPause ()
@@ -110,12 +123,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 			base.OnPause ();
 			_locMgr.RemoveUpdates (this);
 		}
-
-        public override void OnDestroyView()
-        {
-            base.OnDestroyView();
-            _itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
-        }
 
         public void OnLocationChanged (Location location)
 		{
@@ -156,15 +163,15 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		}
 
-		private async void Refresh(){
-            _refreshLayout.Refreshing = await _itemsLoader.LoadMoreItemsAsync();
+		private void Refresh(){
+			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken);
 		    _refreshLayout.Refreshing = false;
 		}
         
-		private async void OnItemListLoadMoreItems()
+		private void OnItemListLoadMoreItems()
         {
             Log.Info("InfiniteScrollListener", "Load more items requested");
-            _refreshLayout.Refreshing = await _itemsLoader.LoadMoreItemsAsync();
+			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken);
             _refreshLayout.Refreshing = false;
         }
 			

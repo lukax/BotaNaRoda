@@ -27,7 +27,7 @@
             android:layout_toRightOf="@id/avatar"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Entrar" />
+            android:text="Clique para entrar" />
         <TextView
             android:id="@+id/userLocality"
             android:layout_width="wrap_content"

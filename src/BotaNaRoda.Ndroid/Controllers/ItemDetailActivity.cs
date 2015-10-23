@@ -64,13 +64,13 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             _holder.ReserveButton.Click += Subscribe;
             _holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+
+			Refresh();
         }
 
         protected override void OnResume()
         {
             base.OnResume();
-
-            Refresh();
         }
 
         protected override void OnSaveInstanceState(Bundle outState)
@@ -116,13 +116,6 @@ namespace BotaNaRoda.Ndroid.Controllers
             Finish();
         }
 
-        private async void Refresh()
-        {
-            _item = await _itemService.GetItem(_itemId);
-
-            UpdateUi();
-        }
-
         public void OnMapReady(GoogleMap googleMap)
         {
             LatLng location = new LatLng(_item.Latitude, _item.Longitude);
@@ -142,6 +135,13 @@ namespace BotaNaRoda.Ndroid.Controllers
                 StartActivity(mapExpandedIntent);
             };
         }
+
+		private async void Refresh()
+		{
+			_item = await _itemService.GetItem(_itemId);
+
+			UpdateUi();
+		}
 
         private void UpdateUi()
         {

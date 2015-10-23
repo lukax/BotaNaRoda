@@ -29,7 +29,6 @@ namespace BotaNaRoda.Ndroid.Controllers
         Theme = "@style/MainTheme", ConfigurationChanges = (ConfigChanges.Orientation | ConfigChanges.ScreenSize))]	
 	public class ItemCreateActivity : AppCompatActivity, ILocationListener
 	{
-        private static readonly TaskScheduler UiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 		private const int CapturePhoto1Id = 0;
 		private const int CapturePhoto2Id = 1;
 		private const int CapturePhoto3Id = 2;
@@ -158,7 +157,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 		{
 		}
 
-	    async void _saveButton_Click (object sender, EventArgs e)
+	    private async void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
 				Toast.MakeText (this, "Por favor ligue o GPS", ToastLength.Long).Show();

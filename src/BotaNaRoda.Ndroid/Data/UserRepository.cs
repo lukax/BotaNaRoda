@@ -32,7 +32,13 @@ namespace BotaNaRoda.Ndroid.Data
             _context = Application.Context;
         }
 
-		public bool IsLoggedIn { get { return AccountStore.Create (_context).FindAccountsForService (ServiceId).Any (); }}
+		public bool IsLoggedIn { 
+			get { 
+				return AccountStore.Create (_context)
+					.FindAccountsForService (ServiceId)
+					.Any (x => !string.IsNullOrEmpty(x.Username)); 
+			}
+		}
 		
 
         public User Get()
@@ -42,10 +48,12 @@ namespace BotaNaRoda.Ndroid.Data
             if (acc != null)
             {
                 string authInfo;
-                if (acc.Properties.TryGetValue("authInfo", out authInfo))
-                {
-                    user = JsonConvert.DeserializeObject<User>(authInfo);
-                }
+				if (acc.Properties.TryGetValue ("authInfo", out authInfo)) {
+					user = JsonConvert.DeserializeObject<User> (authInfo);
+				} else {
+					//Error treating account doesnt exist
+					DeleteExistingAccounts ();
+				}
             }
             return user;
         }

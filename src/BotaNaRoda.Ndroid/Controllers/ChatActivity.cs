@@ -61,6 +61,7 @@ namespace BotaNaRoda.Ndroid
             _holder.ChatSendButton.Click += ChatSendButtonOnClick;
 
             _loadingDialog = ProgressDialog.Show(this, "Carregando...", "");
+
             Refresh();
         }
 

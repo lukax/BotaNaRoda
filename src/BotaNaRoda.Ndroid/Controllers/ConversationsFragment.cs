@@ -39,13 +39,15 @@ namespace BotaNaRoda.Ndroid
             _itemsListView.Adapter = _adapter;
             _itemsListView.ItemClick += _itemsListView_ItemClick;
 
+
+			Refresh();
+
             return view;
         }
 
         public override void OnResume()
         {
             base.OnResume();
-            Refresh();
         }
 
         private async void Refresh()

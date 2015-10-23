@@ -8,6 +8,7 @@ using Android.Database;
 using Android.Locations;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
+using System.Threading;
 
 namespace BotaNaRoda.Ndroid.Data
 {
@@ -42,14 +43,16 @@ namespace BotaNaRoda.Ndroid.Data
             CurrentPageValue = 0;
         }
 
-        public async Task<bool> LoadMoreItemsAsync()
+        public bool LoadMoreItemsAsync(CancellationToken cancellationToken)
         {
             var cantLoad = IsBusy || !CanLoadMoreItems;
             if (cantLoad) return false;
 
-            await Task.Run(() =>
+            Task.Run(() =>
             {
-                IsBusy = true;
+				cancellationToken.ThrowIfCancellationRequested();
+                
+				IsBusy = true;
 
                 var userInfo = _userRepository.Get();
 
@@ -71,8 +74,9 @@ namespace BotaNaRoda.Ndroid.Data
                 CanLoadMoreItems = (itemListViewModels.Length != 0 &&
                     ItemsPerPage == itemListViewModels.Length);
 
-                Parallel.ForEach(itemListViewModels, (item) =>
+				Parallel.ForEach(itemListViewModels.ToList(), (item) =>
                 {
+					cancellationToken.ThrowIfCancellationRequested();
                     var img = Picasso.With(_context).Load(item.ThumbImage.Url).Get();
                     if (img != null)
                     {
