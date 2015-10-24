@@ -125,6 +125,12 @@
     <Compile Include="Controllers\Services\PostItemService.cs" />
     <Compile Include="Library\CirclePageIndicator.cs" />
     <Compile Include="Library\IPageIndicator.cs" />
+    <Compile Include="Library\ModernHttpClient\CaptiveNetworkException.cs" />
+    <Compile Include="Library\ModernHttpClient\ConcatenatingStream.cs" />
+    <Compile Include="Library\ModernHttpClient\NativeCookieHandler.cs" />
+    <Compile Include="Library\ModernHttpClient\OkHttpNetworkHandler.cs" />
+    <Compile Include="Library\ModernHttpClient\ProgressStreamContent.cs" />
+    <Compile Include="Library\ModernHttpClient\Utility.cs" />
     <Compile Include="Library\TitlePageIndicator.cs" />
     <Compile Include="Library\ITitleProvider.cs" />
     <Compile Include="Models\ConversationChatConnectionViewModel.cs" />

@@ -16,6 +16,7 @@ using BotaNaRoda.Ndroid.Auth;
 using BotaNaRoda.Ndroid.Controllers;
 using BotaNaRoda.Ndroid.Models;
 using IdentityModel.Client;
+using ModernHttpClient;
 using Newtonsoft.Json;
 using Xamarin.Auth;
 using Path = System.IO.Path;
@@ -49,7 +50,7 @@ namespace BotaNaRoda.Ndroid.Data
                 Directory.CreateDirectory(_storagePath);
 
             //On android NativeMessageHandler will resolve to OkHttp
-			_httpClient = new HttpClient(/*new NativeMessageHandler()*/);
+			_httpClient = new HttpClient(new NativeMessageHandler());
         }
 
         public void RefreshCache()

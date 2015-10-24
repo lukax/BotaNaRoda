@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using IdentityModel.Client;
+using ModernHttpClient;
 
 namespace BotaNaRoda.Ndroid.Auth
 {
@@ -44,7 +45,7 @@ namespace BotaNaRoda.Ndroid.Auth
 
         public static async Task<TokenResponse> ExchangeRefreshToken(string refreshToken)
         {
-            var httpClient = new HttpClient(/*new NativeMessageHandler()*/);
+            var httpClient = new HttpClient(new NativeMessageHandler());
             //bug doing this manually because of crazy issue with IdentityModel
             var httpResponseMessage = await httpClient.PostAsync(Constants.IdSvrTokenEndpoint,
                 new FormUrlEncodedContent(new Dictionary<string, string>
