@@ -120,7 +120,6 @@ namespace BotaNaRoda.Ndroid.Controllers
                     0,
                     Resources.GetDimensionPixelSize(Resource.Dimension.fb_margin_override_bottom));
 
-
             //_profileTracker = new CustomProfileTracker
             //{
             //    HandleCurrentProfileChanged = (oldProfile, currentProfile) => 

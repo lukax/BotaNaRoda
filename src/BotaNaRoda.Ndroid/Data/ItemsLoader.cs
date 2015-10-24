@@ -47,8 +47,8 @@ namespace BotaNaRoda.Ndroid.Data
 
         public bool LoadMoreItemsAsync(CancellationToken cancellationToken)
         {
-            var cantLoad = IsBusy || !CanLoadMoreItems;
-            if (cantLoad) return false;
+            if (IsBusy) return true;
+            if (!CanLoadMoreItems) return false;
 
             Task.Run(() =>
             {
@@ -88,7 +88,7 @@ namespace BotaNaRoda.Ndroid.Data
                     }
                 });
 
-                if (itemListViewModels.Length == 0 && OnLoaded != null)
+                if (OnLoaded != null)
                 {
                     OnLoaded();
                 }

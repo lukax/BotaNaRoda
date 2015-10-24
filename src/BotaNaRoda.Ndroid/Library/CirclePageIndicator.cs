@@ -9,7 +9,7 @@ using Java.Lang;
 
 namespace BotaNaRoda.Ndroid.Library
 {
-    public class CirclePageIndicator : View, ViewPager.IOnPageChangeListener
+    public class CirclePageIndicator : View, ViewPager.IOnPageChangeListener, IPageIndicator
     {
         const int HORIZONTAL = 0;
         const int VERTICAL = 1;

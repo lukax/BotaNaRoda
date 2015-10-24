@@ -95,7 +95,7 @@ namespace BotaNaRoda.Ndroid.Controllers
             googleMap.UiSettings.ZoomControlsEnabled = true;
             googleMap.UiSettings.MyLocationButtonEnabled = true;
             googleMap.AddMarker(new MarkerOptions().SetPosition(location).SetTitle(_item.Name));
-            googleMap.AnimateCamera(cameraUpdate);
+            googleMap.MoveCamera(cameraUpdate);
             googleMap.MyLocationEnabled = true;
         }
     }

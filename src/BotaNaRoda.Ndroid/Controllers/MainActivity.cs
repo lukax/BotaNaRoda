@@ -23,6 +23,7 @@ using BotaNaRoda.Ndroid.Gcm;
 using BotaNaRoda.Ndroid.Models;
 using Square.Picasso;
 using Fragment = Android.Support.V4.App.Fragment;
+using FragmentTransaction = Android.Support.V4.App.FragmentTransaction;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -139,7 +140,8 @@ namespace BotaNaRoda.Ndroid
             }
             SupportFragmentManager
                 .BeginTransaction()
-                .Replace(Resource.Id.container, _currentFragment, value.Item1.Name)
+                .Replace(Resource.Id.mainFragmentContainer, _currentFragment)
+                .SetTransition(FragmentTransaction.TransitFragmentFade)
                 .Commit();
         }
 

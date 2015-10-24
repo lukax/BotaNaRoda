@@ -124,6 +124,9 @@
     <Compile Include="Controllers\ItemImagePagerAdapter.cs" />
     <Compile Include="Controllers\Services\PostItemService.cs" />
     <Compile Include="Library\CirclePageIndicator.cs" />
+    <Compile Include="Library\IPageIndicator.cs" />
+    <Compile Include="Library\TitlePageIndicator.cs" />
+    <Compile Include="Library\ITitleProvider.cs" />
     <Compile Include="Models\ConversationChatConnectionViewModel.cs" />
     <Compile Include="Data\ChatService.cs" />
     <Compile Include="Constants.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="MyGcmListenerService.cs" />
     <Compile Include="MyInstanceIDListenerService.cs" />
     <Compile Include="RegistrationIntentService.cs" />
+    <Compile Include="Util\UiUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -197,6 +201,9 @@
     <AndroidResource Include="Resources\menu\TakePictureMenu.xml" />
     <AndroidResource Include="Resources\layout\ItemDetailMapExpanded.axml" />
     <AndroidResource Include="Resources\layout\UserDetail.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\UtilProgressDialog.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -273,7 +280,7 @@
     <AndroidResource Include="Resources\layout\ItemDetailImageFragment.axml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\values\CirclePageIndicator.xml" />
+    <AndroidResource Include="Resources\values\ViewPagerIndicator.xml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\ItemDetailImageExpanded.axml" />

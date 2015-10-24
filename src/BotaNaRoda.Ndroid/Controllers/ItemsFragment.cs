@@ -164,26 +164,29 @@ namespace BotaNaRoda.Ndroid.Controllers
 		    }
 		}
 
-		private void Refresh(){
-			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
+		private void Refresh()
+		{
+		    _refreshLayout.Post(() =>
+		    {
+                _refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
+            });
 		}
         
 		private void OnItemListLoadMoreItems()
         {
             Log.Info("InfiniteScrollListener", "Load more items requested");
-			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
+		    _refreshLayout.Post(() =>
+		    {
+		        _refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
+		    });
         }
 
         private void ItemsLoaderOnLoaded()
         {
-            if (Activity != null)
-            {
-                Activity.RunOnUiThread(() =>
-                {
-                    _itemsEmptyText.Visibility = _adapter.Items.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
-                    _refreshLayout.Refreshing = false;
-                });
-            }
+            _refreshLayout.Post(() => {
+                _itemsEmptyText.Visibility = _adapter.Items.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
+                _refreshLayout.Refreshing = false;
+            });
         }
 
         private async void UpdateUserLocation(Location location){

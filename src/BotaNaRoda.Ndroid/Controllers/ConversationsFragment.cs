@@ -52,12 +52,20 @@ namespace BotaNaRoda.Ndroid
 
         private async void Refresh()
         {
-            _conversationsRefreshLayout.Refreshing = true;
+            _conversationsRefreshLayout.Post(() =>
+            {
+                _conversationsRefreshLayout.Refreshing = true;
+            });
+
             _conversations = await _itemService.GetAllConversations();
             _adapter.Conversations = _conversations;
             _adapter.NotifyDataSetChanged();
+
             _conversationsEmptyText.Visibility = _adapter.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
-            _conversationsRefreshLayout.Refreshing = false;
+            _conversationsRefreshLayout.Post(() =>
+            {
+                _conversationsRefreshLayout.Refreshing = false;
+            });
         }
 
         private void _itemsListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)

@@ -22,7 +22,7 @@
         p1:padding="20dp" />
     <ProgressBar
         p1:id="@+id/loginProgressBar"
-        style="?android:attr/progressBarStyleSmall"
+        style="?android:attr/progressBarStyleLarge"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:layout_gravity="center_horizontal"

@@ -16,9 +16,11 @@ using BotaNaRoda.Ndroid.Util;
 using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using Square.Picasso;
-using System.IO;
 using Android.Content;
+using Android.Graphics;
+using Android.Views;
 using BotaNaRoda.Ndroid.Controllers;
+using Path = System.IO.Path;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -65,7 +67,7 @@ namespace BotaNaRoda.Ndroid
             _holder.MessageList.Adapter = _adapter;
             _holder.ChatSendButton.Click += ChatSendButtonOnClick;
 
-            _loadingDialog = ProgressDialog.Show(this, "Carregando...", "");
+            _loadingDialog = UiUtils.CreateProgressDialog(this);
 
             Refresh();
         }
@@ -137,7 +139,7 @@ namespace BotaNaRoda.Ndroid
             _adapter.ChatMessages = _connectionViewModel.Messages;
             _adapter.NotifyDataSetChanged();
 
-            _loadingDialog.Hide();
+            _loadingDialog.Cancel();
         }
 
 		private void MessageReceived(ConversationChatMessage message){

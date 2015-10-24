@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 <!-- The Main Content View -->
     <FrameLayout
-        android:id="@+id/container"
+        android:id="@+id/mainFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 <!-- The Left Navigation Drawer -->

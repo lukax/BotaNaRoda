@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -14,7 +14,7 @@
             android:textSize="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
             android:id="@+id/conversationsEmptyText"
             android:visibility="gone" />
         <ListView
@@ -22,5 +22,5 @@
             android:layout_height="match_parent"
             android:divider="#00000000"
             android:id="@+id/conversationList" />
-    </LinearLayout>
+    </FrameLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
