@@ -61,7 +61,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_itemService = new ItemRestService(_userRepository);
             _itemsLoader = new ItemsLoader(Activity, _userRepository, _itemService, 20, _itemsFilter);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
-            _itemsLoader.OnEmptyList += CheckEmptyList;
+            _itemsLoader.OnLoaded += ItemsLoaderOnLoaded;
 
 			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.itemsRefreshLayout);
             _refreshLayout.Refresh += (sender, args) => Refresh();
@@ -87,10 +87,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         public override void OnDestroyView()
 		{
-			base.OnDestroyView();
-			_uiCancellationToken.Cancel ();
-			_itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
-            _itemsLoader.OnEmptyList -= CheckEmptyList;
+            _uiCancellationToken.Cancel();
+            _itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
+            _itemsLoader.OnLoaded -= ItemsLoaderOnLoaded;
+            base.OnDestroyView();
 		}
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -166,21 +166,24 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		private void Refresh(){
 			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
-		    _refreshLayout.Refreshing = false;
 		}
         
 		private void OnItemListLoadMoreItems()
         {
             Log.Info("InfiniteScrollListener", "Load more items requested");
 			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
-            _refreshLayout.Refreshing = false;
-
-            CheckEmptyList();
         }
 
-        private void CheckEmptyList()
+        private void ItemsLoaderOnLoaded()
         {
-            _itemsEmptyText.Visibility = _adapter.Items.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
+            if (Activity != null)
+            {
+                Activity.RunOnUiThread(() =>
+                {
+                    _itemsEmptyText.Visibility = _adapter.Items.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
+                    _refreshLayout.Refreshing = false;
+                });
+            }
         }
 
         private async void UpdateUserLocation(Location location){

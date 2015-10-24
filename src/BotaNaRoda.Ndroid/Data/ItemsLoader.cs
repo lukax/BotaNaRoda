@@ -30,7 +30,7 @@ namespace BotaNaRoda.Ndroid.Data
         public int CurrentPageValue { get; set; }
         private bool IsBusy { get; set; }
         public event Action<ItemListViewModel> OnItemFetched;
-        public event Action OnEmptyList;
+        public event Action OnLoaded;
 
         public ItemsLoader(Context context, UserRepository userRepository, ItemRestService itemRestService, int itemsPerPage,
             Filter filter)
@@ -69,11 +69,6 @@ namespace BotaNaRoda.Ndroid.Data
                 }
                 var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
 
-                if (itemListViewModels.Length == 0 && OnEmptyList != null)
-                {
-                    OnEmptyList();    
-                }
-
                 itemListViewModels = itemListViewModels.Where(x => Items.All(y => y.Id != x.Id)).ToArray();
 
                 //Items.AddRange(itemListViewModels);
@@ -81,7 +76,7 @@ namespace BotaNaRoda.Ndroid.Data
                 CanLoadMoreItems = (itemListViewModels.Length != 0 &&
                     ItemsPerPage == itemListViewModels.Length);
 
-				await Parallel.ForEach(itemListViewModels.ToList(), (item) =>
+				Parallel.ForEach(itemListViewModels.ToList(), (item) =>
                 {
 					cancellationToken.ThrowIfCancellationRequested();
                     var img = Picasso.With(_context).Load(item.ThumbImage.Url).Get();
@@ -92,6 +87,11 @@ namespace BotaNaRoda.Ndroid.Data
                         OnItemFetch(item);
                     }
                 });
+
+                if (itemListViewModels.Length == 0 && OnLoaded != null)
+                {
+                    OnLoaded();
+                }
 
                 IsBusy = false;
             }, cancellationToken);
