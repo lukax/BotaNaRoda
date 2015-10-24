@@ -58,7 +58,6 @@ namespace BotaNaRoda.Ndroid
             _adapter.NotifyDataSetChanged();
             _conversationsEmptyText.Visibility = _adapter.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
             _conversationsRefreshLayout.Refreshing = false;
-
         }
 
         private void _itemsListView_ItemClick(object sender, AdapterView.ItemClickEventArgs e)

@@ -19,14 +19,16 @@ namespace BotaNaRoda.Ndroid
         private readonly TextView _userNameTextView;
         private readonly ImageView _pictureImageView;
 	    private readonly AppCompatActivity _host;
+	    private readonly DrawerLayout _drawerLayout;
 		private string _currentUsername;
 
 	    public MyActionBarDrawerToggle (AppCompatActivity host,
                 DrawerLayout drawerLayout, int openedResource, int closedResource,
                 UserRepository userRepository) 
 			: base(host, drawerLayout, openedResource, closedResource)
-        {
+	    {
             _host = host;
+	        _drawerLayout = drawerLayout;
             _userRepository = userRepository;
             //Profile
 		    _pictureImageView = host.FindViewById<ImageView>(Resource.Id.avatar);
@@ -65,6 +67,7 @@ namespace BotaNaRoda.Ndroid
                 Intent loginIntent = new Intent(_host, typeof(LoginActivity));
                 loginIntent.PutExtra(LoginActivity.PendingActionBundleKey, LoginActivity.PendingAction.None.ToString());
                 _host.StartActivity(loginIntent);
+                _drawerLayout.CloseDrawers();
             }
         }
 

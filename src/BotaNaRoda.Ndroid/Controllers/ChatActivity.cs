@@ -17,6 +17,8 @@ using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using Square.Picasso;
 using System.IO;
+using Android.Content;
+using BotaNaRoda.Ndroid.Controllers;
 
 namespace BotaNaRoda.Ndroid
 {
@@ -56,13 +58,25 @@ namespace BotaNaRoda.Ndroid
                 ChatSendButton = FindViewById<ImageButton>(Resource.Id.chatSendButton),
             };
 
-			_adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>(), _userRepository.Get());
+            _holder.ItemImage.Click += ItemImageOnClick;
+            _holder.UserImage.Click += UserOnClick;
+
+            _adapter = new ChatMessageAdapter(this, new List<ConversationChatMessage>(), _userRepository.Get());
             _holder.MessageList.Adapter = _adapter;
             _holder.ChatSendButton.Click += ChatSendButtonOnClick;
 
             _loadingDialog = ProgressDialog.Show(this, "Carregando...", "");
 
             Refresh();
+        }
+
+        protected override void OnDestroy()
+        {
+            if (_hubConnection != null)
+            {
+                _hubConnection.Dispose();
+            }
+            base.OnDestroy();
         }
 
         private void ChatSendButtonOnClick(object sender, EventArgs eventArgs)
@@ -132,12 +146,25 @@ namespace BotaNaRoda.Ndroid
 			//_holder.MessageList.SetSelection (_adapter.Count - 1); //scroll to last item
 		}
 
-        protected override void OnDestroy()
+
+        private void UserOnClick(object sender, EventArgs eventArgs)
         {
-			if (_hubConnection != null) {
-				_hubConnection.Dispose ();
-			}
-            base.OnDestroy();
+            if (_connectionViewModel != null)
+            {
+                Intent userDetailIntent = new Intent(this, typeof(UserDetailActivity))
+                    .PutExtra(UserDetailActivity.UserIdExtra, _connectionViewModel.ToUser.Id);
+                StartActivity(userDetailIntent);
+            }
+        }
+
+        private void ItemImageOnClick(object sender, EventArgs eventArgs)
+        {
+            if (_connectionViewModel != null)
+            {
+                Intent imageDetailIntent = new Intent(this, typeof(ItemDetailActivity))
+                    .PutExtra(ItemDetailActivity.ItemIdExtra, _connectionViewModel.Item.Id);
+                StartActivity(imageDetailIntent);
+            }
         }
 
         private class ViewHolder

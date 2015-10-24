@@ -66,16 +66,15 @@ namespace BotaNaRoda.Ndroid.Data
                 usr.IdentityToken = tokenResponse.IdentityToken;
             }
 
-            usr.NotBefore = GetPropFromTokenSafely<long> ("nbf", tokenResponse.AccessToken).ToDateTimeOffsetFromEpoch(); 
-            usr.ExpiresIn = GetPropFromTokenSafely<long> ("exp", tokenResponse.AccessToken).ToDateTimeOffsetFromEpoch();
+            usr.Id = GetPropFromTokenSafely<string>(JwtClaimTypes.Subject, tokenResponse.AccessToken);
+            usr.NotBefore = GetPropFromTokenSafely<long> (JwtClaimTypes.NotBefore, tokenResponse.AccessToken).ToDateTimeOffsetFromEpoch(); 
+            usr.ExpiresIn = GetPropFromTokenSafely<long> (JwtClaimTypes.Expiration, tokenResponse.AccessToken).ToDateTimeOffsetFromEpoch();
 
             usr.AccessToken = tokenResponse.AccessToken;
             usr.RefreshToken = tokenResponse.RefreshToken;
 
             foreach (var claim in userInfoResponse.Claims)
             {
-                if (claim.Item1 == JwtClaimTypes.Id)
-                    usr.Id = claim.Item2;
                 if (claim.Item1 == JwtClaimTypes.Name)
                     usr.Name = claim.Item2;
                 if (claim.Item1 == JwtClaimTypes.PreferredUserName)

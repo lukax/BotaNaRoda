@@ -66,18 +66,6 @@ namespace BotaNaRoda.WebApi.Controllers
                 .Not(Builders<Item>.Filter.Eq(x => x.Status, ItemStatus.Unavailable));
 
             var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
-            return items.Select(x => new ItemListViewModel(x));
-        }
-
-        // GET: api/items/mine
-        [Authorize]
-        [HttpGet("mine")]
-        public async Task<IEnumerable<ItemListViewModel>> GetMyItems(int skip = 0, int limit = 20)
-        {
-            var filter = Builders<Item>.Filter
-                .Eq(x => x.UserId, User.GetSubjectId());
-
-            var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
             return items
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => new ItemListViewModel(x));

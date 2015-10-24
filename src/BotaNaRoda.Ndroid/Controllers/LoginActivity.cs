@@ -223,6 +223,9 @@ namespace BotaNaRoda.Ndroid.Controllers
                 case PendingAction.PostItem:
                     PostItem();
                     break;
+                case PendingAction.None:
+                    Finish();
+                    break;
             }
         }
 

@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Auth\CustomOAuth2Authenticator.cs" />
     <Compile Include="Auth\IdSvrOAuth2Util.cs" />
+    <Compile Include="Controllers\UserDetailActivity.cs" />
     <Compile Include="Controllers\ItemsMapFragment.cs" />
     <Compile Include="Controllers\ItemDetailMapExpandedActivity.cs" />
     <Compile Include="Controllers\ItemImageDetailExpandedActivity.cs" />
@@ -195,6 +196,9 @@
     <AndroidResource Include="Resources\layout\ItemDetailSubscribersListItem.axml" />
     <AndroidResource Include="Resources\menu\TakePictureMenu.xml" />
     <AndroidResource Include="Resources\layout\ItemDetailMapExpanded.axml" />
+    <AndroidResource Include="Resources\layout\UserDetail.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\ItemsMenu.xml" />

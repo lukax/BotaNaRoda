@@ -62,8 +62,10 @@ namespace BotaNaRoda.Ndroid.Controllers
                 MapFragment = FragmentManager.FindFragmentById<MapFragment>(Resource.Id.mapFragment)
             };
 
-            _holder.ReserveButton.Click += Subscribe;
             _holder.SubscribersListView.ItemClick += _holder_SubscribersListView_ItemClick;
+            _holder.ItemAuthorNameView.Click += ItemAuthorImageViewOnClick;
+            _holder.ItemAuthorImageView.Click += ItemAuthorImageViewOnClick;
+            _holder.ReserveButton.Click += Subscribe;
 
 			Refresh();
         }
@@ -149,7 +151,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 
             Title = "Produto " + _item.Name;
             _holder.ItemAuthorNameView.Text = _item.User.Name;
-            _holder.ItemDescriptionView.Text = _item.Description ?? "Nenhuma descrição";
+            _holder.ItemDescriptionView.Text = string.IsNullOrWhiteSpace(_item.Description) ? "Nenhuma descrição" : _item.Description;
             _holder.DistanceView.Text = _item.DistanceTo(_userRepository.Get());
             _holder.ViewPager.Post(() =>
             {
@@ -212,7 +214,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			}
         }
 
-		private async void Subscribe(object sender, EventArgs e)
+        private async void Subscribe(object sender, EventArgs e)
 		{
 			var result = await _itemService.Subscribe (_item.Id);
 			RunOnUiThread(() =>
@@ -227,7 +229,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 				});
 		}
 
-		private async void _holder_SubscribersListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
+        private void ItemAuthorImageViewOnClick(object sender, EventArgs eventArgs)
+        {
+            if (_item != null)
+            {
+                Intent userDetailIntent = new Intent(this, typeof(UserDetailActivity))
+                    .PutExtra(UserDetailActivity.UserIdExtra, _item.User.Id);
+                StartActivity(userDetailIntent);
+            }
+        }
+
+        private async void _holder_SubscribersListView_ItemClick (object sender, AdapterView.ItemClickEventArgs e)
 		{
 			var conversationId = await _itemService.Promise (_item.Id, _item.Subscribers [e.Position].Id);
 

@@ -70,16 +70,19 @@ namespace BotaNaRoda.Ndroid.Data
             return new List<ItemListViewModel>();
         }
 
-        public async Task<IList<ItemListViewModel>> GetMyItemsAsync(double lat, double lon, double radius, int skip, int limit)
+        public async Task<IList<ItemListViewModel>> GetUserItems(string userId, double lat, double lon, double radius, int skip, int limit)
         {
             await SetupAuthorizationHeader();
 
-            var response = await _httpClient.GetAsync(
-                Path.Combine(BotaNaRodaItemsEndpoint, "mine" + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit)));
-            if (response.IsSuccessStatusCode)
+            if (userId != null)
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<IList<ItemListViewModel>>(json);
+                var response = await _httpClient.GetAsync(
+                    Path.Combine(BotaNaRodaUsersEndpoint, userId, "items" + string.Format("?latitude={0}&longitude={1}&radius={2}&skip={3}&limit{4}", lat, lon, radius, skip, limit)));
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<IList<ItemListViewModel>>(json);
+                }
             }
 
             return new List<ItemListViewModel>();
@@ -147,7 +150,7 @@ namespace BotaNaRoda.Ndroid.Data
                 return JsonConvert.DeserializeObject<UserViewModel>(json);
             }
 
-            return null;
+            return new UserViewModel();
         }
 
         private async Task<IList<ImageInfo>> UploadImages(string[] imgPaths)

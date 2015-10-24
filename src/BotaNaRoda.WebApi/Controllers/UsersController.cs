@@ -8,6 +8,7 @@ using BotaNaRoda.WebApi.Data;
 using BotaNaRoda.WebApi.Entity;
 using BotaNaRoda.WebApi.Models;
 using IdentityServer3.Core.Extensions;
+using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Framework.Logging;
@@ -49,6 +50,19 @@ namespace BotaNaRoda.WebApi.Controllers
             }
 
             return new ObjectResult(new UserViewModel(user));
+        }
+
+        // GET: api/users/5/items
+        [HttpGet("{userId}/items")]
+        public async Task<IEnumerable<ItemListViewModel>> GetUserItems(string userId, int skip = 0, int limit = 20)
+        {
+            var filter = Builders<Item>.Filter
+                .Eq(x => x.UserId, userId);
+
+            var items = await _itemsContext.Items.Find(filter).Skip(skip).Limit(limit).ToListAsync();
+            return items
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new ItemListViewModel(x));
         }
 
         // POST api/users

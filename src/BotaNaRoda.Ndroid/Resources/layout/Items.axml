@@ -5,11 +5,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         <TextView
-            android:text="Nenhuma produto encontrado :("
+            android:text="Nenhum produto encontrado :("
             android:textSize="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,5 +33,5 @@
             fab:fab_colorNormal="@color/accent"
             fab:fab_colorPressed="@color/accent_pressed"
             fab:fab_colorRipple="@color/ripple" />
-    </FrameLayout>
+    </LinearLayout>
 </android.support.v4.widget.SwipeRefreshLayout>

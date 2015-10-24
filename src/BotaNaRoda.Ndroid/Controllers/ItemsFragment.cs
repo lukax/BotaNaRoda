@@ -61,6 +61,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 			_itemService = new ItemRestService(_userRepository);
             _itemsLoader = new ItemsLoader(Activity, _userRepository, _itemService, 20, _itemsFilter);
             _itemsLoader.OnItemFetched += ItemsLoaderOnOnItemFetched;
+            _itemsLoader.OnEmptyList += CheckEmptyList;
 
 			_refreshLayout = view.FindViewById<SwipeRefreshLayout>(Resource.Id.itemsRefreshLayout);
             _refreshLayout.Refresh += (sender, args) => Refresh();
@@ -84,11 +85,12 @@ namespace BotaNaRoda.Ndroid.Controllers
             return view;
 		}
 
-		public override void OnDestroyView()
+        public override void OnDestroyView()
 		{
 			base.OnDestroyView();
 			_uiCancellationToken.Cancel ();
 			_itemsLoader.OnItemFetched -= ItemsLoaderOnOnItemFetched;
+            _itemsLoader.OnEmptyList -= CheckEmptyList;
 		}
 
         public override void OnSaveInstanceState(Bundle outState)
@@ -115,7 +117,6 @@ namespace BotaNaRoda.Ndroid.Controllers
 				Accuracy = Accuracy.Coarse,
 				PowerRequirement = Power.NoRequirement
 			}, this, null);
-
         }
 
 		public override void OnPause ()
@@ -164,18 +165,25 @@ namespace BotaNaRoda.Ndroid.Controllers
 		}
 
 		private void Refresh(){
-			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken);
+			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
 		    _refreshLayout.Refreshing = false;
 		}
         
 		private void OnItemListLoadMoreItems()
         {
             Log.Info("InfiniteScrollListener", "Load more items requested");
-			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken);
+			_refreshLayout.Refreshing = _itemsLoader.LoadMoreItemsAsync(_uiCancellationToken.Token);
             _refreshLayout.Refreshing = false;
+
+            CheckEmptyList();
         }
-			
-		private async void UpdateUserLocation(Location location){
+
+        private void CheckEmptyList()
+        {
+            _itemsEmptyText.Visibility = _adapter.Items.Count == 0 ? ViewStates.Visible : ViewStates.Gone;
+        }
+
+        private async void UpdateUserLocation(Location location){
 			Geocoder geocdr = new Geocoder(Activity);
 			var addr = (await geocdr.GetFromLocationAsync(location.Latitude, location.Longitude, 1)).FirstOrDefault();
 			if (addr != null) {

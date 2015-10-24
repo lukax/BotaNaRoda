@@ -18,6 +18,7 @@ using Xamarin.Auth;
 using Square.Picasso;
 using AlertDialog = Android.App.AlertDialog;
 using System.Collections.Generic;
+using Android.Content;
 
 namespace BotaNaRoda.Ndroid.Controllers
 {
@@ -48,6 +49,12 @@ namespace BotaNaRoda.Ndroid.Controllers
 			view.FindViewById<TextView>(Resource.Id.itemDetailSubscriberLocality).Text = user.Locality ?? "";
 
 			var imageView = view.FindViewById<ImageView>(Resource.Id.itemDetailSubscriberProfileImage);
+		    imageView.Click += (sender, args) =>
+		    {
+		        Intent userDetailIntent = new Intent(_context, typeof (UserDetailActivity))
+		            .PutExtra(UserDetailActivity.UserIdExtra, user.Id);
+		        _context.StartActivity(userDetailIntent);
+		    };
 			Picasso.With(_context)
 				.Load(user.Avatar)
 				.Fit()

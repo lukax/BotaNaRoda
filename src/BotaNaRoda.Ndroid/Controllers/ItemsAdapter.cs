@@ -19,7 +19,7 @@ namespace BotaNaRoda.Ndroid.Controllers
 	public class ItemsAdapter : RecyclerView.Adapter
 	{
 	    private readonly Context _context;
-	    public readonly IList<ItemListViewModel> Items = new List<ItemListViewModel>();
+	    public readonly List<ItemListViewModel> Items = new List<ItemListViewModel>();
 	    public ILatLon UserLatLon { get; set; }
 
 		public ItemsAdapter (Context context, ILatLon userLatLon)
@@ -66,16 +66,32 @@ namespace BotaNaRoda.Ndroid.Controllers
                     //rlp.Height = (int)(viewHolder.Image.Width * ratio);
                     rlp.Height = (int) item.ThumbImage.Height.Value;
                     viewHolder.Image.LayoutParameters = rlp;
+
+                    viewHolder.Image.Post(() =>
+                    {
+                        Picasso.With(_context)
+                            .Load(item.ThumbImage.Url)
+                            .Resize(viewHolder.Image.Width, viewHolder.Image.Height) //Not needed image already resized
+                            .CenterCrop()
+                            .Into(viewHolder.Image);
+                    });
+                }
+                else
+                {
+                    var rlp = viewHolder.Image.LayoutParameters;
+                    rlp.Height = 300;
+                    viewHolder.Image.LayoutParameters = rlp;
+
+                    viewHolder.Image.Post(() =>
+                    {
+                        Picasso.With(_context)
+                            .Load(item.ThumbImage.Url)
+                            .Resize(viewHolder.Image.Width, rlp.Height) //Not needed image already resized
+                            .CenterCrop()
+                            .Into(viewHolder.Image);
+                    });
                 }
 
-                viewHolder.Image.Post(() =>
-                {
-                    Picasso.With(_context)
-                        .Load(item.ThumbImage.Url)
-                        .Resize(viewHolder.Image.Width, viewHolder.Image.Height) //Not needed image already resized
-                        .CenterCrop()
-                        .Into(viewHolder.Image);
-                });
             }
         }
        

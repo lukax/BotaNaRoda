@@ -30,8 +30,10 @@ namespace BotaNaRoda.Ndroid.Data
         public int CurrentPageValue { get; set; }
         private bool IsBusy { get; set; }
         public event Action<ItemListViewModel> OnItemFetched;
+        public event Action OnEmptyList;
 
-        public ItemsLoader(Context context, UserRepository userRepository, ItemRestService itemRestService, int itemsPerPage, Filter filter)
+        public ItemsLoader(Context context, UserRepository userRepository, ItemRestService itemRestService, int itemsPerPage,
+            Filter filter)
         {
             _itemRestService = itemRestService;
             _filter = filter;
@@ -63,9 +65,14 @@ namespace BotaNaRoda.Ndroid.Data
                 }
                 else
                 {
-                    loaded = _itemRestService.GetMyItemsAsync(userInfo.Latitude, userInfo.Longitude, 10000, CurrentPageValue, ItemsPerPage).Result;
+                    loaded = _itemRestService.GetUserItems(userInfo.Id, userInfo.Latitude, userInfo.Longitude, 10000, CurrentPageValue, ItemsPerPage).Result;
                 }
                 var itemListViewModels = loaded as ItemListViewModel[] ?? loaded.ToArray();
+
+                if (itemListViewModels.Length == 0 && OnEmptyList != null)
+                {
+                    OnEmptyList();    
+                }
 
                 itemListViewModels = itemListViewModels.Where(x => Items.All(y => y.Id != x.Id)).ToArray();
 
@@ -74,7 +81,7 @@ namespace BotaNaRoda.Ndroid.Data
                 CanLoadMoreItems = (itemListViewModels.Length != 0 &&
                     ItemsPerPage == itemListViewModels.Length);
 
-				Parallel.ForEach(itemListViewModels.ToList(), (item) =>
+				await Parallel.ForEach(itemListViewModels.ToList(), (item) =>
                 {
 					cancellationToken.ThrowIfCancellationRequested();
                     var img = Picasso.With(_context).Load(item.ThumbImage.Url).Get();
@@ -87,7 +94,7 @@ namespace BotaNaRoda.Ndroid.Data
                 });
 
                 IsBusy = false;
-            });
+            }, cancellationToken);
 
             return true;
         }
