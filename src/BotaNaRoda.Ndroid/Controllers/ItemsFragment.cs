@@ -37,6 +37,9 @@ namespace BotaNaRoda.Ndroid.Controllers
         private ItemsLoader _itemsLoader;
         private ItemsLoader.Filter _itemsFilter = ItemsLoader.Filter.AllItems;
 		private CancellationTokenSource _uiCancellationToken;
+        private string _locationFineProvider;
+        private string _locationCoarseProvider;
+        private bool _locationFineUsed;
 
         public override View OnCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -113,11 +116,11 @@ namespace BotaNaRoda.Ndroid.Controllers
         public override void OnResume ()
 		{
 			base.OnResume ();
-			_locMgr.RequestSingleUpdate (new Criteria {
-				Accuracy = Accuracy.Coarse,
-				PowerRequirement = Power.NoRequirement
-			}, this, null);
-        }
+            _locationFineProvider = _locMgr.GetBestProvider(GeoUtil.GetFineCriteria(), true);
+			_locMgr.RequestSingleUpdate (_locationFineProvider, this, null);
+            _locationCoarseProvider = _locMgr.GetBestProvider(GeoUtil.GetCoarseCriteria(), true);
+            _locMgr.RequestSingleUpdate(_locationCoarseProvider, this, null);
+		}
 
 		public override void OnPause ()
 		{
@@ -127,15 +130,15 @@ namespace BotaNaRoda.Ndroid.Controllers
 
         public void OnLocationChanged (Location location)
 		{
-            UpdateUserLocation(location);
-
-            var usr = _userRepository.Get();
-            usr.Latitude = location.Latitude;
-            usr.Longitude = location.Longitude;
-            _userRepository.Save(usr);
-
-            _adapter.UserLatLon = usr;
-			_adapter.NotifyDataSetChanged ();
+            if (location.Provider == _locationFineProvider)
+            {
+                UpdateUserLocation(location, true);
+                _locationFineUsed = true;
+            }
+            else if(!_locationFineUsed)
+            {
+                UpdateUserLocation(location, false);
+            }
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -189,8 +192,18 @@ namespace BotaNaRoda.Ndroid.Controllers
             });
         }
 
-        private async void UpdateUserLocation(Location location){
-			Geocoder geocdr = new Geocoder(Activity);
+        private async void UpdateUserLocation(Location location, bool isPrecise)
+        {
+            var usr = _userRepository.Get();
+            usr.Latitude = location.Latitude;
+            usr.Longitude = location.Longitude;
+            usr.IsPreciseLocation = isPrecise;
+            _userRepository.Save(usr);
+
+            _adapter.UserLatLon = usr;
+            _adapter.NotifyDataSetChanged();
+
+            Geocoder geocdr = new Geocoder(Activity);
 			var addr = (await geocdr.GetFromLocationAsync(location.Latitude, location.Longitude, 1)).FirstOrDefault();
 			if (addr != null) {
 				await _itemService.PostUserLocalization(new UserLocalizationBindingModel

@@ -24,6 +24,7 @@ namespace BotaNaRoda.Ndroid.Data
         public string AccessToken { get; set; }
         public string IdentityToken { get; set; }
         public string RefreshToken { get; set; }
+        public bool IsPreciseLocation { get; set; }
 
         public User()
         {

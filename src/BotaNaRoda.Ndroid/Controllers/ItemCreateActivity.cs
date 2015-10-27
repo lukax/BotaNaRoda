@@ -21,6 +21,7 @@ using AlertDialog = Android.App.AlertDialog;
 using Android.Views;
 using Android.Database;
 using BotaNaRoda.Ndroid.Controllers.Services;
+using BotaNaRoda.Ndroid.Util;
 using Newtonsoft.Json;
 
 namespace BotaNaRoda.Ndroid.Controllers
@@ -40,6 +41,9 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    private ItemRestService _itemService;
 	    private ViewHolder _holder;
         private readonly Dictionary<int, Uri> _captureCodeImageUrlDictionary = new Dictionary<int, Uri>(3);
+	    private string _locationFineProvider;
+	    private string _locationCoarseProvider;
+	    private bool _isFineLocationUsed;
 
 	    protected override void OnCreate (Bundle bundle)
 		{
@@ -73,11 +77,10 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    protected override void OnResume()
 	    {
 	        base.OnResume();
-            _locMgr.RequestSingleUpdate(new Criteria
-            {
-                Accuracy = Accuracy.Coarse,
-                PowerRequirement = Power.NoRequirement
-            }, this, null);
+            _locationFineProvider = _locMgr.GetBestProvider(GeoUtil.GetFineCriteria(), true);
+            _locMgr.RequestSingleUpdate(_locationFineProvider, this, null);
+            _locationCoarseProvider = _locMgr.GetBestProvider(GeoUtil.GetCoarseCriteria(), true);
+            _locMgr.RequestSingleUpdate(_locationCoarseProvider, this, null);
         }
 
         protected override void OnPause()
@@ -142,7 +145,15 @@ namespace BotaNaRoda.Ndroid.Controllers
 
 		public void OnLocationChanged (Location location)
 		{
-			_currentLocation = location;
+		    if (location.Provider == _locationFineProvider)
+		    {
+		        _currentLocation = location;
+		        _isFineLocationUsed = true;
+		    }
+		    else if(!_isFineLocationUsed)
+		    {
+		        _currentLocation = location;
+		    }
 		}
 
 		public void OnProviderDisabled (string provider)
@@ -160,21 +171,17 @@ namespace BotaNaRoda.Ndroid.Controllers
 	    private async void _saveButton_Click (object sender, EventArgs e)
 		{
 			if (_currentLocation == null) {
-				Toast.MakeText (this, "Por favor ligue o GPS", ToastLength.Long).Show();
+				Toast.MakeText (this, "Não foi possível obter dados do GPS :(", ToastLength.Long).Show();
 				return;
 			}
 
 		 	var locationDialog = ProgressDialog.Show (this, "", "Obtendo localização...");
-			int attempts = 0;
-			while (_address == null && attempts < 10) {
-				Geocoder geocdr = new Geocoder(this);
-				_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
-				attempts++;
-			}
+			Geocoder geocdr = new Geocoder(this);
+			_address = (await geocdr.GetFromLocationAsync(_currentLocation.Latitude, _currentLocation.Longitude, 1)).FirstOrDefault();
 			locationDialog.Cancel(); 
 
 			if (_address == null) {
-				Toast.MakeText (this, "Não foi possível obter localização", ToastLength.Short).Show();
+				Toast.MakeText (this, "Não foi possível obter localização :(", ToastLength.Short).Show();
 				return;
 			}
             if (!_imageTaken)

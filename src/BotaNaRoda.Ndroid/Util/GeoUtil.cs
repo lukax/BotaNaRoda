@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using Android.App;
@@ -16,6 +17,24 @@ namespace BotaNaRoda.Ndroid.Util
 {
     public static class GeoUtil
     {
+        public static Criteria GetFineCriteria()
+        {
+            var criteria = new Criteria();
+            criteria.AltitudeRequired = false;
+            criteria.BearingRequired = false;
+            criteria.CostAllowed = false;
+            criteria.PowerRequirement = Power.Low;
+            criteria.Accuracy = Accuracy.Fine;
+            return criteria;
+        }
+
+        public static Criteria GetCoarseCriteria()
+        {
+            var criteria = GetFineCriteria();
+            criteria.Accuracy = Accuracy.Coarse;
+            return criteria;
+        }
+
         public static string DistanceTo(this ILatLon loc1, ILatLon loc2)
         {
 			if ((loc1 == null || loc2 == null) ||
@@ -24,13 +43,6 @@ namespace BotaNaRoda.Ndroid.Util
 				return "";
 			}
             return string.Format("{0:0,0.000}m", DistanceTo(loc1.Latitude, loc1.Longitude, loc2.Latitude, loc2.Longitude));
-        }
-
-
-        public enum DistanceUnit
-        {
-            Kilometer,
-            Mile
         }
 
         public static double DistanceTo(double lat1, double lon1, double lat2, double lon2, DistanceUnit unit = DistanceUnit.Kilometer)
@@ -55,6 +67,12 @@ namespace BotaNaRoda.Ndroid.Util
             }
 
             return dist;
+        }
+
+        public enum DistanceUnit
+        {
+            Kilometer,
+            Mile
         }
 
     }
